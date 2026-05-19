@@ -2,17 +2,16 @@
 
 ## Objective
 
-Start Slice 1 — Tooling and package boundary enforcement. The goal is to make package boundaries executable before any product logic is added.
+Start Slice 2 — Shared contracts foundation. The goal is to define the first platform-agnostic TypeScript contracts that the API, client, and future app implementation can share safely.
 
 ## Expected Files To Change
 
-- root ESLint/config files as needed
-- root `package.json` scripts if boundary commands are added
-- package-level config only where required
-- CI workflow only if a new verification command is introduced
-- documentation only for boundary rule clarifications
+- `packages/shared/src/**`
+- `packages/shared/package.json` if test scripts or lightweight validation tooling are added
+- package tests for shared contracts if introduced
+- documentation only if contract decisions need clarification
 
-No app features, Expo initialization, API routes, or product schemas should be added in this slice.
+No app features, Expo initialization, FastAPI business endpoints, UI screens, or real sync/AI implementation should be added in this slice.
 
 ## Commands To Run
 
@@ -23,22 +22,20 @@ pnpm test
 pnpm build
 ```
 
-If a boundary-specific command is added, run it locally and add it to CI.
-
 ## Definition Of Done
 
-- `packages/shared` is protected from React, React Native, Expo, DOM/browser APIs, Node-only APIs, app imports, UI imports, and API client imports.
-- packages cannot import from `apps/*`.
-- lint/typecheck/test/build pass.
-- CI runs the same baseline checks.
-- no product logic is introduced.
+- `@synapse/shared` exports initial domain/API contract types without platform imports.
+- API envelope, error envelope, pagination, and sync DTO placeholders are represented.
+- runtime validation approach is chosen only if it stays lightweight.
+- package boundary linting remains green.
+- no product flow is implemented.
 
 ## Risks
 
-- ESLint config can become too broad and block valid package internals.
-- TypeScript path aliases can mask invalid dependency edges if lint rules are weak.
-- Adding too much tooling at once can slow the repo before implementation starts.
+- Contracts can become too broad before feature code proves the shape.
+- Runtime validation dependencies can add weight too early.
+- Shared contracts may accidentally encode platform/runtime assumptions.
 
 ## Rollback Notes
 
-Revert only the boundary tooling/config changes from Slice 1. Do not alter the Wave 1/Wave 2 architecture docs or the monorepo scaffold unless the config change directly requires it.
+Revert only the shared contract files and any Slice 2 validation/test additions. Keep Slice 1 ESLint and boundary enforcement intact.

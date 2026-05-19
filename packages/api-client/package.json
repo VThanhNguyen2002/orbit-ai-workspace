@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "lint": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "echo \"No tests yet for @synapse/api-client\"",
     "build": "tsc -p tsconfig.json"

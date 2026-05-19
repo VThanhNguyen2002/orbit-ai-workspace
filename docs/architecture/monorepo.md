@@ -103,12 +103,15 @@ ESLint will enforce these boundaries with `no-restricted-imports` plus dependenc
 - Forbidden: `packages/shared` imports `react-native` or `fs`; `packages/ui` imports `@synapse/api-client`; any package imports from `apps/*`.
 - Package manifests must match the boundary graph so undeclared cross-package imports are caught during install, lint, and typecheck.
 
+Slice 1 implements this with a root `eslint.config.js` flat config and package-level `lint` scripts. The initial enforcement uses restricted imports and globals first; heavier dependency graph tooling can be added later only if the lightweight checks miss real violations.
+
 CI fails on boundary violations. The baseline CI contract is:
 
 - `pnpm lint` runs ESLint restricted-import and dependency-boundary checks.
 - `pnpm typecheck` validates TypeScript project references and path aliases.
 - `pnpm test` runs package/app tests once they exist.
-- Pull requests cannot merge if lint, typecheck, tests, or boundary checks fail.
+- `pnpm build` verifies package build outputs.
+- Pull requests cannot merge if lint, typecheck, tests, build, or boundary checks fail.
 
 Future implementation should keep this lightweight: ESLint restricted imports, TypeScript project references, CI enforcement, and dependency graph constraints are the source of truth. Add custom scripts only if the standard tooling misses a real violation.
 
@@ -208,9 +211,9 @@ The implementation details for boundary checks live in the Platform-Agnostic Enf
 | Mechanism | What It Catches | When |
 |-----------|----------------|------|
 | ESLint restricted imports | Platform leaks and forbidden package imports | Dev time and CI |
-| Dependency boundary rules | Imports that violate the package graph | Dev time and CI |
+| Package manifest discipline | Workspace dependencies that drift from the allowed graph | Install and review time |
 | TypeScript project references | Type-level package boundaries and path alias correctness | `pnpm typecheck` |
-| CI lint/typecheck/test jobs | Any committed violation of the baseline contract | Every PR |
+| CI lint/typecheck/test/build jobs | Any committed violation of the baseline contract | Every PR |
 
 
 ## Tradeoffs
