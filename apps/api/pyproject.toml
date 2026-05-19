@@ -1,0 +1,11 @@
+[project]
+name = "synapse-api"
+version = "0.0.0"
+description = "FastAPI backend for Synapse."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1.0"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

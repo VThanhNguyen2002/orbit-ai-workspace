@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@synapse/shared": ["packages/shared/src/index.ts"],
+      "@synapse/shared/*": ["packages/shared/src/*"],
+      "@synapse/api-client": ["packages/api-client/src/index.ts"],
+      "@synapse/api-client/*": ["packages/api-client/src/*"],
+      "@synapse/ui": ["packages/ui/src/index.ts"],
+      "@synapse/ui/*": ["packages/ui/src/*"]
+    }
+  }
+}
