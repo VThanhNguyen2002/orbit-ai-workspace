@@ -4,6 +4,34 @@
 
 Synapse uses a local persistence layer to enable offline-first behavior. All user content (notes, tasks, voice memo metadata, transcripts, summaries) is stored locally so the app is fully functional without network access. This document defines the storage engine, schema design, data lifecycle, and integration with the sync system.
 
+## Wave 2 Implementation Contract
+
+Local persistence is the write path for user content. Network calls follow local writes; they do not gate the UI.
+
+| Surface | Responsibility |
+|---------|----------------|
+| WatermelonDB entity tables | Notes, tasks, voice memo metadata, transcripts, summaries, sync-visible fields |
+| Sync operations | Durable queue entries with operation id, entity type, payload, retry count, and status |
+| Conflict records | Local-only records used when version conflicts cannot be auto-merged |
+| Temporary files | Voice memo audio before upload only; never stored as database blobs |
+| Secure storage | Refresh token and auth session metadata only, not user content |
+
+Implementation rules:
+
+- Entity schemas live with the local database adapter and mirror shared/server field names where practical.
+- Validation rules live in `@synapse/shared`; local writes should validate before enqueueing sync operations.
+- Local IDs are stable immediately; `server_id` is filled after the first successful push.
+- Logout clears local entity tables, sync queue, conflict records, cached timestamps, and temporary audio files.
+- Failed migrations may trigger full local reset and pull sync, but only after preserving unsynced operations when possible.
+
+Required tests before depending on this layer:
+
+- create/read/update/delete locally without network
+- queue survives app restart
+- `server_id` backfill after create sync
+- logout clears local data
+- migration from version N to N+1 preserves sample data
+
 ## Storage Engine
 
 ### Decision: WatermelonDB on SQLite
@@ -12,7 +40,7 @@ Synapse uses a local persistence layer to enable offline-first behavior. All use
 |-------------------|---------|--------|
 | WatermelonDB | **Selected** | Built for React Native offline-first apps; lazy-loading, observable queries, built-in sync primitives |
 | Raw SQLite (expo-sqlite) | Rejected | Too low-level; would need to build observable queries and sync layer from scratch |
-| MMKV | Rejected | Key-value only; no relational queries, no schema enforcement |
+| MMKV | Not selected for entity persistence | Optional lightweight key-value storage only for small UI/session metadata |
 | Realm | Rejected | Heavy runtime, proprietary sync protocol conflicts with Supabase |
 | PouchDB | Rejected | CouchDB-oriented sync; doesn't align with Supabase PostgreSQL backend |
 
@@ -26,16 +54,16 @@ Synapse uses a local persistence layer to enable offline-first behavior. All use
 ### Web Adapter
 
 - **Mobile:** Native SQLite via `@nozbe/watermelondb/adapters/sqlite`
-- **Web:** `@nozbe/watermelondb/adapters/lokijs` (LokiJS in-memory with IndexedDB persistence)
+- **Web:** `@nozbe/watermelondb/adapters/lokijs` with browser persistence underneath
 
-This means web users also get offline support, though with slightly different performance characteristics (IndexedDB is slower than native SQLite for large datasets).
+This means web users also get offline support, though with slightly different performance characteristics than native SQLite for large datasets.
 
 ## Local Schema
 
 The local schema mirrors the server-side data model but with additional sync-specific fields managed by WatermelonDB.
 
 ```typescript
-// packages/shared/src/local-schema/schema.ts
+// apps/mobile/src/persistence/schema.ts
 import { appSchema, tableSchema } from '@nozbe/watermelondb';
 
 export const schema = appSchema({
@@ -231,7 +259,7 @@ A heavy user with 1,000 notes, 2,000 tasks, 500 transcripts, and 500 summaries w
 WatermelonDB supports schema migrations. When the local schema changes:
 
 ```typescript
-// packages/shared/src/local-schema/migrations.ts
+// apps/mobile/src/persistence/migrations.ts
 import { schemaMigrations, addColumns } from '@nozbe/watermelondb/Schema/migrations';
 
 export const migrations = schemaMigrations({
@@ -265,7 +293,7 @@ export const migrations = schemaMigrations({
 | Separate local and server IDs | Offline creation without server round-trip | Extra mapping logic in sync layer |
 | LokiJS adapter for web | Web offline support | Slower than native SQLite; entire DB in memory |
 | No local encryption (Phase 1) | Simpler implementation | Relies on OS-level device security |
-| Schema in `@synapse/shared` | Single source of truth for local schema | Must keep in sync with server data model manually |
+| Validation in `@synapse/shared`, WatermelonDB schema in app adapter | Keeps shared package platform-agnostic while preserving shared validation | Local schema must be kept aligned with shared/server contracts |
 
 ## Assumptions
 

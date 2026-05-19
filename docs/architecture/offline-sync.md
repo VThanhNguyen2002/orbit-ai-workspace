@@ -13,7 +13,7 @@ graph TB
     subgraph Client
         UI["UI Layer"]
         Store["Zustand Store"]
-        Local["Local Persistence<br/>(MMKV / IndexedDB)"]
+        Local["Local Persistence<br/>(WatermelonDB)"]
         Queue["Sync Queue"]
         Detector["Connectivity Detector"]
     end
@@ -194,10 +194,11 @@ Realtime handles the "other device edited something while I'm looking at it" cas
 
 | Platform | Technology | Purpose |
 |----------|-----------|---------|
-| Mobile | MMKV (react-native-mmkv) | Fast key-value store for entities + sync queue |
-| Web | IndexedDB (via idb) | Structured storage with good capacity |
+| Mobile | WatermelonDB on SQLite | Entity tables, sync queue, conflict records, local reads/writes |
+| Web | WatermelonDB web adapter using IndexedDB-backed persistence | Same app persistence model with browser storage underneath |
+| Optional key-value | MMKV or equivalent | Small UI/session metadata only, not primary entity persistence |
 
-Both stores use the same abstract `LocalStore` interface from `@synapse/shared`:
+The persistence adapter exposes app-level repository operations from `apps/mobile`; shared validation and sync payload types live in `@synapse/shared`:
 
 ```typescript
 interface LocalStore {
@@ -210,7 +211,7 @@ interface LocalStore {
 }
 ```
 
-Platform-specific implementations live in `apps/mobile/services/`. The interface lives in `@synapse/shared`.
+Platform-specific implementations live in `apps/mobile`. `@synapse/shared` stays platform-agnostic and does not import local persistence libraries, React Native, Expo, browser APIs, or Node-only APIs.
 
 ## Connectivity Detection
 

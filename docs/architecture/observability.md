@@ -4,6 +4,31 @@
 
 Synapse uses structured logging, request tracing, error classification, and performance monitoring to maintain visibility into system health. Phase 1 focuses on actionable observability — no dashboards for dashboards' sake.
 
+## Wave 2 Implementation Contract
+
+Observability must explain user-impacting failures without exposing user content.
+
+| Signal | Owner | Minimum Fields |
+|--------|-------|----------------|
+| API request log | FastAPI middleware | `request_id`, method, path, status, duration_ms, user_id when authenticated |
+| API error log | Exception handler | `request_id`, error_code, error_category, safe_message, status |
+| Sync event | Sync service/client | operation_count, applied_count, conflict_count, failed_count, duration_ms |
+| AI event | AI service | provider, model, operation, token_count if available, duration_ms, outcome |
+| Client error | Mobile app | app_version, platform, route/screen, request_id when tied to API |
+
+Privacy rules:
+
+- Never log note content, task descriptions, transcript text, summary text, prompts, embeddings, JWTs, refresh tokens, or audio paths containing raw user data.
+- Use `user_id` for correlation; do not send email addresses to logs or Sentry.
+- Request bodies are scrubbed before Sentry capture.
+- User-facing errors include `request_id` so support can correlate without asking for private content.
+
+Operational gates:
+
+- CI must keep lint/typecheck/test green before observability code lands.
+- API integration tests assert the standard error envelope includes `request_id`.
+- Sync tests assert failures are classified as retryable, conflict, validation, or terminal.
+
 ## Observability Stack
 
 | Layer | Tool | Purpose |

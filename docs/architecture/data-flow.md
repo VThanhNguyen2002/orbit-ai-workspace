@@ -4,6 +4,29 @@
 
 This document traces how data moves through Synapse for every major operation. It covers the online path, offline path, AI processing pipeline, and real-time update propagation. Each flow references the authoritative docs: [api-contract.md](api-contract.md), [offline-sync.md](offline-sync.md), [ai-integration.md](ai-integration.md).
 
+## Wave 2 Flow Contract
+
+All feature work should preserve this order of operations:
+
+1. Validate input locally with shared schemas when available.
+2. Write the local WatermelonDB record and sync operation in the same logical action.
+3. Render from local state immediately.
+4. Push queued operations when authenticated connectivity is available.
+5. Pull server changes after reconnect and before processing stale local operations.
+6. Reconcile by `server_id`, `version`, `updated_at`, and soft-delete state.
+7. Surface terminal failures with a retry path and a `request_id` when the API was involved.
+
+Cross-cutting requirements:
+
+| Concern | Rule |
+|---------|------|
+| Auth | Sync and API flows refresh tokens before network writes |
+| Idempotency | Every queued operation carries a stable operation id |
+| Realtime | Realtime events update local state, not UI state directly |
+| AI | AI provider calls happen only in the backend and stream via SSE |
+| Voice memos | Metadata syncs like other entities; audio uploads are file-transfer operations |
+| Observability | API and sync errors carry safe categories and request ids |
+
 ## Flow 1: Create Note (Online)
 
 ```mermaid

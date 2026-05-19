@@ -96,8 +96,8 @@ Every phase has concrete, measurable criteria. A phase is not complete until all
 - [ ] Empty/irrelevant queries return empty results (no crashes)
 
 ### Local Persistence
-- [ ] MMKV (mobile) stores and retrieves entities correctly
-- [ ] IndexedDB (web) stores and retrieves entities correctly
+- [ ] WatermelonDB stores and retrieves entities correctly on mobile
+- [ ] WatermelonDB web adapter stores and retrieves entities correctly
 - [ ] Last sync timestamp persisted and used for delta sync
 - [ ] Local store cleared on logout
 

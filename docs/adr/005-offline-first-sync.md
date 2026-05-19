@@ -74,7 +74,7 @@ For a single user on multiple devices:
 
 ### Mitigations
 - Sync logic lives in `@synapse/shared` — tested independently of UI
-- Queue persistence uses battle-tested local storage (MMKV, IndexedDB)
+- Queue persistence uses the selected WatermelonDB local persistence layer
 - Integration tests mock connectivity toggling
 - ConflictRecord tracks all resolutions for debugging
 

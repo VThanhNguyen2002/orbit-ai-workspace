@@ -76,7 +76,7 @@ Make the app useful without internet. Add semantic search so users can find cont
 ### Milestones
 
 #### Week 7–8: Offline Sync
-- Implement local persistence (MMKV on mobile, IndexedDB on web)
+- Implement WatermelonDB local persistence (SQLite on mobile, web adapter with browser persistence)
 - Build sync queue with FIFO processing
 - Implement connectivity detection
 - Build pull sync endpoint (`/v1/sync/pull`)
@@ -110,7 +110,7 @@ Make the app useful without internet. Add semantic search so users can find cont
 |------|--------|------------|
 | Sync queue corruption on app crash | High — data loss | Write-ahead logging: persist queue state before processing |
 | pgvector performance at scale | Low (small dataset) — but design for it | IVFFlat index, limit embeddings per user |
-| IndexedDB storage limits on web | Low — text is small | Monitor storage usage, warn at 80% capacity |
+| Browser storage limits on web | Low — text is small | Monitor WatermelonDB web adapter storage usage, warn at 80% capacity |
 | Conflict resolution UX complexity | Medium — confusing UI | Keep it simple: show diff, offer 3 options (keep mine, keep theirs, merge) |
 
 ---

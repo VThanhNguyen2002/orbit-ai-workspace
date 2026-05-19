@@ -4,6 +4,32 @@
 
 Synapse delegates authentication to Supabase Auth and enforces data isolation through PostgreSQL Row-Level Security (RLS). The backend (FastAPI) validates JWTs but never stores credentials. This document defines the auth flow, RLS policy design, and security boundaries.
 
+## Wave 2 Implementation Contract
+
+Auth is implemented as a narrow boundary:
+
+- `apps/mobile` owns sign-in, sign-out, token refresh, and secure refresh-token storage.
+- `apps/api` owns bearer-token validation and maps the JWT `sub` claim to `current_user.user_id`.
+- Supabase Postgres owns data isolation through RLS; API code must still include `user_id` filters for clarity and defense in depth.
+- Service-role access is migration/admin-only unless a background job is explicitly documented and scoped by `user_id`.
+
+Minimum enforcement before feature work:
+
+| Area | Requirement |
+|------|-------------|
+| API auth | Every `/v1/*` route except `/v1/health` depends on `get_current_user` |
+| RLS | Every user-owned table has `SELECT`, `INSERT`, `UPDATE`, and soft-delete policies |
+| Storage | Voice memo object paths start with `{user_id}/` and bucket policies verify that prefix |
+| Tests | API tests cover unauthenticated access, cross-user reads, cross-user writes, and storage path rejection |
+| Logs | Auth failures log `request_id` and reason category, never token contents or email addresses |
+
+Implementation order:
+
+1. Create tables with `user_id`, `version`, timestamps, and `is_deleted` where applicable.
+2. Enable RLS in the same migration that creates each user-owned table.
+3. Add route dependencies and repository helpers that require `current_user`.
+4. Add tests proving user A cannot read or mutate user B data through the API or direct Supabase client.
+
 ## Authentication Flow
 
 ### Client-Side (Expo / React Native Web)

@@ -198,7 +198,7 @@ interface SyncOperation {
 }
 ```
 
-Stored in local persistence (MMKV on mobile, IndexedDB on web). Processed FIFO when connectivity is available.
+Stored in WatermelonDB-backed local persistence alongside entity tables. Processed FIFO when connectivity is available.
 
 ### ConflictRecord
 

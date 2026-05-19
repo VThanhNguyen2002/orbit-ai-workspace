@@ -140,11 +140,11 @@ No other secrets on the client. All AI operations go through the backend.
 
 ### Local Persistence Threat Model
 
-Data stored locally (MMKV on mobile, IndexedDB on web) is not encrypted at rest by default.
+Data stored locally in WatermelonDB (SQLite on mobile, web adapter storage in the browser) is not encrypted at rest by default.
 
 **Accepted risk for Phase 1:** Local storage relies on OS-level device security (device lock, encryption). This is the same security model as most mobile apps (including banking apps).
 
-**Phase 2 consideration:** Encrypt sensitive fields (note content, task descriptions) before writing to local storage using a key derived from the user's auth session.
+**Phase 2 consideration:** Encrypt sensitive fields (note content, task descriptions) before writing to local persistence using a key derived from the user's auth session.
 
 ### What's Stored Locally
 
@@ -164,7 +164,7 @@ Data stored locally (MMKV on mobile, IndexedDB on web) is not encrypted at rest 
 
 - **Mobile:** `expo-secure-store` (Keychain on iOS, Keystore on Android)
 - **Web:** `httpOnly` cookie or in-memory (Supabase handles this)
-- Never in localStorage, never in MMKV, never in IndexedDB
+- Never in localStorage, browser persistence, key-value stores, or WatermelonDB entity tables
 
 ## Data Deletion
 
