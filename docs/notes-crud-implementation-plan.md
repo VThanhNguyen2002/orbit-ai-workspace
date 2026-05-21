@@ -35,8 +35,9 @@ offline-first sync.
 | `version` | non-negative integer | Optimistic concurrency |
 | `sync_metadata` | optional local metadata | Client/local only; not required from backend responses |
 
-Contract gap: `NoteSchema` covers full entities, but dedicated request/response
-schemas for create, update, list, and delete are not implemented yet.
+Slice 6A added dedicated shared request/response schemas for create, update,
+get, list, and delete. Backend routes and API client note methods remain
+deferred.
 
 ## API Endpoint Plan
 
@@ -120,8 +121,8 @@ Soft delete should set:
 - `updated_at: <server timestamp>`
 - `version: version + 1`
 
-Deletion should also require version conflict protection. Slice 6A should decide
-whether the version travels in the request body or as a query/header parameter.
+Deletion also requires version conflict protection. Slice 6A chose a request
+body shape with `version`.
 
 ## Backend Structure Plan
 
@@ -140,14 +141,17 @@ errors that the global handler converts to the standard error envelope.
 
 ## Shared Contract Impact
 
-Slice 6A should add or confirm these shared schemas before backend code:
+Slice 6A added these shared schemas before backend code:
 
 - `CreateNoteRequestSchema`
 - `UpdateNoteRequestSchema`
-- `DeleteNoteRequestSchema` or equivalent version-bearing delete contract
-- `NoteResponseSchema`
+- `DeleteNoteRequestSchema`
+- `CreateNoteResponseSchema`
+- `UpdateNoteResponseSchema`
+- `DeleteNoteResponseSchema`
+- `GetNoteResponseSchema`
+- `ListNotesRequestSchema`
 - `ListNotesResponseSchema`
-- `NoteListQuerySchema` if pagination needs note-specific filters
 
 Rules:
 

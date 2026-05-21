@@ -40,6 +40,9 @@ The backend validates the JWT against Supabase's JWT secret. The `sub` claim bec
 | DELETE | `/v1/notes/{note_id}` | Soft delete note |
 | POST | `/v1/notes/{note_id}/summarize` | Trigger AI summarization (SSE) |
 
+`GET /v1/notes` uses the exported `ListNotesResponseSchema` shape:
+`data.items` for note rows and `data.pagination` for pagination metadata.
+
 ### Tasks
 
 | Method | Path | Description |
@@ -265,18 +268,18 @@ Example — Note creation schema:
 // @synapse/shared/src/validation/note.ts
 import { z } from 'zod';
 
-export const CreateNoteSchema = z.object({
+export const CreateNoteRequestSchema = z.object({
   title: z.string().min(1).max(500),
   content: z.string().max(50_000).default(''),
   content_type: z.enum(['plain', 'markdown']).default('plain'),
 });
 
-export const UpdateNoteSchema = z.object({
+export const UpdateNoteRequestSchema = z.object({
   title: z.string().min(1).max(500).optional(),
   content: z.string().max(50_000).optional(),
   content_type: z.enum(['plain', 'markdown']).optional(),
   is_archived: z.boolean().optional(),
-  version: z.number().int().positive(),  // Required for optimistic concurrency
+  version: z.number().int().nonnegative(),  // Required for optimistic concurrency
 });
 ```
 

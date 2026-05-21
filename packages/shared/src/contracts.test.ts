@@ -5,6 +5,10 @@ import {
   AiStreamEventSchema,
   ApiErrorEnvelopeSchema,
   ConflictResolutionStrategySchema,
+  CreateNoteRequestSchema,
+  DeleteNoteRequestSchema,
+  ListNotesRequestSchema,
+  ListNotesResponseSchema,
   NoteSchema,
   PaginationRequestSchema,
   SemanticSearchRequestSchema,
@@ -14,6 +18,7 @@ import {
   SyncPushRequestSchema,
   SyncPullResponseSchema,
   TaskStatusSchema,
+  UpdateNoteRequestSchema,
 } from "./index";
 
 const user_id = "11111111-1111-4111-8111-111111111111";
@@ -77,6 +82,149 @@ describe("shared contract schemas", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("parses a valid create note request with defaults", () => {
+    expect(
+      CreateNoteRequestSchema.parse({
+        title: "Planning note",
+      }),
+    ).toEqual({
+      title: "Planning note",
+      content: "",
+      content_type: "plain",
+    });
+
+    expect(
+      CreateNoteRequestSchema.parse({
+        title: "Planning note",
+        content: "Decisions and follow-up items.",
+        content_type: "markdown",
+      }),
+    ).toEqual({
+      title: "Planning note",
+      content: "Decisions and follow-up items.",
+      content_type: "markdown",
+    });
+  });
+
+  it("rejects server-controlled fields in create note requests", () => {
+    const result = CreateNoteRequestSchema.safeParse({
+      id: note_id,
+      user_id,
+      title: "Planning note",
+      content: "Decisions and follow-up items.",
+      content_type: "markdown",
+      is_archived: false,
+      is_deleted: false,
+      created_at: timestamp,
+      updated_at: timestamp,
+      deleted_at: null,
+      version: 1,
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("requires version for update note requests", () => {
+    expect(
+      UpdateNoteRequestSchema.parse({
+        title: "Updated title",
+        version: 1,
+      }),
+    ).toEqual({
+      title: "Updated title",
+      version: 1,
+    });
+
+    expect(
+      UpdateNoteRequestSchema.safeParse({
+        title: "Updated title",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("requires version for delete note requests", () => {
+    expect(DeleteNoteRequestSchema.parse({ version: 1 })).toEqual({
+      version: 1,
+    });
+
+    expect(DeleteNoteRequestSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("parses note list pagination and filters", () => {
+    expect(ListNotesRequestSchema.parse({})).toEqual({
+      page: 1,
+      per_page: 20,
+      sort: "updated_at",
+      order: "desc",
+      include_deleted: false,
+    });
+
+    expect(
+      ListNotesRequestSchema.parse({
+        page: 2,
+        per_page: 25,
+        sort: "title",
+        order: "asc",
+        is_archived: true,
+        include_deleted: true,
+      }),
+    ).toEqual({
+      page: 2,
+      per_page: 25,
+      sort: "title",
+      order: "asc",
+      is_archived: true,
+      include_deleted: true,
+    });
+  });
+
+  it("parses a snake_case list notes response", () => {
+    const response = {
+      data: {
+        items: [validNote],
+        pagination: {
+          page: 1,
+          per_page: 20,
+          total: 1,
+          has_next: false,
+        },
+      },
+      meta: { request_id },
+    };
+
+    expect(ListNotesResponseSchema.parse(response)).toEqual(response);
+  });
+
+  it("rejects camelCase note CRUD contracts", () => {
+    expect(
+      CreateNoteRequestSchema.safeParse({
+        title: "Planning note",
+        contentType: "markdown",
+      }).success,
+    ).toBe(false);
+
+    expect(
+      ListNotesRequestSchema.safeParse({
+        includeDeleted: true,
+      }).success,
+    ).toBe(false);
+
+    expect(
+      ListNotesResponseSchema.safeParse({
+        data: {
+          items: [validNote],
+          pagination: {
+            page: 1,
+            perPage: 20,
+            total: 1,
+            hasNext: false,
+          },
+        },
+        meta: { requestId: request_id },
+      }).success,
+    ).toBe(false);
   });
 
   it("parses an API error envelope", () => {

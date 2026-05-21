@@ -1,11 +1,14 @@
 import { z } from "zod";
 
 import {
+  createApiSuccessEnvelopeSchema,
   EntityIdSchema,
   IsoTimestampSchema,
   JsonObjectSchema,
   NonNegativeIntegerSchema,
   NullableIsoTimestampSchema,
+  PaginationMetaSchema,
+  PaginationRequestSchema,
 } from "../common/index.js";
 
 export const SyncMetadataSchema = z.strictObject({
@@ -42,6 +45,48 @@ export const NoteSchema = z.strictObject({
   is_archived: z.boolean(),
   is_deleted: z.boolean(),
 });
+
+export const CreateNoteRequestSchema = z.strictObject({
+  title: z.string().min(1).max(500),
+  content: z.string().max(50_000).default(""),
+  content_type: NoteContentTypeSchema.default("plain"),
+});
+
+export const CreateNoteResponseSchema =
+  createApiSuccessEnvelopeSchema(NoteSchema);
+
+export const UpdateNoteRequestSchema = z.strictObject({
+  title: z.string().min(1).max(500).optional(),
+  content: z.string().max(50_000).optional(),
+  content_type: NoteContentTypeSchema.optional(),
+  is_archived: z.boolean().optional(),
+  version: NonNegativeIntegerSchema,
+});
+
+export const UpdateNoteResponseSchema =
+  createApiSuccessEnvelopeSchema(NoteSchema);
+
+export const DeleteNoteRequestSchema = z.strictObject({
+  version: NonNegativeIntegerSchema,
+});
+
+export const DeleteNoteResponseSchema =
+  createApiSuccessEnvelopeSchema(NoteSchema);
+
+export const GetNoteResponseSchema = createApiSuccessEnvelopeSchema(NoteSchema);
+
+export const ListNotesRequestSchema = PaginationRequestSchema.extend({
+  is_archived: z.boolean().optional(),
+  include_deleted: z.boolean().default(false),
+});
+
+export const ListNotesDataSchema = z.strictObject({
+  items: z.array(NoteSchema),
+  pagination: PaginationMetaSchema,
+});
+
+export const ListNotesResponseSchema =
+  createApiSuccessEnvelopeSchema(ListNotesDataSchema);
 
 export const TaskStatusSchema = z.enum([
   "todo",
@@ -130,6 +175,15 @@ export type SyncMetadata = z.infer<typeof SyncMetadataSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type NoteContentType = z.infer<typeof NoteContentTypeSchema>;
 export type Note = z.infer<typeof NoteSchema>;
+export type CreateNoteRequest = z.infer<typeof CreateNoteRequestSchema>;
+export type CreateNoteResponse = z.infer<typeof CreateNoteResponseSchema>;
+export type UpdateNoteRequest = z.infer<typeof UpdateNoteRequestSchema>;
+export type UpdateNoteResponse = z.infer<typeof UpdateNoteResponseSchema>;
+export type DeleteNoteRequest = z.infer<typeof DeleteNoteRequestSchema>;
+export type DeleteNoteResponse = z.infer<typeof DeleteNoteResponseSchema>;
+export type GetNoteResponse = z.infer<typeof GetNoteResponseSchema>;
+export type ListNotesRequest = z.infer<typeof ListNotesRequestSchema>;
+export type ListNotesResponse = z.infer<typeof ListNotesResponseSchema>;
 export type TaskStatus = z.infer<typeof TaskStatusSchema>;
 export type TaskPriority = z.infer<typeof TaskPrioritySchema>;
 export type Task = z.infer<typeof TaskSchema>;

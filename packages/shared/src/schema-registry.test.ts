@@ -77,6 +77,12 @@ describe("contract schema registry", () => {
     const files = new Set(ContractSchemaManifest.map((entry) => entry.file));
 
     expect(files.has("domain/note.schema.json")).toBe(true);
+    expect(files.has("domain/create_note_request.schema.json")).toBe(true);
+    expect(files.has("domain/update_note_request.schema.json")).toBe(true);
+    expect(files.has("domain/delete_note_request.schema.json")).toBe(true);
+    expect(files.has("domain/get_note_response.schema.json")).toBe(true);
+    expect(files.has("domain/list_notes_request.schema.json")).toBe(true);
+    expect(files.has("domain/list_notes_response.schema.json")).toBe(true);
     expect(files.has("sync/sync_push_request.schema.json")).toBe(true);
     expect(files.has("sync/sync_pull_response.schema.json")).toBe(true);
     expect(files.has("ai/semantic_search_response.schema.json")).toBe(true);
