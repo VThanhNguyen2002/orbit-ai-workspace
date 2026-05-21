@@ -32,8 +32,25 @@ jobs:
           node-version: 22.13.0
           cache: pnpm
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: python -m pip install -e ".[dev]"
+
+      - name: API lint
+        working-directory: apps/api
+        run: python -m ruff check .
+
+      - name: API tests
+        working-directory: apps/api
+        run: python -m pytest
 
       - name: Lint
         run: pnpm lint

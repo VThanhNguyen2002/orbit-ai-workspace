@@ -1,6 +1,37 @@
 # Synapse API
 
-FastAPI backend placeholder for the Synapse service.
+FastAPI backend for the Synapse service.
+
+## Baseline Routes
+
+The API is mounted under `/v1`.
+
+- `GET /v1/health` returns the service health payload.
+- `GET /v1/version` returns service, app, and API version metadata.
+
+Both routes use the shared success envelope shape:
+
+```json
+{
+  "data": {},
+  "meta": {
+    "request_id": "req_abc123"
+  }
+}
+```
+
+Errors use the shared error envelope shape and include the same `request_id` in
+`meta.request_id`. The request id is also returned as the `X-Request-ID` header.
+
+## Local Checks
+
+From this directory:
+
+```bash
+python -m pip install -e ".[dev]"
+python -m ruff check .
+python -m pytest
+```
 
 ## Contract Bridge
 

@@ -19,7 +19,7 @@ All endpoints are prefixed with `/v1`. Version bumps only on breaking changes.
 
 ## Authentication
 
-Every request (except `/v1/health`) requires a valid Supabase JWT in the `Authorization` header.
+Every request (except `/v1/health` and `/v1/version`) requires a valid Supabase JWT in the `Authorization` header.
 
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
@@ -80,6 +80,7 @@ The backend validates the JWT against Supabase's JWT secret. The `sub` claim bec
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/v1/health` | Health check (no auth) |
+| GET | `/v1/version` | Service and API version metadata (no auth) |
 
 ## Request/Response Formats
 
