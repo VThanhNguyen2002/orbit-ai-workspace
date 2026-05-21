@@ -238,6 +238,26 @@ JSON Schema file
 Pydantic model validation
 ```
 
+### Contract Export Bridge
+
+`@synapse/shared` exports backend-consumable JSON Schema artifacts from the same
+Zod schemas used by TypeScript clients:
+
+```bash
+pnpm --filter @synapse/shared build
+pnpm --filter @synapse/shared check-schemas
+```
+
+The generated artifacts are written to `packages/shared/dist/schemas/`:
+
+- `manifest.json` lists every exported contract with a stable `$id` and file path
+- `<group>/<name>.schema.json` contains a draft-07 JSON Schema artifact
+
+FastAPI should treat these files as generated validation inputs. Future backend
+routes can load schemas by manifest entry, validate incoming request bodies and
+outgoing response payloads, then call business logic. The bridge does not create
+Pydantic models, endpoints, auth, Supabase clients, or provider integrations.
+
 Example — Note creation schema:
 
 ```typescript

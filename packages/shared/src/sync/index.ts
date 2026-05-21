@@ -7,14 +7,14 @@ import {
   JsonObjectSchema,
   NonNegativeIntegerSchema,
   RequestIdSchema,
-} from "../common";
+} from "../common/index.js";
 import {
   NoteSchema,
   SummarySchema,
   TaskSchema,
   TranscriptSchema,
   VoiceMemoSchema,
-} from "../domain";
+} from "../domain/index.js";
 
 export const SyncEntityTypeSchema = z.enum(["note", "task", "voice_memo"]);
 export const SyncOperationTypeSchema = z.enum(["create", "update", "delete"]);

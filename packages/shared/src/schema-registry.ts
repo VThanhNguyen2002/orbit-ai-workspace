@@ -1,0 +1,517 @@
+import type { z } from "zod";
+
+import {
+  AiStreamActionItemsEventSchema,
+  AiStreamDoneEventSchema,
+  AiStreamErrorEventSchema,
+  AiStreamEventSchema,
+  AiStreamTokenEventSchema,
+  AiUsageSchema,
+  EmbeddingMetadataSchema,
+  SemanticSearchDataSchema,
+  SemanticSearchMetaSchema,
+  SemanticSearchRequestSchema,
+  SemanticSearchResponseSchema,
+  SemanticSearchResultSchema,
+  SemanticSearchSourceTypeSchema,
+  SummarizeRequestSchema,
+  SummarizeResponseSchema,
+} from "./ai/index.js";
+import {
+  ApiMetaSchema,
+  ApiSuccessEnvelopeSchema,
+  PaginationMetaSchema,
+  PaginationRequestSchema,
+  PaginationSortSchema,
+  SortOrderSchema,
+} from "./common/index.js";
+import {
+  EmbeddingSchema,
+  EmbeddingSourceTypeSchema,
+  NoteContentTypeSchema,
+  NoteSchema,
+  SummaryActionItemSchema,
+  SummarySchema,
+  SummarySourceTypeSchema,
+  SyncMetadataSchema,
+  TaskPrioritySchema,
+  TaskSchema,
+  TaskStatusSchema,
+  TranscriptSchema,
+  UserSchema,
+  VoiceMemoSchema,
+  VoiceMemoStatusSchema,
+} from "./domain/index.js";
+import {
+  ApiErrorCodeSchema,
+  ApiErrorDetailSchema,
+  ApiErrorEnvelopeSchema,
+  ApiErrorMetaSchema,
+  ApiErrorPayloadSchema,
+} from "./errors/index.js";
+import {
+  ConflictRecordSchema,
+  ConflictResolutionStrategySchema,
+  SyncCursorSchema,
+  SyncEntityTypeSchema,
+  SyncOperationSchema,
+  SyncOperationStatusSchema,
+  SyncOperationTypeSchema,
+  SyncPullDataSchema,
+  SyncPullMetaSchema,
+  SyncPullRequestSchema,
+  SyncPullResponseSchema,
+  SyncPushDataSchema,
+  SyncPushRequestSchema,
+  SyncPushResponseSchema,
+  SyncPushResultSchema,
+  SyncPushResultStatusSchema,
+} from "./sync/index.js";
+
+export type ContractSchemaGroup =
+  | "ai"
+  | "common"
+  | "domain"
+  | "errors"
+  | "sync";
+
+export type ContractSchemaDefinition = Readonly<{
+  description: string;
+  group: ContractSchemaGroup;
+  name: string;
+  schema: z.ZodType;
+  title: string;
+}>;
+
+export type ContractSchemaManifestEntry = Readonly<{
+  description: string;
+  file: string;
+  group: ContractSchemaGroup;
+  id: string;
+  name: string;
+  title: string;
+}>;
+
+const defineContractSchemas = <T extends readonly ContractSchemaDefinition[]>(
+  definitions: T,
+): T => definitions;
+
+export const ContractSchemaDefinitions = defineContractSchemas([
+  {
+    group: "common",
+    name: "sort_order",
+    title: "Sort Order",
+    description: "Allowed sort direction values.",
+    schema: SortOrderSchema,
+  },
+  {
+    group: "common",
+    name: "pagination_sort",
+    title: "Pagination Sort",
+    description: "Allowed paginated list sort keys.",
+    schema: PaginationSortSchema,
+  },
+  {
+    group: "common",
+    name: "pagination_request",
+    title: "Pagination Request",
+    description: "Standard page/per_page query contract.",
+    schema: PaginationRequestSchema,
+  },
+  {
+    group: "common",
+    name: "pagination_meta",
+    title: "Pagination Metadata",
+    description: "Standard paginated response metadata.",
+    schema: PaginationMetaSchema,
+  },
+  {
+    group: "common",
+    name: "api_meta",
+    title: "API Metadata",
+    description: "Standard API response metadata.",
+    schema: ApiMetaSchema,
+  },
+  {
+    group: "common",
+    name: "api_success_envelope",
+    title: "API Success Envelope",
+    description: "Generic successful API response envelope shape.",
+    schema: ApiSuccessEnvelopeSchema,
+  },
+  {
+    group: "domain",
+    name: "sync_metadata",
+    title: "Sync Metadata",
+    description: "Optional per-entity local sync metadata.",
+    schema: SyncMetadataSchema,
+  },
+  {
+    group: "domain",
+    name: "user",
+    title: "User",
+    description: "Public user profile contract.",
+    schema: UserSchema,
+  },
+  {
+    group: "domain",
+    name: "note_content_type",
+    title: "Note Content Type",
+    description: "Allowed note content formats.",
+    schema: NoteContentTypeSchema,
+  },
+  {
+    group: "domain",
+    name: "note",
+    title: "Note",
+    description: "Note entity wire contract.",
+    schema: NoteSchema,
+  },
+  {
+    group: "domain",
+    name: "task_status",
+    title: "Task Status",
+    description: "Allowed task status values.",
+    schema: TaskStatusSchema,
+  },
+  {
+    group: "domain",
+    name: "task_priority",
+    title: "Task Priority",
+    description: "Allowed task priority values.",
+    schema: TaskPrioritySchema,
+  },
+  {
+    group: "domain",
+    name: "task",
+    title: "Task",
+    description: "Task entity wire contract.",
+    schema: TaskSchema,
+  },
+  {
+    group: "domain",
+    name: "voice_memo_status",
+    title: "Voice Memo Status",
+    description: "Allowed voice memo processing status values.",
+    schema: VoiceMemoStatusSchema,
+  },
+  {
+    group: "domain",
+    name: "voice_memo",
+    title: "Voice Memo",
+    description: "Voice memo metadata wire contract.",
+    schema: VoiceMemoSchema,
+  },
+  {
+    group: "domain",
+    name: "transcript",
+    title: "Transcript",
+    description: "Voice memo transcript wire contract.",
+    schema: TranscriptSchema,
+  },
+  {
+    group: "domain",
+    name: "summary_source_type",
+    title: "Summary Source Type",
+    description: "Allowed summary source entity types.",
+    schema: SummarySourceTypeSchema,
+  },
+  {
+    group: "domain",
+    name: "summary_action_item",
+    title: "Summary Action Item",
+    description: "AI-extracted action item contract.",
+    schema: SummaryActionItemSchema,
+  },
+  {
+    group: "domain",
+    name: "summary",
+    title: "Summary",
+    description: "AI-generated summary wire contract.",
+    schema: SummarySchema,
+  },
+  {
+    group: "domain",
+    name: "embedding_source_type",
+    title: "Embedding Source Type",
+    description: "Allowed embedding source entity types.",
+    schema: EmbeddingSourceTypeSchema,
+  },
+  {
+    group: "domain",
+    name: "embedding",
+    title: "Embedding",
+    description: "Embedding metadata wire contract.",
+    schema: EmbeddingSchema,
+  },
+  {
+    group: "errors",
+    name: "api_error_code",
+    title: "API Error Code",
+    description: "Stable API error code values.",
+    schema: ApiErrorCodeSchema,
+  },
+  {
+    group: "errors",
+    name: "api_error_detail",
+    title: "API Error Detail",
+    description: "Structured API error detail contract.",
+    schema: ApiErrorDetailSchema,
+  },
+  {
+    group: "errors",
+    name: "api_error_payload",
+    title: "API Error Payload",
+    description: "Standard API error payload contract.",
+    schema: ApiErrorPayloadSchema,
+  },
+  {
+    group: "errors",
+    name: "api_error_meta",
+    title: "API Error Metadata",
+    description: "Standard API error metadata contract.",
+    schema: ApiErrorMetaSchema,
+  },
+  {
+    group: "errors",
+    name: "api_error_envelope",
+    title: "API Error Envelope",
+    description: "Standard API error response envelope.",
+    schema: ApiErrorEnvelopeSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_entity_type",
+    title: "Sync Entity Type",
+    description: "Allowed sync entity type values.",
+    schema: SyncEntityTypeSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_operation_type",
+    title: "Sync Operation Type",
+    description: "Allowed sync operation type values.",
+    schema: SyncOperationTypeSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_operation_status",
+    title: "Sync Operation Status",
+    description: "Allowed sync operation status values.",
+    schema: SyncOperationStatusSchema,
+  },
+  {
+    group: "sync",
+    name: "conflict_resolution_strategy",
+    title: "Conflict Resolution Strategy",
+    description: "Allowed conflict resolution strategy values.",
+    schema: ConflictResolutionStrategySchema,
+  },
+  {
+    group: "sync",
+    name: "sync_cursor",
+    title: "Sync Cursor",
+    description: "Sync pull cursor/query contract.",
+    schema: SyncCursorSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_operation",
+    title: "Sync Operation",
+    description: "Offline sync operation wire contract.",
+    schema: SyncOperationSchema,
+  },
+  {
+    group: "sync",
+    name: "conflict_record",
+    title: "Conflict Record",
+    description: "Conflict record wire contract.",
+    schema: ConflictRecordSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_push_request",
+    title: "Sync Push Request",
+    description: "Batch sync push request body.",
+    schema: SyncPushRequestSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_push_result_status",
+    title: "Sync Push Result Status",
+    description: "Allowed sync push result status values.",
+    schema: SyncPushResultStatusSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_push_result",
+    title: "Sync Push Result",
+    description: "Single sync push result contract.",
+    schema: SyncPushResultSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_push_data",
+    title: "Sync Push Data",
+    description: "Sync push response data payload.",
+    schema: SyncPushDataSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_push_response",
+    title: "Sync Push Response",
+    description: "Sync push API response envelope.",
+    schema: SyncPushResponseSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_pull_request",
+    title: "Sync Pull Request",
+    description: "Sync pull request query contract.",
+    schema: SyncPullRequestSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_pull_data",
+    title: "Sync Pull Data",
+    description: "Sync pull response data payload.",
+    schema: SyncPullDataSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_pull_meta",
+    title: "Sync Pull Metadata",
+    description: "Sync pull response metadata payload.",
+    schema: SyncPullMetaSchema,
+  },
+  {
+    group: "sync",
+    name: "sync_pull_response",
+    title: "Sync Pull Response",
+    description: "Sync pull API response envelope.",
+    schema: SyncPullResponseSchema,
+  },
+  {
+    group: "ai",
+    name: "summarize_request",
+    title: "Summarize Request",
+    description: "AI summarization request body.",
+    schema: SummarizeRequestSchema,
+  },
+  {
+    group: "ai",
+    name: "summarize_response",
+    title: "Summarize Response",
+    description: "AI summarization response payload.",
+    schema: SummarizeResponseSchema,
+  },
+  {
+    group: "ai",
+    name: "semantic_search_source_type",
+    title: "Semantic Search Source Type",
+    description: "Allowed semantic search source types.",
+    schema: SemanticSearchSourceTypeSchema,
+  },
+  {
+    group: "ai",
+    name: "semantic_search_request",
+    title: "Semantic Search Request",
+    description: "Semantic search request body.",
+    schema: SemanticSearchRequestSchema,
+  },
+  {
+    group: "ai",
+    name: "semantic_search_result",
+    title: "Semantic Search Result",
+    description: "Single semantic search result item.",
+    schema: SemanticSearchResultSchema,
+  },
+  {
+    group: "ai",
+    name: "semantic_search_data",
+    title: "Semantic Search Data",
+    description: "Semantic search response data payload.",
+    schema: SemanticSearchDataSchema,
+  },
+  {
+    group: "ai",
+    name: "semantic_search_meta",
+    title: "Semantic Search Metadata",
+    description: "Semantic search response metadata payload.",
+    schema: SemanticSearchMetaSchema,
+  },
+  {
+    group: "ai",
+    name: "semantic_search_response",
+    title: "Semantic Search Response",
+    description: "Semantic search API response envelope.",
+    schema: SemanticSearchResponseSchema,
+  },
+  {
+    group: "ai",
+    name: "embedding_metadata",
+    title: "Embedding Metadata",
+    description: "Embedding generation metadata contract.",
+    schema: EmbeddingMetadataSchema,
+  },
+  {
+    group: "ai",
+    name: "ai_usage",
+    title: "AI Usage",
+    description: "AI usage and cost telemetry contract.",
+    schema: AiUsageSchema,
+  },
+  {
+    group: "ai",
+    name: "ai_stream_token_event",
+    title: "AI Stream Token Event",
+    description: "SSE token event payload.",
+    schema: AiStreamTokenEventSchema,
+  },
+  {
+    group: "ai",
+    name: "ai_stream_action_items_event",
+    title: "AI Stream Action Items Event",
+    description: "SSE action items event payload.",
+    schema: AiStreamActionItemsEventSchema,
+  },
+  {
+    group: "ai",
+    name: "ai_stream_done_event",
+    title: "AI Stream Done Event",
+    description: "SSE completion event payload.",
+    schema: AiStreamDoneEventSchema,
+  },
+  {
+    group: "ai",
+    name: "ai_stream_error_event",
+    title: "AI Stream Error Event",
+    description: "SSE error event payload.",
+    schema: AiStreamErrorEventSchema,
+  },
+  {
+    group: "ai",
+    name: "ai_stream_event",
+    title: "AI Stream Event",
+    description: "Union of supported AI SSE event payloads.",
+    schema: AiStreamEventSchema,
+  },
+] as const);
+
+export const contractSchemaId = (
+  definition: Pick<ContractSchemaDefinition, "group" | "name">,
+): string => `urn:synapse:contract:${definition.group}:${definition.name}`;
+
+export const contractSchemaFile = (
+  definition: Pick<ContractSchemaDefinition, "group" | "name">,
+): string => `${definition.group}/${definition.name}.schema.json`;
+
+export const ContractSchemaManifest: readonly ContractSchemaManifestEntry[] =
+  ContractSchemaDefinitions.map((definition) => ({
+    description: definition.description,
+    file: contractSchemaFile(definition),
+    group: definition.group,
+    id: contractSchemaId(definition),
+    name: definition.name,
+    title: definition.title,
+  }));

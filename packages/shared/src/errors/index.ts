@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { JsonValueSchema, RequestIdSchema } from "../common";
+import { JsonValueSchema, RequestIdSchema } from "../common/index.js";
 
 export const ApiErrorCodeSchema = z.enum([
   "VALIDATION_ERROR",

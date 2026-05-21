@@ -6,6 +6,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "check-schemas": "pnpm --filter @synapse/shared check-schemas",
     "format": "prettier --check .",
     "dev": "turbo run dev --parallel",
     "build": "turbo run build"

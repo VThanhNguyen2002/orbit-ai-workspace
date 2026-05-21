@@ -6,7 +6,7 @@ import {
   JsonObjectSchema,
   NonNegativeIntegerSchema,
   NullableIsoTimestampSchema,
-} from "../common";
+} from "../common/index.js";
 
 export const SyncMetadataSchema = z.strictObject({
   last_synced_at: NullableIsoTimestampSchema,

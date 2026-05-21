@@ -7,12 +7,12 @@ import {
   NonNegativeIntegerSchema,
   PositiveIntegerSchema,
   RequestIdSchema,
-} from "../common";
+} from "../common/index.js";
 import {
   SummaryActionItemSchema,
   SummarySchema,
   SummarySourceTypeSchema,
-} from "../domain";
+} from "../domain/index.js";
 
 export const AiProviderSchema = z.string().min(1).max(100);
 export const AiModelSchema = z.string().min(1).max(200);
