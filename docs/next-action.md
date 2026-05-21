@@ -2,18 +2,18 @@
 
 ## Objective
 
-Start Slice 6 — Notes CRUD implementation plan. This is still a planning and
-design-first slice, not feature implementation.
+Start Slice 6A — Notes contract refinement. The Notes CRUD plan is in place;
+the next step should refine shared request/response schemas before route code.
 
 ## Expected Files To Change
 
-- planning docs for Notes CRUD endpoint shape and sequencing
-- docs that identify shared schema/API client changes needed later
-- docs that describe sync queue and conflict implications
-- docs that define API, shared, and client test expectations
+- `packages/shared/src/**`
+- `packages/shared/src/**/*.test.ts`
+- `packages/shared/package.json` only if contract tooling needs a small update
+- `docs/architecture/api-contract.md` only for contract clarifications
 
-No Notes CRUD code, database integration, Supabase/auth wiring, frontend screens,
-or sync implementation should be added in this slice.
+No FastAPI Notes routes, database integration, Supabase/auth wiring, frontend
+screens, or sync engine implementation should be added in this slice.
 
 ## Commands To Run
 
@@ -26,20 +26,23 @@ pnpm build
 
 ## Definition Of Done
 
-- Notes endpoint list matches the API contract.
-- Required shared schemas and future API client methods are identified.
-- Optimistic update and sync queue implications are documented.
-- API, shared, and client test expectations are explicit.
+- Shared contracts include create, update, delete/version, list query, and list
+  response schemas for notes.
+- Schemas reuse existing Note, pagination, success envelope, and error envelope
+  contracts.
+- Contract tests cover valid snake_case payloads, invalid payloads, and camelCase
+  rejection.
+- JSON Schema export/check remains deterministic.
 - No product feature code is implemented.
 
 ## Risks
 
-- Planning can drift into implementation before persistence/auth boundaries are ready.
-- CRUD endpoints can accidentally bypass offline-first and versioning constraints.
-- Shared schemas can grow too broad before the Notes flow proves the shape.
-- Tests can miss conflict, validation, and auth-isolation expectations if not planned now.
+- Contract refinement can accidentally encode backend persistence details.
+- Direct create id ownership must be settled before backend implementation.
+- Delete version semantics need one clear request shape.
+- Tests can miss camelCase rejection or conflict envelope expectations.
 
 ## Rollback Notes
 
-Revert only Slice 6 planning docs if the CRUD sequence changes. Keep completed
-Slices 1-5 intact.
+Revert only Slice 6A shared contract additions and related contract docs if the
+shape changes. Keep completed Slices 1-6 planning docs intact.

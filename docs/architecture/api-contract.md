@@ -35,10 +35,10 @@ The backend validates the JWT against Supabase's JWT secret. The `sub` claim bec
 |--------|------|-------------|
 | GET | `/v1/notes` | List notes (paginated) |
 | POST | `/v1/notes` | Create note |
-| GET | `/v1/notes/:id` | Get single note |
-| PATCH | `/v1/notes/:id` | Update note (partial) |
-| DELETE | `/v1/notes/:id` | Soft delete note |
-| POST | `/v1/notes/:id/summarize` | Trigger AI summarization (SSE) |
+| GET | `/v1/notes/{note_id}` | Get single note |
+| PATCH | `/v1/notes/{note_id}` | Update note (partial) |
+| DELETE | `/v1/notes/{note_id}` | Soft delete note |
+| POST | `/v1/notes/{note_id}/summarize` | Trigger AI summarization (SSE) |
 
 ### Tasks
 
@@ -287,7 +287,7 @@ The frontend validates before sending. The backend validates again using the equ
 Updates use PATCH semantics — only included fields are modified. The `version` field is always required to enable conflict detection.
 
 ```json
-PATCH /v1/notes/abc-123
+PATCH /v1/notes/{note_id}
 {
   "title": "New title",
   "version": 3
