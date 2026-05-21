@@ -164,13 +164,22 @@ Returned when an update targets a stale version:
         "actual": 5,
         "server_data": {
           "id": "note-uuid",
+          "user_id": "user-uuid",
           "title": "Updated title",
           "content": "Full current content from server",
+          "content_type": "markdown",
+          "is_archived": false,
+          "is_deleted": false,
           "version": 5,
-          "updated_at": "2025-05-18T10:30:00Z"
+          "created_at": "2025-05-18T09:00:00Z",
+          "updated_at": "2025-05-18T10:30:00Z",
+          "deleted_at": null
         }
       }
     ]
+  },
+  "meta": {
+    "request_id": "req_abc123"
   }
 }
 ```
@@ -281,7 +290,9 @@ Accepts a batch of offline operations:
       "entity_id": "note-uuid",
       "operation": "update",
       "payload": { "title": "New title", "version": 3 },
-      "created_at": 1700000000000
+      "created_at": 1700000000000,
+      "retry_count": 0,
+      "status": "pending"
     }
   ]
 }
@@ -296,6 +307,9 @@ Response:
       { "operation_id": "op-uuid", "status": "applied" },
       { "operation_id": "op-uuid-2", "status": "conflict", "server_data": { ... } }
     ]
+  },
+  "meta": {
+    "request_id": "req_abc123"
   }
 }
 ```
@@ -319,6 +333,7 @@ Returns all entities modified after the given timestamp for the current user. Us
     "notes": [
       {
         "id": "note-uuid",
+        "user_id": "user-uuid",
         "title": "Updated note",
         "content": "...",
         "content_type": "markdown",
@@ -326,20 +341,25 @@ Returns all entities modified after the given timestamp for the current user. Us
         "is_deleted": false,
         "version": 5,
         "created_at": "2025-05-18T09:00:00Z",
-        "updated_at": "2025-05-18T10:30:00Z"
+        "updated_at": "2025-05-18T10:30:00Z",
+        "deleted_at": null
       }
     ],
     "tasks": [
       {
         "id": "task-uuid",
+        "user_id": "user-uuid",
         "title": "Follow up with team",
+        "description": null,
         "status": "todo",
         "priority": "high",
+        "due_date": null,
         "is_deleted": false,
         "version": 2,
         "note_id": "note-uuid",
         "created_at": "2025-05-18T09:15:00Z",
-        "updated_at": "2025-05-18T10:45:00Z"
+        "updated_at": "2025-05-18T10:45:00Z",
+        "deleted_at": null
       }
     ],
     "voice_memos": [],
@@ -378,10 +398,16 @@ When a push operation conflicts, the `server_data` in the result contains the fu
         "status": "conflict",
         "server_data": {
           "id": "note-uuid-2",
+          "user_id": "user-uuid",
           "title": "Server version of title",
           "content": "Server content",
+          "content_type": "markdown",
+          "is_archived": false,
+          "is_deleted": false,
           "version": 7,
-          "updated_at": "2025-05-18T10:30:00Z"
+          "created_at": "2025-05-18T09:00:00Z",
+          "updated_at": "2025-05-18T10:30:00Z",
+          "deleted_at": null
         }
       },
       {
@@ -390,6 +416,9 @@ When a push operation conflicts, the `server_data` in the result contains the fu
         "reason": "Entity not found (may have been permanently deleted)"
       }
     ]
+  },
+  "meta": {
+    "request_id": "req_abc123"
   }
 }
 ```
