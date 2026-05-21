@@ -2,16 +2,18 @@
 
 ## Objective
 
-Start Slice 2 — Shared contracts foundation. The goal is to define the first platform-agnostic TypeScript contracts that the API, client, and future app implementation can share safely.
+Start Slice 6 — Notes CRUD implementation plan. This is still a planning and
+design-first slice, not feature implementation.
 
 ## Expected Files To Change
 
-- `packages/shared/src/**`
-- `packages/shared/package.json` if test scripts or lightweight validation tooling are added
-- package tests for shared contracts if introduced
-- documentation only if contract decisions need clarification
+- planning docs for Notes CRUD endpoint shape and sequencing
+- docs that identify shared schema/API client changes needed later
+- docs that describe sync queue and conflict implications
+- docs that define API, shared, and client test expectations
 
-No app features, Expo initialization, FastAPI business endpoints, UI screens, or real sync/AI implementation should be added in this slice.
+No Notes CRUD code, database integration, Supabase/auth wiring, frontend screens,
+or sync implementation should be added in this slice.
 
 ## Commands To Run
 
@@ -24,18 +26,20 @@ pnpm build
 
 ## Definition Of Done
 
-- `@synapse/shared` exports initial domain/API contract types without platform imports.
-- API envelope, error envelope, pagination, and sync DTO placeholders are represented.
-- runtime validation approach is chosen only if it stays lightweight.
-- package boundary linting remains green.
-- no product flow is implemented.
+- Notes endpoint list matches the API contract.
+- Required shared schemas and future API client methods are identified.
+- Optimistic update and sync queue implications are documented.
+- API, shared, and client test expectations are explicit.
+- No product feature code is implemented.
 
 ## Risks
 
-- Contracts can become too broad before feature code proves the shape.
-- Runtime validation dependencies can add weight too early.
-- Shared contracts may accidentally encode platform/runtime assumptions.
+- Planning can drift into implementation before persistence/auth boundaries are ready.
+- CRUD endpoints can accidentally bypass offline-first and versioning constraints.
+- Shared schemas can grow too broad before the Notes flow proves the shape.
+- Tests can miss conflict, validation, and auth-isolation expectations if not planned now.
 
 ## Rollback Notes
 
-Revert only the shared contract files and any Slice 2 validation/test additions. Keep Slice 1 ESLint and boundary enforcement intact.
+Revert only Slice 6 planning docs if the CRUD sequence changes. Keep completed
+Slices 1-5 intact.
