@@ -12,10 +12,13 @@
   "scripts": {
     "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "echo \"No tests yet for @synapse/api-client\"",
+    "test": "vitest run",
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@synapse/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
   }
 }
