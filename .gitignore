@@ -25,6 +25,7 @@ credentials.*
 *.key
 *.p8
 *.p12
+*.pfx
 *.crt
 *.cer
 *.der
