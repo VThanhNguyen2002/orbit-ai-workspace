@@ -2,8 +2,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request
 
+from app.core.auth import AuthContext, get_auth_context
 from app.core.errors import ApiError
 from app.models.responses import ApiErrorDetail, success_envelope
+from app.repositories.notes import NoteNotFoundError, NoteVersionConflictError
 from app.schemas.notes import (
     CreateNoteRequest,
     DeleteNoteRequest,
@@ -12,26 +14,18 @@ from app.schemas.notes import (
     UpdateNoteRequest,
 )
 from app.services.notes import (
-    DEV_USER_ID,
-    NoteNotFoundError,
     NoteService,
-    NoteVersionConflictError,
     get_note_service,
 )
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
 
-def get_current_user_id() -> str:
-    """Temporary auth placeholder until Supabase JWT auth is added."""
-    return DEV_USER_ID
-
-
 @router.get("")
 def list_notes(
     request: Request,
     service: Annotated[NoteService, Depends(get_note_service)],
-    user_id: Annotated[str, Depends(get_current_user_id)],
+    auth_context: Annotated[AuthContext, Depends(get_auth_context)],
     page: Annotated[int, Query(ge=1)] = 1,
     per_page: Annotated[int, Query(ge=1, le=100)] = 20,
     sort: NoteSortField = "updated_at",
@@ -40,7 +34,7 @@ def list_notes(
     include_deleted: bool = False,
 ):
     notes = service.list_notes(
-        user_id=user_id,
+        user_id=auth_context.user_id,
         page=page,
         per_page=per_page,
         sort=sort,
@@ -56,9 +50,9 @@ def create_note(
     request: Request,
     payload: CreateNoteRequest,
     service: Annotated[NoteService, Depends(get_note_service)],
-    user_id: Annotated[str, Depends(get_current_user_id)],
+    auth_context: Annotated[AuthContext, Depends(get_auth_context)],
 ):
-    note = service.create_note(user_id=user_id, request=payload)
+    note = service.create_note(user_id=auth_context.user_id, request=payload)
     return success_envelope(request, note.model_dump())
 
 
@@ -67,10 +61,10 @@ def get_note(
     note_id: str,
     request: Request,
     service: Annotated[NoteService, Depends(get_note_service)],
-    user_id: Annotated[str, Depends(get_current_user_id)],
+    auth_context: Annotated[AuthContext, Depends(get_auth_context)],
 ):
     try:
-        note = service.get_note(user_id=user_id, note_id=note_id)
+        note = service.get_note(user_id=auth_context.user_id, note_id=note_id)
     except NoteNotFoundError as exc:
         raise _note_not_found() from exc
 
@@ -83,10 +77,14 @@ def update_note(
     request: Request,
     payload: UpdateNoteRequest,
     service: Annotated[NoteService, Depends(get_note_service)],
-    user_id: Annotated[str, Depends(get_current_user_id)],
+    auth_context: Annotated[AuthContext, Depends(get_auth_context)],
 ):
     try:
-        note = service.update_note(user_id=user_id, note_id=note_id, request=payload)
+        note = service.update_note(
+            user_id=auth_context.user_id,
+            note_id=note_id,
+            request=payload,
+        )
     except NoteNotFoundError as exc:
         raise _note_not_found() from exc
     except NoteVersionConflictError as exc:
@@ -101,10 +99,14 @@ def delete_note(
     request: Request,
     payload: DeleteNoteRequest,
     service: Annotated[NoteService, Depends(get_note_service)],
-    user_id: Annotated[str, Depends(get_current_user_id)],
+    auth_context: Annotated[AuthContext, Depends(get_auth_context)],
 ):
     try:
-        note = service.delete_note(user_id=user_id, note_id=note_id, request=payload)
+        note = service.delete_note(
+            user_id=auth_context.user_id,
+            note_id=note_id,
+            request=payload,
+        )
     except NoteNotFoundError as exc:
         raise _note_not_found() from exc
     except NoteVersionConflictError as exc:

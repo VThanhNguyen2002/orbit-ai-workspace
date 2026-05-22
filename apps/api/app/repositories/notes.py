@@ -1,28 +1,33 @@
-from app.schemas.notes import Note, NoteSortField, SortOrder
+from typing import Protocol
+
+from app.core.config import Settings, get_settings
+from app.schemas.notes import (
+    CreateNoteRequest,
+    DeleteNoteRequest,
+    ListNotesData,
+    Note,
+    NoteSortField,
+    SortOrder,
+    UpdateNoteRequest,
+)
 
 
-class InMemoryNotesRepository:
-    def __init__(self) -> None:
-        self._notes: dict[str, Note] = {}
+class NoteNotFoundError(Exception):
+    pass
 
-    def clear(self) -> None:
-        self._notes.clear()
 
-    def create(self, note: Note) -> Note:
-        self._notes[note.id] = note.model_copy(deep=True)
-        return note.model_copy(deep=True)
+class NoteVersionConflictError(Exception):
+    def __init__(self, *, expected_version: int, server_note: Note) -> None:
+        self.expected_version = expected_version
+        self.server_note = server_note
 
-    def get(self, *, note_id: str, user_id: str, include_deleted: bool = False) -> Note | None:
-        note = self._notes.get(note_id)
-        if note is None or note.user_id != user_id:
-            return None
 
-        if note.is_deleted and not include_deleted:
-            return None
+class NotesRepositoryNotConfiguredError(Exception):
+    pass
 
-        return note.model_copy(deep=True)
 
-    def list(
+class NotesRepository(Protocol):
+    def list_notes(
         self,
         *,
         user_id: str,
@@ -32,27 +37,24 @@ class InMemoryNotesRepository:
         order: SortOrder,
         is_archived: bool | None,
         include_deleted: bool,
-    ) -> tuple[list[Note], int]:
-        notes = [
-            note
-            for note in self._notes.values()
-            if note.user_id == user_id
-            and (include_deleted or not note.is_deleted)
-            and (is_archived is None or note.is_archived == is_archived)
-        ]
-        notes.sort(key=lambda note: (getattr(note, sort), note.id), reverse=order == "desc")
+    ) -> ListNotesData: ...
 
-        start = (page - 1) * per_page
-        end = start + per_page
-        return [note.model_copy(deep=True) for note in notes[start:end]], len(notes)
+    def create_note(self, *, user_id: str, request: CreateNoteRequest) -> Note: ...
 
-    def save(self, note: Note) -> Note:
-        self._notes[note.id] = note.model_copy(deep=True)
-        return note.model_copy(deep=True)
+    def get_note(self, *, user_id: str, note_id: str) -> Note: ...
+
+    def update_note(self, *, user_id: str, note_id: str, request: UpdateNoteRequest) -> Note: ...
+
+    def delete_note(self, *, user_id: str, note_id: str, request: DeleteNoteRequest) -> Note: ...
 
 
-_notes_repository = InMemoryNotesRepository()
+def get_notes_repository(settings: Settings | None = None) -> NotesRepository:
+    resolved_settings = settings or get_settings()
+    if resolved_settings.notes_repository == "supabase":
+        from app.repositories.notes_supabase import get_supabase_notes_repository
 
+        return get_supabase_notes_repository(resolved_settings)
 
-def get_notes_repository() -> InMemoryNotesRepository:
-    return _notes_repository
+    from app.repositories.notes_memory import get_memory_notes_repository
+
+    return get_memory_notes_repository()

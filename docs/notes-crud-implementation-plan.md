@@ -18,15 +18,21 @@ existing envelope/error behavior.
 
 Status update: Slice 6D now documents the Notes persistence/auth integration
 plan in [notes-persistence-auth-integration-plan.md](notes-persistence-auth-integration-plan.md).
-Supabase migrations, RLS policies, JWT auth wiring, and repository replacement
-remain planned but not implemented.
+It served as the planning source for the Slice 6E auth/repository boundary and
+migration/RLS draft.
+
+Status update: Slice 6E now includes the auth context boundary, repository
+protocol, deterministic memory repository default, Supabase repository scaffold,
+draft Notes SQL migration/RLS policy file, and tests for config, ownership,
+version conflicts, and soft delete semantics. Live Supabase client injection and
+full JWT validation remain deferred.
 
 ## Non-Goals
 
-- No durable Notes persistence implementation in Slice 6B beyond the in-memory
-  route skeleton.
-- No database migrations, Supabase clients, auth providers, RLS policies, or
-  storage integration.
+- No live durable Notes persistence implementation beyond the in-memory local
+  default and Supabase scaffold.
+- No Supabase clients, auth providers, executed migrations, or storage
+  integration.
 - No frontend screens, Expo initialization, or local persistence engine.
 - No AI summarization, embeddings, search, or sync engine implementation.
 - No real secrets or environment values.
@@ -229,11 +235,12 @@ and future sync push do not diverge.
   request bodies.
 - Missing, deleted, or cross-user notes return `404 NOT_FOUND`.
 - Server logs must not include note `title` or `content`.
-- RLS remains required when Supabase persistence is added.
+- RLS remains required when live Supabase persistence is wired. Slice 6E adds the
+  draft Notes migration/RLS policy file.
 - No service-role key or provider key is exposed to the client.
 - Note content is sensitive local data and follows the local storage risk model
   already documented for Phase 1.
-- The Slice 6D persistence/auth plan requires user-scoped Supabase clients for
+- The Slice 6D/6E persistence/auth plan requires user-scoped Supabase clients for
   request handling. Service-role access is migration/admin-only.
 
 ## Testing Strategy
@@ -283,8 +290,11 @@ Future app/local persistence:
    Plan database migrations, RLS, auth dependency, and local persistence mapping
    before implementation.
 5. **Slice 6E — Notes Supabase persistence/auth implementation**
-   Add migrations, RLS, JWT auth dependency, user-scoped repository wiring, and
-   tests according to the Slice 6D plan.
+   Add auth and repository boundaries, a migration/RLS draft, Supabase scaffold,
+   and deterministic tests without live Supabase.
+6. **Slice 6F — Notes integration verification**
+   Verify package, API, contract, and build integration before live Supabase
+   wiring.
 
 ## Measurable Definition Of Done
 

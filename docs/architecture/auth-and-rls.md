@@ -34,6 +34,19 @@ The Notes-specific migration, RLS, auth dependency, and repository replacement
 plan is documented in
 [notes-persistence-auth-integration-plan.md](../notes-persistence-auth-integration-plan.md).
 
+Slice 6E implementation status:
+
+- Notes routes now depend on `get_auth_context` instead of a route-local
+  `dev_user` constant.
+- Local/test mode remains `SYNAPSE_AUTH_MODE=dev` and returns
+  `AuthContext(user_id="dev_user", auth_mode="dev")` unless overridden.
+- JWT validation is isolated behind the auth dependency but remains deferred;
+  `jwt` mode currently rejects requests rather than accepting unverified tokens.
+- The Notes repository boundary exists with a memory default and a Supabase
+  scaffold that requires a future injected user-scoped client.
+- `supabase/migrations/20260522000000_create_notes.sql` drafts the Notes table,
+  indexes, soft-delete/version metadata, and own-user RLS policies.
+
 ## Authentication Flow
 
 ### Client-Side (Expo / React Native Web)

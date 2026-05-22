@@ -37,6 +37,12 @@ CREATE POLICY "Users can only access own notes"
 - Service role key is used only for system operations (embedding generation, scheduled cleanup)
 - Service role key never leaves the backend environment
 
+Slice 6E adds the first Notes RLS draft in
+`supabase/migrations/20260522000000_create_notes.sql`. The API still defaults to
+the memory repository for local/test determinism, and the Supabase request path
+will require an injected user-scoped client before live use. No service-role key
+is used by Notes request handlers.
+
 ### API-Level Isolation
 
 Even though RLS handles authorization, the API adds defense-in-depth:

@@ -4,14 +4,15 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 
-from app.repositories.notes import get_notes_repository
+from app.core.auth import AuthContext, get_auth_context
+from app.repositories.notes_memory import get_memory_notes_repository
 
 
 @pytest.fixture(autouse=True)
 def reset_notes_repository() -> Generator[None, None, None]:
-    get_notes_repository().clear()
+    get_memory_notes_repository().clear()
     yield
-    get_notes_repository().clear()
+    get_memory_notes_repository().clear()
 
 
 def test_notes_route_boots_with_empty_list(client: TestClient) -> None:
@@ -129,6 +130,38 @@ def test_get_note_success(client: TestClient) -> None:
             "request_id": "req_get_note",
         },
     }
+
+
+def test_notes_routes_hide_cross_user_notes(client: TestClient) -> None:
+    client.app.dependency_overrides[get_auth_context] = lambda: AuthContext(
+        user_id="user_a",
+        auth_mode="dev",
+    )
+    note = _create_note(client)
+    assert note["user_id"] == "user_a"
+
+    client.app.dependency_overrides[get_auth_context] = lambda: AuthContext(
+        user_id="user_b",
+        auth_mode="dev",
+    )
+
+    list_response = client.get("/v1/notes")
+    get_response = client.get(f"/v1/notes/{note['id']}")
+    patch_response = client.patch(
+        f"/v1/notes/{note['id']}",
+        json={"title": "Cross-user edit", "version": note["version"]},
+    )
+    delete_response = client.request(
+        "DELETE",
+        f"/v1/notes/{note['id']}",
+        json={"version": note["version"]},
+    )
+
+    assert list_response.status_code == 200
+    assert list_response.json()["data"]["items"] == []
+    assert get_response.status_code == 404
+    assert patch_response.status_code == 404
+    assert delete_response.status_code == 404
 
 
 def test_missing_note_returns_404(client: TestClient) -> None:

@@ -43,10 +43,12 @@ The backend validates the JWT against Supabase's JWT secret. The `sub` claim bec
 `GET /v1/notes` uses the exported `ListNotesResponseSchema` shape:
 `data.items` for note rows and `data.pagination` for pagination metadata.
 
-Current backend status: the Slice 6B FastAPI Notes routes exist and Slice 6C
-added typed API client methods. Runtime storage is still process-local in memory
-and auth still uses the temporary `dev_user` placeholder. Slice 6D documents the
-planned Supabase JWT, RLS, and persistence replacement in
+Current backend status: the Slice 6B FastAPI Notes routes exist, Slice 6C added
+typed API client methods, and Slice 6E added an auth context dependency,
+repository interface, memory default, Supabase repository scaffold, and draft
+Notes migration/RLS file. Runtime storage still defaults to process-local memory
+for deterministic local and CI runs. Full Supabase JWT validation and live
+user-scoped Supabase client wiring remain deferred and are tracked in
 [notes-persistence-auth-integration-plan.md](../notes-persistence-auth-integration-plan.md).
 
 ### Tasks

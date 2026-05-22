@@ -8,8 +8,8 @@ The API is mounted under `/v1`.
 
 - `GET /v1/health` returns the service health payload.
 - `GET /v1/version` returns service, app, and API version metadata.
-- `GET /v1/notes` lists non-deleted notes from the in-memory skeleton store.
-- `POST /v1/notes` creates a note in the in-memory skeleton store.
+- `GET /v1/notes` lists non-deleted notes from the configured Notes repository.
+- `POST /v1/notes` creates a note in the configured Notes repository.
 - `GET /v1/notes/{note_id}` returns one non-deleted note.
 - `PATCH /v1/notes/{note_id}` updates a note when the request `version` matches.
 - `DELETE /v1/notes/{note_id}` soft deletes a note when the request `version`
@@ -29,11 +29,34 @@ All routes use the shared success envelope shape:
 Errors use the shared error envelope shape and include the same `request_id` in
 `meta.request_id`. The request id is also returned as the `X-Request-ID` header.
 
-The Notes routes are a Slice 6B backend skeleton only. They use a process-local
-in-memory repository, do not persist across process restarts, and currently use
-the temporary placeholder user id `dev_user` until Supabase JWT auth is added.
-Supabase storage, RLS policies, real auth provider validation, and database
-migrations remain deferred.
+The Notes routes now use a narrow auth context dependency and repository
+interface. Local and test runs default to `SYNAPSE_AUTH_MODE=dev` and
+`SYNAPSE_NOTES_REPOSITORY=memory`, which still uses the safe `dev_user` identity
+and process-local storage. That default keeps CI deterministic and requires no
+Supabase project or secrets.
+
+Slice 6E adds a Supabase-ready repository scaffold plus the draft
+`supabase/migrations/20260522000000_create_notes.sql` migration with Notes RLS
+policies. Live Supabase client wiring and full JWT validation remain
+environment-gated follow-up work; request-path code does not use the service
+role key.
+
+## Configuration
+
+Supported local placeholders:
+
+```bash
+SYNAPSE_AUTH_MODE=dev
+SYNAPSE_NOTES_REPOSITORY=memory
+SYNAPSE_DEV_USER_ID=dev_user
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=replace-with-supabase-anon-key
+SUPABASE_JWT_SECRET=replace-with-supabase-jwt-secret
+SUPABASE_SERVICE_ROLE_KEY=replace-with-service-role-key
+```
+
+Use `.env` for real local values; it is gitignored. Commit only `.env.example`
+placeholders.
 
 ## Local Checks
 

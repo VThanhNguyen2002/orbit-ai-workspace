@@ -2,18 +2,27 @@
 
 ## Status
 
-Slice 6D planning only. This document describes how the current in-memory Notes
-backend should be replaced with Supabase-backed persistence and real bearer auth.
-It does not add migrations, Supabase clients, provider configuration, secrets,
-frontend UI, API client methods, or sync engine behavior.
+Slice 6E foundation is now in place. The Notes backend has an auth context
+boundary, a repository protocol, the deterministic in-memory repository remains
+the default, and a Supabase-ready repository scaffold plus draft migration/RLS
+file exist. Live Supabase client wiring, full JWT verification, provider
+configuration, secrets, frontend UI, and sync engine behavior remain deferred.
 
 ## Current Implemented Surface
 
 - Shared Notes CRUD contracts exist in `@synapse/shared`.
 - FastAPI Notes routes exist under `/v1/notes`.
 - `@synapse/api-client` exposes `client.notes.list/create/get/update/delete`.
-- API route storage is process-local in memory and is reset on process restart.
-- API auth currently uses the temporary placeholder identity `dev_user`.
+- API route storage defaults to the process-local memory repository and is reset
+  on process restart.
+- API auth uses `get_auth_context`. Local/test `dev` mode returns the safe
+  `dev_user` identity; future `jwt` mode validation is isolated behind the same
+  dependency.
+- `supabase/migrations/20260522000000_create_notes.sql` drafts `public.notes`,
+  indexes, soft-delete/version fields, and own-user RLS policies.
+- `apps/api/app/repositories/notes_supabase.py` contains the mapping and
+  conditional write scaffold, but requires an injected user-scoped Supabase
+  client before it can be used in request paths.
 
 ## Target State
 
@@ -28,10 +37,10 @@ Notes CRUD should become a normal authenticated backend path:
 7. Missing, deleted, and cross-user Notes still return `404 NOT_FOUND`.
 8. Update/delete conflicts still return `409 CONFLICT` with full `server_data`.
 
-## Non-Goals
+## Remaining Non-Goals
 
-- No database migration is implemented in Slice 6D.
-- No Supabase Python client is added in Slice 6D.
+- No database migration is executed in CI.
+- No Supabase Python client is added or constructed in request handlers yet.
 - No service role key is introduced to request handlers.
 - No frontend auth flow, local persistence adapter, Realtime subscription, or sync
   engine is implemented here.
@@ -40,9 +49,8 @@ Notes CRUD should become a normal authenticated backend path:
 
 ## Database Migration Contract
 
-The first Notes persistence implementation should introduce a Supabase migration
-for `public.notes`. The exact migration filename is implementation-owned, but
-the table contract should be:
+The Slice 6E draft migration is
+`supabase/migrations/20260522000000_create_notes.sql`. Its table contract is:
 
 ```sql
 CREATE TABLE public.notes (
@@ -119,7 +127,7 @@ with explicit `user_id` scoping.
 
 ## Auth Boundary Contract
 
-Replace the route-local placeholder:
+Slice 6E replaced the route-local placeholder:
 
 ```python
 dev_user_id = "dev_user"
@@ -128,22 +136,24 @@ dev_user_id = "dev_user"
 with a shared API dependency that returns a typed current user context:
 
 ```python
-class CurrentUser(BaseModel):
+class AuthContext(BaseModel):
     user_id: str
-    access_token: str
+    auth_mode: str
+    access_token: str | None = None
 ```
 
 Implementation expectations:
 
 - `/v1/health` and `/v1/version` remain public.
-- Notes routes depend on `get_current_user`.
+- Notes routes depend on `get_auth_context`.
 - Missing, malformed, expired, or invalid bearer tokens return `401 UNAUTHORIZED`
   using the existing API error envelope.
 - Auth failures log only `request_id` and a reason category, never token contents
   or email addresses.
 - `user_id` always comes from the token `sub` claim and is never accepted from
   client request bodies.
-- The bearer token is passed to the Supabase user-scoped client so RLS is active.
+- The bearer token will be passed to the Supabase user-scoped client so RLS is
+  active once live client wiring is implemented.
 
 Required settings names, with no values committed:
 
@@ -155,24 +165,27 @@ Service-role keys must not be used in request-handling code.
 
 ## Repository Replacement Plan
 
-Keep the existing route/service shape thin. Replace only the persistence boundary:
+Keep the existing route/service shape thin. Slice 6E replaces only the
+persistence boundary:
 
 - Keep `apps/api/app/routers/notes.py` responsible for request parsing and
   envelope/error translation.
 - Keep `apps/api/app/services/notes.py` responsible for version and soft-delete
   semantics.
-- Replace or wrap `apps/api/app/repositories/notes.py` with a Supabase-backed
-  repository.
-- Preserve an in-memory or fake repository for deterministic unit tests.
+- `apps/api/app/repositories/notes.py` defines the protocol and factory.
+- `apps/api/app/repositories/notes_memory.py` preserves deterministic local and
+  unit-test behavior.
+- `apps/api/app/repositories/notes_supabase.py` is a Supabase-shaped scaffold
+  that is not live-wired until a user-scoped client is injected.
 
 Repository methods should require authenticated context:
 
 ```text
-list(user, page, per_page, sort, order, is_archived, include_deleted)
-create(user, payload)
-get(user, note_id, include_deleted = false)
-update(user, note_id, payload)
-soft_delete(user, note_id, version)
+list_notes(user_id, page, per_page, sort, order, is_archived, include_deleted)
+create_note(user_id, payload)
+get_note(user_id, note_id)
+update_note(user_id, note_id, payload)
+delete_note(user_id, note_id, payload)
 ```
 
 All repository queries should include `user_id = current_user.user_id` even though
