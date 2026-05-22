@@ -65,3 +65,38 @@ pnpm build
 Revert only Slice 6F verification changes if they introduce noise. Keep completed
 shared contracts, backend skeleton, API client methods, Slice 6E auth/repository
 boundaries, and migration/RLS draft intact.
+
+## External Review Gate
+
+Before considering the slice complete:
+
+1. Render the full final report clearly and structurally.
+2. Include:
+   - architectural decisions
+   - tradeoffs
+   - risks
+   - shortcuts/deferred items
+   - verification evidence
+   - CI status
+   - security observations
+3. Assume the rendered output will be reviewed externally by ChatGPT as an
+   extended engineering review gate.
+4. Be explicit about:
+   - anything intentionally deferred
+   - anything scaffold-only
+   - anything mocked/faked
+   - any remaining inconsistencies
+   - any temporary implementations
+5. Do not hide weak points or unresolved risks.
+6. Do not automatically continue to the next slice after rendering the report.
+7. Wait for external ChatGPT review feedback before proceeding further.
+
+The rendered report must be detailed enough for:
+
+- architecture review
+- consistency review
+- security review
+- CI/reliability review
+- implementation-scope review
+
+Treat the final report as a handoff artifact for external engineering audit.
