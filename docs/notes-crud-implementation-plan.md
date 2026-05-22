@@ -16,6 +16,11 @@ for list, create, get, update, and delete. The client keeps snake_case DTOs,
 uses shared request contracts for outgoing Notes payloads, and preserves the
 existing envelope/error behavior.
 
+Status update: Slice 6D now documents the Notes persistence/auth integration
+plan in [notes-persistence-auth-integration-plan.md](notes-persistence-auth-integration-plan.md).
+Supabase migrations, RLS policies, JWT auth wiring, and repository replacement
+remain planned but not implemented.
+
 ## Non-Goals
 
 - No durable Notes persistence implementation in Slice 6B beyond the in-memory
@@ -92,9 +97,10 @@ Planned request body:
 Server-owned fields: `id`, `user_id`, `created_at`, `updated_at`, `deleted_at`,
 `version`, `is_deleted`. Default `is_archived` should be `false`.
 
-Open contract decision for Slice 6A: decide whether direct `POST /notes` accepts
-an optional client-generated `id`, or whether client-generated ids are reserved
-for future `/sync/push` create operations.
+Decision for persistence integration: direct `POST /notes` keeps server-generated
+ids. Future `/sync/push` may accept client-generated UUIDs for offline-created
+entities after the sync contract explicitly supports idempotent create
+operations.
 
 ### Get Note
 
@@ -142,8 +148,10 @@ Use the existing FastAPI baseline:
 - `apps/api/app/schemas/notes.py`: Pydantic request/response models or generated
   schema-backed equivalents
 - `apps/api/app/services/notes.py`: business rules and persistence calls
-- `apps/api/app/repositories/notes.py`: in-memory repository only for Slice 6B
-- `apps/api/app/core/deps.py`: future `get_current_user` and database dependency
+- `apps/api/app/repositories/notes.py`: in-memory repository in Slice 6B, planned
+  Supabase-backed repository behind the same boundary
+- `apps/api/app/core/deps.py`: future `get_current_user` and Supabase client
+  dependency
 - `apps/api/tests/test_notes.py`: route tests before real database wiring
 
 Routes should return the existing success envelope and raise typed application
@@ -225,6 +233,8 @@ and future sync push do not diverge.
 - No service-role key or provider key is exposed to the client.
 - Note content is sensitive local data and follows the local storage risk model
   already documented for Phase 1.
+- The Slice 6D persistence/auth plan requires user-scoped Supabase clients for
+  request handling. Service-role access is migration/admin-only.
 
 ## Testing Strategy
 
@@ -272,6 +282,9 @@ Future app/local persistence:
 4. **Slice 6D — Notes persistence/auth integration plan**
    Plan database migrations, RLS, auth dependency, and local persistence mapping
    before implementation.
+5. **Slice 6E — Notes Supabase persistence/auth implementation**
+   Add migrations, RLS, JWT auth dependency, user-scoped repository wiring, and
+   tests according to the Slice 6D plan.
 
 ## Measurable Definition Of Done
 

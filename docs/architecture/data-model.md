@@ -42,6 +42,7 @@ erDiagram
         boolean is_deleted
         timestamptz created_at
         timestamptz updated_at
+        timestamptz deleted_at
         bigint version
     }
 
@@ -126,8 +127,12 @@ Primary content entity. Text-based, supports archiving and soft deletion.
 - `version` — monotonically incrementing integer, used for conflict detection
 - `updated_at` — server-set timestamp, used for ordering
 - `is_deleted` — soft delete flag; physical deletion happens via scheduled cleanup
+- `deleted_at` — server-set timestamp for soft deletion and cleanup eligibility
 
 **Content type** is `plain` or `markdown`. Rich text is out of scope for Phase 1.
+
+The Notes persistence/auth implementation plan is tracked in
+[notes-persistence-auth-integration-plan.md](../notes-persistence-auth-integration-plan.md).
 
 ### Task
 

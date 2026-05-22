@@ -30,6 +30,10 @@ Implementation order:
 3. Add route dependencies and repository helpers that require `current_user`.
 4. Add tests proving user A cannot read or mutate user B data through the API or direct Supabase client.
 
+The Notes-specific migration, RLS, auth dependency, and repository replacement
+plan is documented in
+[notes-persistence-auth-integration-plan.md](../notes-persistence-auth-integration-plan.md).
+
 ## Authentication Flow
 
 ### Client-Side (Expo / React Native Web)
@@ -138,7 +142,8 @@ Every table containing user data has RLS enabled. Policies ensure users can only
 
 ### Policy Pattern
 
-All user-owned tables follow the same policy template:
+User-owned tables follow this policy shape unless a resource has stricter
+semantics:
 
 ```sql
 -- Enable RLS
@@ -160,17 +165,15 @@ CREATE POLICY "Users can update own notes"
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
--- Users can only delete (soft) their own rows
-CREATE POLICY "Users can delete own notes"
-  ON notes FOR DELETE
-  USING (user_id = auth.uid());
+-- Physical delete policies are resource-specific.
+-- Notes CRUD uses UPDATE for soft delete rather than SQL DELETE.
 ```
 
 ### RLS Policy Map
 
 | Table | SELECT | INSERT | UPDATE | DELETE | Special Rules |
 |-------|--------|--------|--------|--------|---------------|
-| `notes` | Own rows | Own rows | Own rows | Own rows | — |
+| `notes` | Own rows | Own rows | Own rows | Physical delete is not used by Notes CRUD | HTTP delete is a soft-delete update |
 | `tasks` | Own rows | Own rows | Own rows | Own rows | — |
 | `voice_memos` | Own rows | Own rows | Own rows | Own rows | — |
 | `transcripts` | Own rows | Own rows | Own rows | Own rows | Immutable after creation (app-level, not RLS) |
