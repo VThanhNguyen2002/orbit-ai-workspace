@@ -8,8 +8,14 @@ The API is mounted under `/v1`.
 
 - `GET /v1/health` returns the service health payload.
 - `GET /v1/version` returns service, app, and API version metadata.
+- `GET /v1/notes` lists non-deleted notes from the in-memory skeleton store.
+- `POST /v1/notes` creates a note in the in-memory skeleton store.
+- `GET /v1/notes/{note_id}` returns one non-deleted note.
+- `PATCH /v1/notes/{note_id}` updates a note when the request `version` matches.
+- `DELETE /v1/notes/{note_id}` soft deletes a note when the request `version`
+  matches.
 
-Both routes use the shared success envelope shape:
+All routes use the shared success envelope shape:
 
 ```json
 {
@@ -22,6 +28,12 @@ Both routes use the shared success envelope shape:
 
 Errors use the shared error envelope shape and include the same `request_id` in
 `meta.request_id`. The request id is also returned as the `X-Request-ID` header.
+
+The Notes routes are a Slice 6B backend skeleton only. They use a process-local
+in-memory repository, do not persist across process restarts, and currently use
+the temporary placeholder user id `dev_user` until Supabase JWT auth is added.
+Supabase storage, RLS policies, real auth provider validation, and database
+migrations remain deferred.
 
 ## Local Checks
 

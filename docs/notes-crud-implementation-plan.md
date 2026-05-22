@@ -2,14 +2,19 @@
 
 ## Objective
 
-Plan the first Notes CRUD implementation without writing product code. Notes are
-the first feature to exercise shared contracts, FastAPI routing, typed API
-client methods, auth boundaries, soft deletion, pagination, and future
-offline-first sync.
+Track the first Notes CRUD implementation slices. Notes are the first feature to
+exercise shared contracts, FastAPI routing, typed API client methods, auth
+boundaries, soft deletion, pagination, and future offline-first sync.
+
+Status update: Slice 6B now includes a minimal FastAPI Notes route skeleton with
+strict Pydantic DTOs, process-local in-memory storage, soft delete behavior, and
+a temporary `dev_user` auth placeholder. Supabase persistence, JWT validation,
+RLS, frontend UI, API client methods, and sync remain deferred.
 
 ## Non-Goals
 
-- No Notes CRUD implementation in this slice.
+- No durable Notes persistence implementation in Slice 6B beyond the in-memory
+  route skeleton.
 - No database migrations, Supabase clients, auth providers, RLS policies, or
   storage integration.
 - No frontend screens, Expo initialization, or local persistence engine.
@@ -36,8 +41,8 @@ offline-first sync.
 | `sync_metadata` | optional local metadata | Client/local only; not required from backend responses |
 
 Slice 6A added dedicated shared request/response schemas for create, update,
-get, list, and delete. Backend routes and API client note methods remain
-deferred.
+get, list, and delete. Slice 6B added backend skeleton routes; API client note
+methods remain deferred.
 
 ## API Endpoint Plan
 
@@ -65,7 +70,7 @@ Default behavior:
 - exclude `is_deleted = true`
 - include archived notes unless an explicit future `is_archived` filter is added
 - sort by `updated_at desc`
-- return `data: Note[]` and `meta.pagination`
+- return `data.items` and `data.pagination`
 
 ### Create Note
 
@@ -129,12 +134,12 @@ body shape with `version`.
 Use the existing FastAPI baseline:
 
 - `apps/api/app/routers/notes.py`: route declarations only, thin handlers
-- `apps/api/app/models/notes.py`: Pydantic request/response models or generated
+- `apps/api/app/schemas/notes.py`: Pydantic request/response models or generated
   schema-backed equivalents
-- `apps/api/app/services/note_service.py`: business rules and persistence calls
+- `apps/api/app/services/notes.py`: business rules and persistence calls
+- `apps/api/app/repositories/notes.py`: in-memory repository only for Slice 6B
 - `apps/api/app/core/deps.py`: future `get_current_user` and database dependency
-- `apps/api/tests/test_notes.py`: mocked-service route tests before real database
-  wiring
+- `apps/api/tests/test_notes.py`: route tests before real database wiring
 
 Routes should return the existing success envelope and raise typed application
 errors that the global handler converts to the standard error envelope.
@@ -255,14 +260,12 @@ Future app/local persistence:
 1. **Slice 6A — Notes contract refinement**
    Add create/update/delete/list schemas, tests, and JSON Schema exports.
 2. **Slice 6B — Notes backend route skeleton**
-   Add FastAPI route signatures, dependency placeholders, mocked service tests,
-   and response envelopes. No database yet.
-3. **Slice 6C — Notes service and persistence boundary**
-   Define repository/service interfaces and fake persistence tests before
-   Supabase wiring.
-4. **Slice 6D — Notes API client methods**
-   Add typed client methods and tests against mocked fetch responses.
-5. **Slice 6E — Notes persistence/auth integration plan**
+   Add FastAPI route signatures, strict DTOs, in-memory repository/service
+   boundaries, route tests, and response envelopes. No database yet.
+3. **Slice 6C — Notes API client methods**
+   Add typed client methods for list, create, get, update, and delete using the
+   shared Notes contracts.
+4. **Slice 6D — Notes persistence/auth integration plan**
    Plan database migrations, RLS, auth dependency, and local persistence mapping
    before implementation.
 
