@@ -32,7 +32,8 @@ Errors use the shared error envelope shape and include the same `request_id` in
 The Notes routes now use a narrow auth context dependency and repository
 interface. Local and test runs default to `SYNAPSE_AUTH_MODE=dev` and
 `SYNAPSE_NOTES_REPOSITORY=memory`, which still uses the safe `dev_user` identity
-and process-local storage. That default keeps CI deterministic and requires no
+and process-local storage. Dev auth is deterministic and local/test-only; do not
+use it in production. That default keeps CI deterministic and requires no
 Supabase project or secrets.
 
 Slice 6E adds a Supabase-ready repository scaffold plus the draft
@@ -40,6 +41,10 @@ Slice 6E adds a Supabase-ready repository scaffold plus the draft
 policies. Live Supabase client wiring and full JWT validation remain
 environment-gated follow-up work; request-path code does not use the service
 role key.
+
+Slice 6G hardens auth mode handling. Supported modes are `dev` and `jwt`.
+Unknown modes fail closed with `401 UNAUTHORIZED`; `jwt` mode requires a Bearer
+header shape and rejects missing, malformed, unconfigured, or unverified tokens.
 
 ## Configuration
 

@@ -47,6 +47,19 @@ Slice 6E implementation status:
 - `supabase/migrations/20260522000000_create_notes.sql` drafts the Notes table,
   indexes, soft-delete/version metadata, and own-user RLS policies.
 
+Slice 6G hardening status:
+
+- Supported API auth modes are explicit: `dev` and `jwt`.
+- `dev` mode is deterministic and intended only for local development and tests.
+  It must not be used in production deployments.
+- Unknown `SYNAPSE_AUTH_MODE` values now fail closed with `401 UNAUTHORIZED`
+  instead of falling back to `dev`.
+- `jwt` mode requires an `Authorization: Bearer <token>` header shape, rejects
+  missing or malformed authorization headers, and rejects placeholder/fake tokens
+  while full JWT verification remains deferred.
+- `jwt` mode does not require live Supabase in CI; without verifier/config it
+  fails closed rather than accepting requests.
+
 ## Authentication Flow
 
 ### Client-Side (Expo / React Native Web)
@@ -107,7 +120,8 @@ When the device is offline:
 
 ## Backend JWT Validation
 
-FastAPI validates every request (except `/v1/health`) via a dependency:
+Target state: FastAPI validates every request (except `/v1/health`) via a
+dependency:
 
 ```python
 # app/dependencies/auth.py
@@ -146,6 +160,10 @@ async def get_current_user(
 - Issues its own tokens
 - Manages sessions
 - Calls Supabase Auth admin APIs (Phase 1)
+
+Current implementation note: Slice 6G does not add a JWT library or live
+Supabase verifier. The `jwt` branch exists as a fail-closed boundary until the
+future verifier can validate signature, expiry, audience, and `sub`.
 
 ## Row-Level Security (RLS)
 

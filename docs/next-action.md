@@ -2,18 +2,18 @@
 
 ## Objective
 
-Start Slice 6F — Notes integration verification. The shared Notes CRUD
-contracts, FastAPI route skeleton, API client methods, auth context boundary,
-repository interface, memory default, Supabase repository scaffold, and draft
-Notes migration/RLS file are in place. The next step should verify the full
-contract across packages and document any remaining integration gaps before live
-Supabase wiring.
+Start Slice 6H — Notes live auth/Supabase integration planning. The shared
+Notes CRUD contracts, FastAPI route skeleton, API client methods, auth context
+boundary, explicit `dev`/`jwt` auth modes, fail-closed JWT branch, repository
+interface, memory default, Supabase repository scaffold, and draft Notes
+migration/RLS file are in place. The next step should plan live JWT verification
+and user-scoped Supabase client wiring without breaking deterministic CI.
 
 ## Expected Files To Change
 
-- Verification docs and small test fixes only if gaps are discovered.
+- Planning docs and small deterministic tests only if gaps are discovered.
 - Avoid frontend UI, Expo initialization, sync engine work, AI/provider work, and
-  live Supabase client wiring unless Slice 6F explicitly expands scope.
+  live Supabase client wiring unless Slice 6H explicitly expands scope.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, or service-role usage in
@@ -38,23 +38,25 @@ pnpm build
 
 ## Definition Of Done
 
-- All requested API, shared, API-client, lint, typecheck, test, and build
-  commands pass from a clean checkout.
-- Verification confirms memory repo remains the default and does not require
-  Supabase environment variables.
-- Verification confirms Notes auth derives `user_id` from the auth context and
-  never from client payloads.
-- Verification confirms missing/deleted/cross-user Notes return `404`; stale
-  versions return `409` with `server_data`.
-- Verification confirms the migration/RLS draft is present but not executed in
-  CI.
+- Planning identifies the JWT library/verifier approach and exact config needed
+  without committing secrets.
+- Planning identifies how request-path Supabase clients will be user-scoped and
+  avoid service-role use.
+- Memory repo remains the default and does not require Supabase environment
+  variables.
+- Notes auth still derives `user_id` from the auth context and never from client
+  payloads.
+- Missing/deleted/cross-user Notes still return `404`; stale versions return
+  `409` with `server_data`.
 - No secrets, provider integration, frontend UI, Expo initialization, or sync
   engine work is added.
 
 ## Risks
 
-- The Supabase repository is scaffolded only; live client injection and JWT
+- The Supabase repository is scaffolded only; live client injection and full JWT
   verification still need dedicated implementation.
+- Auth currently rejects all `jwt` requests after Bearer-shape checks because no
+  verifier is wired yet.
 - The SQL RLS draft still needs execution against a real Supabase project and
   integration tests using user-scoped tokens.
 - Contract drift can still appear between shared Zod schemas and FastAPI
@@ -62,9 +64,9 @@ pnpm build
 
 ## Rollback Notes
 
-Revert only Slice 6F verification changes if they introduce noise. Keep completed
-shared contracts, backend skeleton, API client methods, Slice 6E auth/repository
-boundaries, and migration/RLS draft intact.
+Revert only Slice 6H planning changes if they introduce noise. Keep completed
+shared contracts, backend skeleton, API client methods, Slice 6E/6G
+auth/repository boundaries, and migration/RLS draft intact.
 
 ## External Review Gate
 

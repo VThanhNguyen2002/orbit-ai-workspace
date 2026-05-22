@@ -1,10 +1,12 @@
 import os
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, cast
 
 AuthMode = Literal["dev", "jwt"]
+ConfiguredAuthMode = AuthMode | str
 NotesRepositoryMode = Literal["memory", "supabase"]
+SUPPORTED_AUTH_MODES: tuple[AuthMode, ...] = ("dev", "jwt")
 
 
 @dataclass(frozen=True)
@@ -14,7 +16,7 @@ class Settings:
     app_version: str = "0.0.0"
     api_version: str = "v1"
     api_prefix: str = "/v1"
-    auth_mode: AuthMode = "dev"
+    auth_mode: ConfiguredAuthMode = "dev"
     dev_user_id: str = "dev_user"
     notes_repository: NotesRepositoryMode = "memory"
     supabase_url: str | None = None
@@ -39,11 +41,11 @@ def get_settings() -> Settings:
     )
 
 
-def _auth_mode(value: str) -> AuthMode:
-    if value == "jwt":
-        return "jwt"
+def _auth_mode(value: str) -> ConfiguredAuthMode:
+    if value in SUPPORTED_AUTH_MODES:
+        return cast(AuthMode, value)
 
-    return "dev"
+    return value
 
 
 def _notes_repository_mode(value: str) -> NotesRepositoryMode:

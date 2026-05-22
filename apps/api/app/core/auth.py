@@ -1,13 +1,13 @@
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastapi import Depends, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.core.config import Settings, get_settings
+from app.core.config import AuthMode, Settings, get_settings
 from app.core.errors import ApiError
 from app.models.responses import ApiErrorDetail
 
-AuthContextMode = Literal["dev", "jwt"]
+AuthContextMode = AuthMode
 
 
 class AuthContext(BaseModel):
@@ -25,13 +25,14 @@ def get_auth_context(
     if settings.auth_mode == "dev":
         return AuthContext(user_id=settings.dev_user_id, auth_mode="dev")
 
-    return _jwt_auth_context(request=request, settings=settings)
+    if settings.auth_mode == "jwt":
+        return _jwt_auth_context(request=request, settings=settings)
+
+    raise _unauthorized("Unsupported auth mode")
 
 
 def _jwt_auth_context(*, request: Request, settings: Settings) -> AuthContext:
-    credentials = _bearer_token(request)
-    if credentials is None:
-        raise _unauthorized("Missing bearer token")
+    _bearer_token(request)
 
     if not settings.supabase_jwt_secret:
         raise _unauthorized("JWT auth is not configured")
@@ -42,14 +43,18 @@ def _jwt_auth_context(*, request: Request, settings: Settings) -> AuthContext:
     raise _unauthorized("JWT auth validation is not implemented")
 
 
-def _bearer_token(request: Request) -> str | None:
+def _bearer_token(request: Request) -> str:
     value = request.headers.get("authorization")
     if value is None:
-        return None
+        raise _unauthorized("Missing bearer token")
 
-    scheme, _, token = value.partition(" ")
+    parts = value.split()
+    if len(parts) != 2:
+        raise _unauthorized("Malformed bearer token")
+
+    scheme, token = parts
     if scheme.lower() != "bearer" or not token:
-        return None
+        raise _unauthorized("Malformed bearer token")
 
     return token
 

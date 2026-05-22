@@ -1,9 +1,11 @@
 import pytest
+from fastapi.testclient import TestClient
 from starlette.requests import Request
 
 from app.core.auth import AuthContext, get_auth_context
 from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
+from app.main import create_app
 
 
 def test_settings_do_not_require_supabase_environment(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -26,6 +28,17 @@ def test_settings_do_not_require_supabase_environment(monkeypatch: pytest.Monkey
     assert settings.supabase_service_role_key is None
 
 
+def test_settings_preserve_unsupported_auth_mode_for_fail_closed_auth(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SYNAPSE_AUTH_MODE", "unsupported")
+    get_settings.cache_clear()
+
+    settings = get_settings()
+
+    assert settings.auth_mode == "unsupported"
+
+
 def test_dev_auth_context_returns_safe_dev_user() -> None:
     auth_context = get_auth_context(
         request=_request(),
@@ -35,7 +48,7 @@ def test_dev_auth_context_returns_safe_dev_user() -> None:
     assert auth_context == AuthContext(user_id="dev_user", auth_mode="dev")
 
 
-def test_jwt_auth_boundary_rejects_missing_bearer_token() -> None:
+def test_jwt_auth_boundary_rejects_missing_authorization() -> None:
     with pytest.raises(ApiError) as exc_info:
         get_auth_context(
             request=_request(),
@@ -44,6 +57,38 @@ def test_jwt_auth_boundary_rejects_missing_bearer_token() -> None:
 
     assert exc_info.value.status_code == 401
     assert exc_info.value.code == "UNAUTHORIZED"
+
+
+@pytest.mark.parametrize(
+    "authorization",
+    [
+        "",
+        "token placeholder-token",
+        "Bearer",
+        "Bearer placeholder-token extra",
+    ],
+)
+def test_jwt_auth_boundary_rejects_malformed_authorization(authorization: str) -> None:
+    with pytest.raises(ApiError) as exc_info:
+        get_auth_context(
+            request=_request(authorization=authorization),
+            settings=Settings(auth_mode="jwt", supabase_jwt_secret="placeholder"),
+        )
+
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.code == "UNAUTHORIZED"
+
+
+def test_jwt_auth_boundary_without_verifier_config_fails_closed() -> None:
+    with pytest.raises(ApiError) as exc_info:
+        get_auth_context(
+            request=_request(authorization="Bearer placeholder-token"),
+            settings=Settings(auth_mode="jwt"),
+        )
+
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.code == "UNAUTHORIZED"
+    assert exc_info.value.message == "JWT auth is not configured"
 
 
 def test_jwt_auth_boundary_is_explicitly_deferred() -> None:
@@ -55,6 +100,46 @@ def test_jwt_auth_boundary_is_explicitly_deferred() -> None:
 
     assert exc_info.value.status_code == 401
     assert exc_info.value.message == "JWT auth validation is not implemented"
+
+
+def test_unsupported_auth_mode_fails_closed() -> None:
+    with pytest.raises(ApiError) as exc_info:
+        get_auth_context(
+            request=_request(),
+            settings=Settings(auth_mode="unsupported"),
+        )
+
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.code == "UNAUTHORIZED"
+    assert exc_info.value.message == "Unsupported auth mode"
+
+
+def test_notes_route_in_jwt_mode_rejects_missing_authorization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SYNAPSE_AUTH_MODE", "jwt")
+    get_settings.cache_clear()
+
+    with TestClient(create_app()) as client:
+        response = client.get("/v1/notes", headers={"x-request-id": "req_jwt_missing"})
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "UNAUTHORIZED"
+    assert response.json()["meta"] == {"request_id": "req_jwt_missing"}
+
+
+def test_notes_route_with_unsupported_auth_mode_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SYNAPSE_AUTH_MODE", "unsupported")
+    get_settings.cache_clear()
+
+    with TestClient(create_app()) as client:
+        response = client.get("/v1/notes", headers={"x-request-id": "req_auth_mode"})
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "UNAUTHORIZED"
+    assert response.json()["meta"] == {"request_id": "req_auth_mode"}
 
 
 def _request(*, authorization: str | None = None) -> Request:

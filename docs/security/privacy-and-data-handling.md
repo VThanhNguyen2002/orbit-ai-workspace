@@ -43,6 +43,11 @@ the memory repository for local/test determinism, and the Supabase request path
 will require an injected user-scoped client before live use. No service-role key
 is used by Notes request handlers.
 
+Slice 6G hardens the API auth mode boundary. `SYNAPSE_AUTH_MODE=dev` remains a
+local/test-only deterministic path, while `SYNAPSE_AUTH_MODE=jwt` fails closed
+for missing, malformed, unconfigured, or unverified bearer tokens. Unknown auth
+modes also fail closed instead of silently becoming dev auth.
+
 ### API-Level Isolation
 
 Even though RLS handles authorization, the API adds defense-in-depth:
@@ -171,6 +176,8 @@ Data stored locally in WatermelonDB (SQLite on mobile, web adapter storage in th
 - **Mobile:** `expo-secure-store` (Keychain on iOS, Keystore on Android)
 - **Web:** `httpOnly` cookie or in-memory (Supabase handles this)
 - Never in localStorage, browser persistence, key-value stores, or WatermelonDB entity tables
+- The API must not log bearer token contents. Auth failures should report only
+  coarse failure categories through the standard error envelope.
 
 ## Data Deletion
 
