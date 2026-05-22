@@ -2,19 +2,19 @@
 
 ## Objective
 
-Start Slice 6C — Notes API client methods. The shared Notes CRUD contracts exist
-and the Slice 6B FastAPI route skeleton is in place with in-memory storage only.
-The next step should add typed client methods without frontend UI, sync engine,
-database migrations, or provider integration.
+Start Slice 6D — Notes persistence/auth integration plan. The shared Notes CRUD
+contracts, Slice 6B FastAPI route skeleton, and Slice 6C API client methods are
+in place. The next step should plan durable persistence and auth integration
+before implementation.
 
 ## Expected Files To Change
 
-- `packages/api-client/src/index.ts`
-- `packages/api-client/src/index.test.ts`
-- shared contract imports only if needed
+- docs for persistence/auth planning
+- future migration/RLS/auth boundary notes only if needed
 
-No database integration, Supabase/auth provider wiring, frontend screens, Expo
-initialization, or sync engine implementation should be added in this slice.
+Do not add database migrations, Supabase clients, provider secrets, frontend
+screens, Expo initialization, API client methods, or sync engine implementation
+in this planning slice.
 
 ## Commands To Run
 
@@ -28,20 +28,18 @@ pnpm --filter @synapse/shared contracts:check
 
 ## Definition Of Done
 
-- API client exposes Notes list/create/get/update/delete methods.
-- Methods keep snake_case request and response DTOs.
-- Methods parse standard success envelopes and preserve error handling behavior.
-- Tests cover expected paths, query serialization, payloads, and 404/409 error
-  mapping.
-- No product UI, sync engine, auth provider, or database code is implemented.
+- Persistence/auth boundaries for Notes are documented before code changes.
+- Supabase table/RLS/auth dependency expectations are clear.
+- In-memory backend limitations and replacement path are explicit.
+- No provider secrets, live Supabase calls, UI, or sync engine code is added.
 
 ## Risks
 
-- Client methods can drift from the shared snake_case contracts.
-- Error mapping should stay compatible with existing `ApiClientError` behavior.
-- Notes client work should not pull in sync or UI responsibilities.
+- Persistence planning can drift into implementation too early.
+- Auth placeholder replacement must preserve non-enumerating 404 behavior.
+- RLS and application-level user scoping need to stay aligned.
 
 ## Rollback Notes
 
-Revert only Slice 6C API client changes if route sequencing changes. Keep
-completed shared contracts and Slice 6B backend skeleton intact.
+Revert only Slice 6D planning docs if route sequencing changes. Keep completed
+shared contracts, backend skeleton, and API client methods intact.

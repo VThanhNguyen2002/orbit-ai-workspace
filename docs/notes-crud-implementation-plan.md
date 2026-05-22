@@ -9,7 +9,12 @@ boundaries, soft deletion, pagination, and future offline-first sync.
 Status update: Slice 6B now includes a minimal FastAPI Notes route skeleton with
 strict Pydantic DTOs, process-local in-memory storage, soft delete behavior, and
 a temporary `dev_user` auth placeholder. Supabase persistence, JWT validation,
-RLS, frontend UI, API client methods, and sync remain deferred.
+RLS, frontend UI, and sync remain deferred.
+
+Status update: Slice 6C now includes typed `@synapse/api-client` Notes methods
+for list, create, get, update, and delete. The client keeps snake_case DTOs,
+uses shared request contracts for outgoing Notes payloads, and preserves the
+existing envelope/error behavior.
 
 ## Non-Goals
 
@@ -41,8 +46,8 @@ RLS, frontend UI, API client methods, and sync remain deferred.
 | `sync_metadata` | optional local metadata | Client/local only; not required from backend responses |
 
 Slice 6A added dedicated shared request/response schemas for create, update,
-get, list, and delete. Slice 6B added backend skeleton routes; API client note
-methods remain deferred.
+get, list, and delete. Slice 6B added backend skeleton routes, and Slice 6C
+added API client note methods.
 
 ## API Endpoint Plan
 
@@ -169,8 +174,7 @@ Rules:
 
 ## API Client Impact
 
-Future `@synapse/api-client` work should add typed methods after shared schemas
-exist:
+`@synapse/api-client` now includes typed methods after shared schemas exist:
 
 - `notes.list(query)`
 - `notes.create(payload)`
@@ -179,7 +183,7 @@ exist:
 - `notes.delete(note_id, payload)`
 
 The client should keep using the generic request wrapper, auth token callback,
-and shared success/error envelopes. Tests should cover:
+and shared success/error envelopes. Tests cover:
 
 - query serialization for pagination
 - success envelope parsing for list and single-note responses
