@@ -46,9 +46,14 @@ The intended Notes ownership and RLS behavior is documented in architecture
 plans only. Those summaries are not a migration, have not been executed, and do
 not authorize creation or deployment of database artifacts.
 
-## History Note
+## Git History Posture
 
-Removing a tracked migration removes it from the current tree, not from existing
-Git history. No credentials or real data were identified in the removed draft.
-Any decision to rewrite history must be separately reviewed and coordinated
-because it changes repository history for all collaborators.
+- Removed migration artifacts must not remain in `HEAD`.
+- The removed Notes SQL draft contained no secrets, credentials, or production
+  data; therefore this project will not rewrite Git history at this time.
+- Historical removal requires explicit approval and coordination because it
+  changes repository history for all collaborators.
+- Reserve history rewriting for discovered secrets, credentials, production
+  data, other sensitive exposure, or a reviewed cleanup before public release.
+- Private repository status is not a substitute for review discipline or future
+  public-release preparation.
