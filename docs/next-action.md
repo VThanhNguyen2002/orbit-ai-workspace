@@ -2,12 +2,11 @@
 
 ## Objective
 
-Start **Slice 6H-1 - JWT verifier interface and tests**. Slice 6H planning is
-captured in
-[notes-live-auth-supabase-plan.md](notes-live-auth-supabase-plan.md): use
-asymmetric Supabase signing keys and JWKS verification as the default live auth
-path, retain HS256 only as an explicit legacy mode, and do not wire live
-Supabase persistence until authenticated identity is verified.
+Start **Slice 6H-2 - User-scoped Supabase client factory**. Slice 6H-1 now
+provides an injected verifier boundary and a configured RS256 adapter with
+local-key tests; it does not perform Supabase JWKS discovery or contact a live
+service. The next factory should propagate the already verified caller token
+through a narrowly scoped client boundary using fakes in tests.
 
 Security gate: no executable Supabase migration is committed. Notes/RLS design
 remains sanitized documentation only, and any future migration artifact requires
@@ -16,11 +15,11 @@ explicit approval and security review under
 
 ## Expected Files To Change
 
-- API auth/config modules, dependency metadata, and deterministic auth tests
-  needed for the verifier interface and its selected adapters.
+- API client-factory/repository-boundary modules and deterministic fake-client
+  tests required to model caller-scoped data access.
 - Documentation/config placeholders only when required by implemented settings.
-- Do not add the user-scoped Supabase client factory or create/execute an RLS
-  migration in this slice.
+- Do not connect to live Supabase, wire live Notes persistence, add JWKS network
+  retrieval, or create/execute an RLS migration in this slice.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, live Notes Supabase repository
@@ -45,14 +44,11 @@ pnpm build
 
 ## Definition Of Done
 
-- A verifier interface is injected behind `get_auth_context`; production JWT
-  mode never accepts a token based on header shape alone.
-- JWKS mode verifies signature, expiry, issuer, audience, and UUID `sub` with an
-  explicit asymmetric algorithm allowlist; legacy HS256 is opt-in only.
-- Tests use generated local keys/fakes and cover invalid and valid token paths
-  without requiring Supabase or network calls.
-- A verified `sub` is the only source for `AuthContext.user_id`, and errors/logs
-  never expose bearer-token values.
+- A request-scoped factory consumes the verified caller access token without
+  mutating global authentication state.
+- Tests use fake client construction only and demonstrate that caller identity
+  and token handoff stay scoped to the request.
+- No service-role credential is read or used in the request path.
 - Memory persistence remains the default; no live Supabase client or executable
   migration is introduced.
 - No real credentials, UI, Expo, AI, or sync engine work is added.
@@ -61,10 +57,9 @@ pnpm build
 
 - The Supabase repository remains scaffolded only; live client injection still
   needs its later implementation slice.
-- Until Slice 6H-1 is completed, auth rejects all `jwt` requests after
-  Bearer-shape checks because no verifier is wired yet.
-- JWKS cache and key-rotation handling require careful deterministic tests before
-  production enablement.
+- The configured RS256 verifier is suitable for deterministic boundary tests,
+  but JWKS cache and key-rotation handling remain required before production
+  Supabase authentication is enabled.
 - The Notes/RLS design has no executable migration artifact. Any later migration
   and user-scoped validation must pass explicit security approval first.
 - Contract drift can still appear between shared Zod schemas and FastAPI
@@ -72,10 +67,10 @@ pnpm build
 
 ## Rollback Notes
 
-If Slice 6H-1 implementation is unsuitable, revert only that implementation.
-Keep completed shared contracts, backend skeleton, API client methods, Slice
-6E/6G auth/repository boundaries, Slice 6H plan, and the database artifact
-security policy intact.
+If Slice 6H-2 implementation is unsuitable, revert only that factory work. Keep
+completed shared contracts, backend skeleton, API client methods, Slice 6E/6G
+boundaries, Slice 6H-1 verifier boundary/tests, the Slice 6H plan, and the
+database artifact security policy intact.
 
 ## External Review Gate
 

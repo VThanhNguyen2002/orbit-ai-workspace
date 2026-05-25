@@ -2,10 +2,12 @@
 
 ## Status
 
-Slice 6H is planning/design only. It does not add a JWT library, live Supabase
-client wiring, migration execution, credentials, frontend UI, sync engine, or AI
-integration. A subsequent security patch removed the executable Notes SQL draft;
-no executable Supabase migration is currently committed.
+Slice 6H-1 adds the API JWT verifier boundary and deterministic local-key tests.
+It includes a configured RS256 adapter, but does not add live Supabase JWKS
+discovery, Supabase client wiring, migration execution, credentials, frontend
+UI, sync engine, or AI integration. A prior security patch removed the
+executable Notes SQL draft; no executable Supabase migration is currently
+committed.
 
 ## Objective
 
@@ -16,8 +18,8 @@ enabled and validated.
 
 ## Non-Goals
 
-- No runtime code, dependencies, Supabase client, or JWT verifier is added in
-  this slice.
+- No live Supabase client, network-backed JWKS retrieval, or legacy shared-secret
+  JWT adapter is added in this slice.
 - No executable database migration is committed, executed, or treated as
   production-ready without explicit approval and security review.
 - No real key, token, password, URL, or `.env` file is added.
@@ -31,8 +33,11 @@ enabled and validated.
 - `@synapse/api-client` exposes typed Notes methods.
 - `apps/api/app/core/auth.py` has explicit `dev` and `jwt` modes.
 - `dev` mode returns a deterministic local/test `AuthContext`.
-- `jwt` mode validates only the `Authorization: Bearer <token>` shape and then
-  fails closed.
+- `jwt` mode delegates bearer tokens to an injected verifier. The implemented
+  RS256 adapter requires configured issuer, audience, and public key values and
+  verifies signature, expiry, UUID `sub`, and authenticated role.
+- If JWT verifier configuration is absent or token verification fails, `jwt`
+  mode fails closed with `401 UNAUTHORIZED`.
 - Unknown auth modes fail closed with `401 UNAUTHORIZED`.
 - The memory Notes repository remains the default.
 - `apps/api/app/repositories/notes_supabase.py` is scaffold-only and requires an
@@ -46,9 +51,10 @@ enabled and validated.
 
 1. Keep `dev` and `jwt` as the only API auth modes.
 2. Keep `dev` local/test-only and deterministic.
-3. Keep `jwt` fail-closed until a real verifier is wired.
-4. Add a dedicated JWT verifier boundary before adding any Supabase request-path
-   code.
+3. Keep `jwt` fail-closed unless a configured verifier successfully verifies the
+   bearer token.
+4. Use the dedicated JWT verifier boundary before adding any Supabase
+   request-path code.
 5. Verify tokens locally using asymmetric Supabase Auth signing keys exposed by
    JWKS as the production default; do not make per-request user lookup the normal
    validation path.
@@ -66,11 +72,12 @@ enabled and validated.
 
 ### Decision
 
-Implement `Slice 6H-1 - JWT verifier interface and tests` before live
-persistence wiring. Its production adapter should use `PyJWT[crypto]` to verify
-Supabase-issued tokens against an asymmetric JWKS endpoint. Supabase documents
-asymmetric signing keys/JWKS verification as the modern local-verification path;
-shared-secret verification remains a legacy compatibility mode.
+Slice 6H-1 implements `JwtVerifier` and `VerifiedJwtClaims`, plus a
+`PyJWT[crypto]` RS256 adapter configured with `SYNAPSE_JWT_PUBLIC_KEY`,
+`SYNAPSE_JWT_ISSUER`, and `SYNAPSE_JWT_AUDIENCE`. This provides a real
+verification boundary without a network dependency. Live Supabase deployments
+still require a later JWKS adapter; shared-secret verification remains a
+deferred legacy compatibility option only.
 
 ### Verifier Shape
 
@@ -78,12 +85,12 @@ Introduce a small verifier protocol such as:
 
 ```python
 class JwtVerifier(Protocol):
-    def verify(self, token: str) -> VerifiedJwt: ...
+    def verify(self, token: str) -> VerifiedJwtClaims: ...
 
 
-class VerifiedJwt(BaseModel):
-    user_id: str
-    claims: dict[str, Any]
+class VerifiedJwtClaims(BaseModel):
+    sub: str
+    role: Literal["authenticated"]
 ```
 
 `get_auth_context` should keep parsing the Bearer header, then delegate only the
@@ -91,7 +98,7 @@ token string to the verifier. The dependency should return:
 
 ```python
 AuthContext(
-    user_id=verified.user_id,
+    user_id=verified.sub,
     auth_mode="jwt",
     access_token=token,
 )
@@ -100,9 +107,18 @@ AuthContext(
 The raw token is retained only long enough to create the caller-scoped Supabase
 request client; it must never appear in logs or error bodies.
 
-### JWKS Mode
+### Implemented Configured RS256 Mode
 
-Use `PyJWT[crypto]` with a bounded in-process JWKS cache:
+`PyJwtRsaVerifier` uses an explicit `RS256` allowlist and a configured public
+key. It validates signature, `exp`, issuer, audience, UUID `sub`, and
+`role="authenticated"`. It rejects unsigned tokens, invalid signatures, and
+all invalid claims with a coarse `401 UNAUTHORIZED` response. It does not log
+or return token values.
+
+### Deferred JWKS Mode
+
+For live Supabase integration, extend the verifier boundary with
+`PyJWT[crypto]` and a bounded in-process JWKS cache:
 
 - Derive the issuer from `SUPABASE_URL` unless overridden:
   `https://<project-ref>.supabase.co/auth/v1`.
@@ -120,9 +136,10 @@ Use `PyJWT[crypto]` with a bounded in-process JWKS cache:
 - Return only coarse `401 UNAUTHORIZED` responses to clients.
 - Log only request id and failure category, never token contents or user email.
 
-### Legacy HS256 Mode
+### Deferred Legacy HS256 Mode
 
-Support HS256 only in an explicitly selected legacy deployment mode:
+If an identified legacy deployment later requires HS256, support it only in an
+explicitly selected compatibility mode:
 
 - Require `SUPABASE_JWT_SECRET`.
 - Keep HS256 in a mode-specific algorithm allowlist and do not select an
@@ -132,8 +149,8 @@ Support HS256 only in an explicitly selected legacy deployment mode:
 
 ### Tests
 
-Deterministic unit tests should use generated local keys and fake claims, not
-live Supabase:
+Implemented tests generate ephemeral local RSA keys and fake claims, not live
+Supabase:
 
 - missing Authorization -> `401`
 - malformed Authorization -> `401`
@@ -142,7 +159,9 @@ live Supabase:
 - wrong issuer -> `401`
 - wrong audience -> `401`
 - missing `sub` -> `401`
+- malformed UUID `sub` -> `401`
 - invalid signature -> `401`
+- unsupported role and unsigned token -> `401`
 - valid local test JWT -> `AuthContext(user_id=<sub>, auth_mode="jwt")`
 - fake placeholder token -> `401`
 
@@ -233,6 +252,9 @@ Currently implemented settings remain safe because the live path is unwired:
 - `SYNAPSE_AUTH_MODE=dev`
 - `SYNAPSE_NOTES_REPOSITORY=memory`
 - `SYNAPSE_DEV_USER_ID=dev_user`
+- `SYNAPSE_JWT_ISSUER`
+- `SYNAPSE_JWT_AUDIENCE`
+- `SYNAPSE_JWT_PUBLIC_KEY` (RS256 verification key; optional in default mode)
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_JWT_SECRET`
@@ -249,17 +271,17 @@ implementation slices:
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY` for the recommended deployment, or the currently
   modeled `SUPABASE_ANON_KEY` only for a legacy-compatible deployment
-- `SUPABASE_JWT_AUDIENCE=authenticated`
-- `SUPABASE_JWT_ISSUER=https://<project-ref>.supabase.co/auth/v1`
-- `SUPABASE_JWKS_URL=https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`
+- `SYNAPSE_JWT_AUDIENCE=authenticated`
+- `SYNAPSE_JWT_ISSUER=https://<project-ref>.supabase.co/auth/v1`
+- `SYNAPSE_JWKS_URL=https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`
 - `SUPABASE_JWT_SECRET` only when `SYNAPSE_JWT_VERIFIER_MODE=legacy_hs256`
 
 `SUPABASE_SERVICE_ROLE_KEY` may exist for migration/admin tooling, but the API
 request path must not read or inject it into a user request client.
 
-Current `.env.example` is not expanded in this planning slice because the new
-configuration is not yet read by runtime code. When implemented, it must contain
-placeholders only; files containing real `.env` values remain gitignored.
+`.env.example` contains placeholders for the configured local RS256 verifier
+only. Files containing real environment values remain gitignored, and no test
+or runtime credential is committed.
 
 ## Deterministic CI And Test Strategy
 
@@ -267,7 +289,7 @@ Default CI must remain independent of live Supabase:
 
 - `SYNAPSE_AUTH_MODE=dev`
 - `SYNAPSE_NOTES_REPOSITORY=memory`
-- fake JWT verifier tests use local generated keys
+- JWT verifier tests generate local RSA keys in test fixtures
 - fake Supabase repository/client tests use deterministic in-memory responses
 - no live network calls
 - no required Supabase environment variables
@@ -284,25 +306,25 @@ Optional integration tests should require all of:
 
 | Risk | Control |
 |------|---------|
-| Fake JWT accepted | Keep `jwt` fail-closed until verifier exists; reject invalid signatures and `alg=none`. |
+| Fake JWT accepted | `jwt` requires successful RS256 verification; tests reject invalid signatures and `alg=none`. |
 | Token leakage | Never log token values, refresh tokens, email, note title, or note content. |
 | Service-role misuse | Do not import or inject service-role credentials into request-path dependencies. |
 | RLS bypass via API bug | Keep explicit `user_id` filters in every query. |
 | RLS policy drift | Add user A/user B RLS tests before live enablement. |
 | Premature operational schema artifact | Ignore Supabase migration SQL and require explicit security review before any exception. |
-| Key rotation outage | Prefer JWKS/asymmetric keys and refresh cache on unknown `kid`. |
+| Key rotation outage | Configured-key mode is not suitable for live rotation; add JWKS caching/refresh before live Supabase auth. |
 | Legacy secret exposure | Use `SUPABASE_JWT_SECRET` only for legacy HS256 verification; never commit it. |
 | CI flakiness | Keep default tests fake/local; gate live Supabase tests. |
 
 ## Future Implementation Slices
 
-1. **Slice 6H-1 - JWT verifier interface and tests (recommended next)**
-   Add the injected verifier boundary, selected JWT dependency/config parsing,
-   JWKS-mode and explicit legacy-mode adapters, local-key unit tests, and
-   route-level JWT success/failure tests. Do not wire Supabase persistence yet.
-2. **Slice 6H-2 - User-scoped Supabase client factory**
+1. **Slice 6H-1 - JWT verifier interface and tests (completed)**
+   The injected boundary, configured RS256 adapter, placeholder configuration,
+   generated-local-key tests, and route-level success/failure coverage exist.
+   JWKS and legacy shared-secret adapters remain intentionally deferred.
+2. **Slice 6H-2 - User-scoped Supabase client factory (recommended next)**
    Add request-scoped client construction with caller token and fake-client tests.
-   Keep memory repository default.
+   Keep memory repository default and do not connect to live Supabase.
 3. **Slice 6H-3 - Supabase Notes repository wiring**
    Wire the scaffold behind config, preserve memory default, and verify
    repository semantics with mocked Supabase responses.
@@ -320,15 +342,16 @@ Optional integration tests should require all of:
 
 ## Definition Of Done
 
-Slice 6H planning is done when this document records the verifier, client,
-migration, RLS, configuration, testing, and risk decisions; related architecture
-docs no longer prescribe HS256 as the default; and the next task is
-`Slice 6H-1`. No executable database migration is part of that implementation.
+Slice 6H-1 is complete when the configured local verifier accepts only valid
+RS256 test tokens, maps verified UUID `sub` to `AuthContext.user_id`, and fails
+closed for unavailable configuration and invalid input without live services.
+No executable database migration is part of this implementation.
 
 Later live enablement is done only when:
 
+- a network-backed Supabase JWKS verifier is added and reviewed for key rotation;
 - `SYNAPSE_AUTH_MODE=jwt` accepts only cryptographically verified Supabase access
-  tokens.
+  tokens in live configuration;
 - Missing, malformed, expired, wrong-audience, wrong-issuer, missing-`sub`, and
   invalid-signature tokens return `401`.
 - `AuthContext.user_id` comes only from verified `sub`.

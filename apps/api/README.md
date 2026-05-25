@@ -38,13 +38,20 @@ Supabase project or secrets.
 
 Slice 6E adds a Supabase-ready repository scaffold. Notes/RLS persistence intent
 is maintained as sanitized architecture documentation only; no executable
-Supabase migration is currently committed. Live Supabase client wiring and full
-JWT validation remain environment-gated follow-up work; request-path code does
-not use the service role key.
+Supabase migration is currently committed. Live Supabase client wiring remains
+deferred; request-path code does not use the service role key.
 
 Slice 6G hardens auth mode handling. Supported modes are `dev` and `jwt`.
 Unknown modes fail closed with `401 UNAUTHORIZED`; `jwt` mode requires a Bearer
-header shape and rejects missing, malformed, unconfigured, or unverified tokens.
+header shape and rejects missing or malformed headers.
+
+Slice 6H-1 adds an injected JWT verifier interface and a configured RS256
+`PyJWT[crypto]` adapter. In `jwt` mode it verifies signature, expiry, issuer,
+audience, authenticated role, and UUID `sub`, which becomes
+`AuthContext.user_id`; invalid or unconfigured requests return `401
+UNAUTHORIZED`. Tests generate local RSA keys at runtime and make no Supabase
+network calls. Live Supabase JWKS discovery and the user-scoped repository
+client remain deferred.
 
 ## Configuration
 
@@ -54,14 +61,18 @@ Supported local placeholders:
 SYNAPSE_AUTH_MODE=dev
 SYNAPSE_NOTES_REPOSITORY=memory
 SYNAPSE_DEV_USER_ID=dev_user
+SYNAPSE_JWT_ISSUER=https://issuer.example.invalid/auth/v1
+SYNAPSE_JWT_AUDIENCE=authenticated
+SYNAPSE_JWT_PUBLIC_KEY=replace-with-rs256-public-key-pem
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=replace-with-supabase-anon-key
-SUPABASE_JWT_SECRET=replace-with-supabase-jwt-secret
+SUPABASE_JWT_SECRET=replace-with-legacy-jwt-secret
 SUPABASE_SERVICE_ROLE_KEY=replace-with-service-role-key
 ```
 
 Use `.env` for real local values; it is gitignored. Commit only `.env.example`
-placeholders.
+placeholders. The `SYNAPSE_JWT_*` values are optional in default `dev` mode and
+must all be configured before `jwt` mode will accept an RS256 token.
 
 ## Local Checks
 

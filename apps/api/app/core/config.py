@@ -18,6 +18,9 @@ class Settings:
     api_prefix: str = "/v1"
     auth_mode: ConfiguredAuthMode = "dev"
     dev_user_id: str = "dev_user"
+    jwt_issuer: str | None = None
+    jwt_audience: str | None = None
+    jwt_public_key: str | None = None
     notes_repository: NotesRepositoryMode = "memory"
     supabase_url: str | None = None
     supabase_anon_key: str | None = None
@@ -31,6 +34,9 @@ def get_settings() -> Settings:
         app_version=os.getenv("SYNAPSE_API_VERSION", Settings.app_version),
         auth_mode=_auth_mode(os.getenv("SYNAPSE_AUTH_MODE", Settings.auth_mode)),
         dev_user_id=os.getenv("SYNAPSE_DEV_USER_ID", Settings.dev_user_id),
+        jwt_issuer=os.getenv("SYNAPSE_JWT_ISSUER"),
+        jwt_audience=os.getenv("SYNAPSE_JWT_AUDIENCE"),
+        jwt_public_key=os.getenv("SYNAPSE_JWT_PUBLIC_KEY"),
         notes_repository=_notes_repository_mode(
             os.getenv("SYNAPSE_NOTES_REPOSITORY", Settings.notes_repository)
         ),

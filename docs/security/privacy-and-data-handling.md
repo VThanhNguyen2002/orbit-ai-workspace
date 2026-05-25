@@ -42,11 +42,17 @@ local/test-only deterministic path, while `SYNAPSE_AUTH_MODE=jwt` fails closed
 for missing, malformed, unconfigured, or unverified bearer tokens. Unknown auth
 modes also fail closed instead of silently becoming dev auth.
 
-Slice 6H planning selects asymmetric Supabase JWT verification through JWKS as
-the normal live mode, with shared-secret verification limited to an explicit
-legacy deployment. Future request-path Data API clients must use a public
-publishable key (or a documented legacy anon key) plus the verified caller JWT;
-they must never use a service-role credential.
+Slice 6H-1 implements an injected JWT verifier and a configured RS256 adapter.
+It verifies signature, expiry, issuer, audience, UUID subject, and authenticated
+role; `AuthContext.user_id` is derived only from verified `sub`. Deterministic
+tests generate local RSA keys at runtime, never call Supabase, and assert that
+token values do not appear in authorization error responses.
+
+Asymmetric Supabase JWT verification through JWKS remains the normal live target
+but is not wired yet; shared-secret verification is limited to a future explicit
+legacy deployment if required. Future request-path Data API clients must use a
+public publishable key (or a documented legacy anon key) plus the verified
+caller JWT; they must never use a service-role credential.
 
 ### API-Level Isolation
 

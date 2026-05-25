@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.config import AuthMode, Settings, get_settings
 from app.core.errors import ApiError
+from app.core.jwt_verifier import JwtVerificationError, JwtVerifier, get_jwt_verifier
 from app.models.responses import ApiErrorDetail
 
 AuthContextMode = AuthMode
@@ -21,26 +22,29 @@ class AuthContext(BaseModel):
 def get_auth_context(
     request: Request,
     settings: Annotated[Settings, Depends(get_settings)],
+    jwt_verifier: Annotated[JwtVerifier | None, Depends(get_jwt_verifier)] = None,
 ) -> AuthContext:
     if settings.auth_mode == "dev":
         return AuthContext(user_id=settings.dev_user_id, auth_mode="dev")
 
     if settings.auth_mode == "jwt":
-        return _jwt_auth_context(request=request, settings=settings)
+        return _jwt_auth_context(request=request, jwt_verifier=jwt_verifier)
 
     raise _unauthorized("Unsupported auth mode")
 
 
-def _jwt_auth_context(*, request: Request, settings: Settings) -> AuthContext:
-    _bearer_token(request)
+def _jwt_auth_context(*, request: Request, jwt_verifier: JwtVerifier | None) -> AuthContext:
+    token = _bearer_token(request)
 
-    if not settings.supabase_jwt_secret:
+    if jwt_verifier is None:
         raise _unauthorized("JWT auth is not configured")
 
-    # Slice 6E establishes the auth boundary without committing a JWT library or
-    # requiring live Supabase in CI. Full signature/audience/expiry validation is
-    # intentionally deferred behind this function.
-    raise _unauthorized("JWT auth validation is not implemented")
+    try:
+        claims = jwt_verifier.verify(token)
+    except JwtVerificationError as exc:
+        raise _unauthorized("Invalid bearer token") from exc
+
+    return AuthContext(user_id=claims.sub, auth_mode="jwt", access_token=token)
 
 
 def _bearer_token(request: Request) -> str:

@@ -10,6 +10,9 @@ from app.main import create_app
 
 def test_settings_do_not_require_supabase_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     for key in (
+        "SYNAPSE_JWT_ISSUER",
+        "SYNAPSE_JWT_AUDIENCE",
+        "SYNAPSE_JWT_PUBLIC_KEY",
         "SUPABASE_URL",
         "SUPABASE_ANON_KEY",
         "SUPABASE_JWT_SECRET",
@@ -22,6 +25,9 @@ def test_settings_do_not_require_supabase_environment(monkeypatch: pytest.Monkey
 
     assert settings.auth_mode == "dev"
     assert settings.notes_repository == "memory"
+    assert settings.jwt_issuer is None
+    assert settings.jwt_audience is None
+    assert settings.jwt_public_key is None
     assert settings.supabase_url is None
     assert settings.supabase_anon_key is None
     assert settings.supabase_jwt_secret is None
@@ -52,7 +58,7 @@ def test_jwt_auth_boundary_rejects_missing_authorization() -> None:
     with pytest.raises(ApiError) as exc_info:
         get_auth_context(
             request=_request(),
-            settings=Settings(auth_mode="jwt", supabase_jwt_secret="placeholder"),
+            settings=Settings(auth_mode="jwt"),
         )
 
     assert exc_info.value.status_code == 401
@@ -72,7 +78,7 @@ def test_jwt_auth_boundary_rejects_malformed_authorization(authorization: str) -
     with pytest.raises(ApiError) as exc_info:
         get_auth_context(
             request=_request(authorization=authorization),
-            settings=Settings(auth_mode="jwt", supabase_jwt_secret="placeholder"),
+            settings=Settings(auth_mode="jwt"),
         )
 
     assert exc_info.value.status_code == 401
@@ -91,15 +97,17 @@ def test_jwt_auth_boundary_without_verifier_config_fails_closed() -> None:
     assert exc_info.value.message == "JWT auth is not configured"
 
 
-def test_jwt_auth_boundary_is_explicitly_deferred() -> None:
-    with pytest.raises(ApiError) as exc_info:
-        get_auth_context(
-            request=_request(authorization="Bearer placeholder-token"),
-            settings=Settings(auth_mode="jwt", supabase_jwt_secret="placeholder"),
-        )
+def test_settings_read_local_jwt_verifier_configuration(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SYNAPSE_JWT_ISSUER", "https://issuer.example.invalid/auth/v1")
+    monkeypatch.setenv("SYNAPSE_JWT_AUDIENCE", "authenticated")
+    monkeypatch.setenv("SYNAPSE_JWT_PUBLIC_KEY", "public-key-placeholder")
+    get_settings.cache_clear()
 
-    assert exc_info.value.status_code == 401
-    assert exc_info.value.message == "JWT auth validation is not implemented"
+    settings = get_settings()
+
+    assert settings.jwt_issuer == "https://issuer.example.invalid/auth/v1"
+    assert settings.jwt_audience == "authenticated"
+    assert settings.jwt_public_key == "public-key-placeholder"
 
 
 def test_unsupported_auth_mode_fails_closed() -> None:

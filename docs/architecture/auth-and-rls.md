@@ -45,8 +45,8 @@ Slice 6E implementation status:
   `dev_user` constant.
 - Local/test mode remains `SYNAPSE_AUTH_MODE=dev` and returns
   `AuthContext(user_id="dev_user", auth_mode="dev")` unless overridden.
-- JWT validation is isolated behind the auth dependency but remains deferred;
-  `jwt` mode currently rejects requests rather than accepting unverified tokens.
+- JWT validation is isolated behind the auth dependency; Slice 6H-1 now provides
+  the verifier implementation described below.
 - The Notes repository boundary exists with a memory default and a Supabase
   scaffold that requires a future injected user-scoped client.
 - No executable Supabase migration is currently committed. Notes table,
@@ -60,10 +60,22 @@ Slice 6G hardening status:
 - Unknown `SYNAPSE_AUTH_MODE` values now fail closed with `401 UNAUTHORIZED`
   instead of falling back to `dev`.
 - `jwt` mode requires an `Authorization: Bearer <token>` header shape, rejects
-  missing or malformed authorization headers, and rejects placeholder/fake tokens
-  while full JWT verification remains deferred.
+  missing or malformed authorization headers, and rejects placeholder/fake
+  tokens.
 - `jwt` mode does not require live Supabase in CI; without verifier/config it
   fails closed rather than accepting requests.
+
+Slice 6H-1 verification status:
+
+- `JwtVerifier` and `VerifiedJwtClaims` form an injected authentication
+  boundary.
+- The implemented `PyJwtRsaVerifier` accepts only configured RS256 tokens and
+  validates signature, expiration, issuer, audience, UUID `sub`, and
+  `role="authenticated"`.
+- Verified `sub` is the source of `AuthContext.user_id`; invalid tokens receive
+  the coarse `401 UNAUTHORIZED` envelope without token content.
+- Tests generate ephemeral local RSA keypairs. Supabase JWKS discovery and live
+  request-scoped Supabase clients are still deferred.
 
 ## Authentication Flow
 
@@ -125,16 +137,17 @@ When the device is offline:
 
 ## Backend JWT Validation
 
-Target state: FastAPI validates every authenticated request through an injected
-verifier boundary. The selected default is local verification of asymmetric
-Supabase access tokens against the project JWKS endpoint, using a bounded cache
-and refresh on an unknown key id. This avoids placing a Supabase Auth user lookup
-in every request path and supports signing-key rotation.
+FastAPI validates JWT-authenticated requests through an injected verifier
+boundary. The current adapter verifies configured RS256 public keys locally
+using `PyJWT[crypto]`; it provides deterministic, no-network testing and a real
+verification boundary. The live target remains verification of asymmetric
+Supabase access tokens against project JWKS, using a bounded cache and refresh
+on an unknown key id.
 
 Validation checks:
 
-1. Verify the signature using a configured asymmetric algorithm allowlist and
-   JWKS in the default mode.
+1. Verify the signature using the explicit `RS256` allowlist and configured
+   public key in the implemented adapter; use JWKS in a future live adapter.
 2. Validate `exp`, issuer, and the configured audience (`authenticated` by
    default).
 3. Require a non-empty UUID `sub`, which becomes `AuthContext.user_id`.
@@ -143,9 +156,9 @@ Validation checks:
 5. Reject every failure with a coarse `401 UNAUTHORIZED` envelope and never log
    token content.
 
-HS256 validation using `SUPABASE_JWT_SECRET` is allowed only in an explicitly
-configured legacy compatibility mode. It is not a fallback from JWKS mode, and
-unsigned tokens are never accepted.
+HS256 validation using `SUPABASE_JWT_SECRET` remains deferred and may be added
+only in an explicitly configured legacy compatibility mode. It must not be a
+fallback from JWKS mode, and unsigned tokens are never accepted.
 
 **The backend never:**
 - Stores passwords or credentials
@@ -153,9 +166,9 @@ unsigned tokens are never accepted.
 - Manages sessions
 - Calls Supabase Auth admin APIs (Phase 1)
 
-Current implementation note: Slice 6G does not add a JWT library or live
-Supabase verifier. The `jwt` branch exists as a fail-closed boundary until
-`Slice 6H-1 - JWT verifier interface and tests` implements this decision.
+Current implementation note: Slice 6H-1 adds the verifier interface and local
+configured RS256 adapter. It does not fetch Supabase JWKS, wire a Supabase
+repository/client, or require live Supabase settings in default CI.
 
 ## Row-Level Security (RLS)
 
