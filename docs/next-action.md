@@ -2,29 +2,31 @@
 
 ## Objective
 
-Start Slice 6H — Notes live auth/Supabase integration planning. The shared
-Notes CRUD contracts, FastAPI route skeleton, API client methods, auth context
-boundary, explicit `dev`/`jwt` auth modes, fail-closed JWT branch, repository
-interface, memory default, Supabase repository scaffold, and draft Notes
-migration/RLS file are in place. The next step should plan live JWT verification
-and user-scoped Supabase client wiring without breaking deterministic CI.
+Start **Slice 6H-1 - JWT verifier interface and tests**. Slice 6H planning is
+captured in
+[notes-live-auth-supabase-plan.md](notes-live-auth-supabase-plan.md): use
+asymmetric Supabase signing keys and JWKS verification as the default live auth
+path, retain HS256 only as an explicit legacy mode, and do not wire live
+Supabase persistence until authenticated identity is verified.
 
 ## Expected Files To Change
 
-- Planning docs and small deterministic tests only if gaps are discovered.
-- Avoid frontend UI, Expo initialization, sync engine work, AI/provider work, and
-  live Supabase client wiring unless Slice 6H explicitly expands scope.
+- API auth/config modules, dependency metadata, and deterministic auth tests
+  needed for the verifier interface and its selected adapters.
+- Documentation/config placeholders only when required by implemented settings.
+- Do not add the user-scoped Supabase client factory or execute the RLS
+  migration in this slice.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
-methods, sync engine implementation, AI behavior, or service-role usage in
-request handlers.
+methods, sync engine implementation, AI behavior, live Notes Supabase repository
+wiring, or service-role usage in request handlers.
 
 ## Commands To Run
 
 ```bash
 cd apps/api
-python -m ruff check .
-python -m pytest
+python3 -m ruff check .
+python3 -m pytest
 cd ../..
 
 pnpm --filter @synapse/shared test
@@ -38,35 +40,36 @@ pnpm build
 
 ## Definition Of Done
 
-- Planning identifies the JWT library/verifier approach and exact config needed
-  without committing secrets.
-- Planning identifies how request-path Supabase clients will be user-scoped and
-  avoid service-role use.
-- Memory repo remains the default and does not require Supabase environment
-  variables.
-- Notes auth still derives `user_id` from the auth context and never from client
-  payloads.
-- Missing/deleted/cross-user Notes still return `404`; stale versions return
-  `409` with `server_data`.
-- No secrets, provider integration, frontend UI, Expo initialization, or sync
-  engine work is added.
+- A verifier interface is injected behind `get_auth_context`; production JWT
+  mode never accepts a token based on header shape alone.
+- JWKS mode verifies signature, expiry, issuer, audience, and UUID `sub` with an
+  explicit asymmetric algorithm allowlist; legacy HS256 is opt-in only.
+- Tests use generated local keys/fakes and cover invalid and valid token paths
+  without requiring Supabase or network calls.
+- A verified `sub` is the only source for `AuthContext.user_id`, and errors/logs
+  never expose bearer-token values.
+- Memory persistence remains the default; no live Supabase client or migration
+  execution is introduced.
+- No real credentials, UI, Expo, AI, or sync engine work is added.
 
 ## Risks
 
-- The Supabase repository is scaffolded only; live client injection and full JWT
-  verification still need dedicated implementation.
-- Auth currently rejects all `jwt` requests after Bearer-shape checks because no
-  verifier is wired yet.
+- The Supabase repository remains scaffolded only; live client injection still
+  needs its later implementation slice.
+- Until Slice 6H-1 is completed, auth rejects all `jwt` requests after
+  Bearer-shape checks because no verifier is wired yet.
+- JWKS cache and key-rotation handling require careful deterministic tests before
+  production enablement.
 - The SQL RLS draft still needs execution against a real Supabase project and
   integration tests using user-scoped tokens.
 - Contract drift can still appear between shared Zod schemas and FastAPI
-  Pydantic models until the JSON Schema bridge is completed.
+  Pydantic models until the separate `Slice 6H-6` drift guard is completed.
 
 ## Rollback Notes
 
-Revert only Slice 6H planning changes if they introduce noise. Keep completed
-shared contracts, backend skeleton, API client methods, Slice 6E/6G
-auth/repository boundaries, and migration/RLS draft intact.
+If Slice 6H-1 implementation is unsuitable, revert only that implementation.
+Keep completed shared contracts, backend skeleton, API client methods, Slice
+6E/6G auth/repository boundaries, Slice 6H plan, and migration/RLS draft intact.
 
 ## External Review Gate
 

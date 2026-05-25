@@ -17,7 +17,7 @@ Minimum enforcement before feature work:
 
 | Area | Requirement |
 |------|-------------|
-| API auth | Every `/v1/*` route except `/v1/health` depends on `get_current_user` |
+| API auth | Every `/v1/*` route except `/v1/health` and `/v1/version` depends on the auth boundary |
 | RLS | Every user-owned table has `SELECT`, `INSERT`, `UPDATE`, and soft-delete policies |
 | Storage | Voice memo object paths start with `{user_id}/` and bucket policies verify that prefix |
 | Tests | API tests cover unauthenticated access, cross-user reads, cross-user writes, and storage path rejection |
@@ -33,6 +33,8 @@ Implementation order:
 The Notes-specific migration, RLS, auth dependency, and repository replacement
 plan is documented in
 [notes-persistence-auth-integration-plan.md](../notes-persistence-auth-integration-plan.md).
+The selected live integration sequence and verifier/client decisions are in
+[notes-live-auth-supabase-plan.md](../notes-live-auth-supabase-plan.md).
 
 Slice 6E implementation status:
 
@@ -120,40 +122,27 @@ When the device is offline:
 
 ## Backend JWT Validation
 
-Target state: FastAPI validates every request (except `/v1/health`) via a
-dependency:
+Target state: FastAPI validates every authenticated request through an injected
+verifier boundary. The selected default is local verification of asymmetric
+Supabase access tokens against the project JWKS endpoint, using a bounded cache
+and refresh on an unknown key id. This avoids placing a Supabase Auth user lookup
+in every request path and supports signing-key rotation.
 
-```python
-# app/dependencies/auth.py
-from jose import jwt, JWTError
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+Validation checks:
 
-security = HTTPBearer()
+1. Verify the signature using a configured asymmetric algorithm allowlist and
+   JWKS in the default mode.
+2. Validate `exp`, issuer, and the configured audience (`authenticated` by
+   default).
+3. Require a non-empty UUID `sub`, which becomes `AuthContext.user_id`.
+4. Retain the verified access token only for construction of the user-scoped
+   Data API client.
+5. Reject every failure with a coarse `401 UNAUTHORIZED` envelope and never log
+   token content.
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-) -> dict:
-    try:
-        payload = jwt.decode(
-            credentials.credentials,
-            settings.SUPABASE_JWT_SECRET,
-            algorithms=["HS256"],
-            audience="authenticated",
-        )
-        user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token: no sub claim")
-        return {"user_id": user_id, "email": payload.get("email")}
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-```
-
-**Validation checks:**
-1. Signature verification against `SUPABASE_JWT_SECRET`
-2. `exp` claim — reject expired tokens
-3. `aud` claim — must be `"authenticated"`
-4. `sub` claim — must exist and becomes `user_id` for all downstream queries
+HS256 validation using `SUPABASE_JWT_SECRET` is allowed only in an explicitly
+configured legacy compatibility mode. It is not a fallback from JWKS mode, and
+unsigned tokens are never accepted.
 
 **The backend never:**
 - Stores passwords or credentials
@@ -162,8 +151,8 @@ async def get_current_user(
 - Calls Supabase Auth admin APIs (Phase 1)
 
 Current implementation note: Slice 6G does not add a JWT library or live
-Supabase verifier. The `jwt` branch exists as a fail-closed boundary until the
-future verifier can validate signature, expiry, audience, and `sub`.
+Supabase verifier. The `jwt` branch exists as a fail-closed boundary until
+`Slice 6H-1 - JWT verifier interface and tests` implements this decision.
 
 ## Row-Level Security (RLS)
 
@@ -217,8 +206,8 @@ All policies use `auth.uid()` which extracts the `sub` claim from the JWT in the
 
 | Context | Key Used | RLS Enforced |
 |---------|----------|-------------|
-| Client → Supabase direct (Realtime, Auth) | Anon key + user JWT | Yes |
-| Backend → Supabase (normal queries) | Anon key + user JWT (passed through) | Yes |
+| Client → Supabase direct (Realtime, Auth) | Publishable key + user JWT; legacy anon key only where required | Yes |
+| Backend → Supabase (normal queries) | Publishable key + user JWT; legacy anon key only where required | Yes |
 | Backend → Supabase (migrations, admin) | Service role key | No (bypasses RLS) |
 | Backend → Supabase (background jobs) | Service role key | No — must add `WHERE user_id = ?` manually |
 

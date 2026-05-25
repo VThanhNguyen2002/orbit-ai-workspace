@@ -8,6 +8,11 @@ the default, and a Supabase-ready repository scaffold plus draft migration/RLS
 file exist. Live Supabase client wiring, full JWT verification, provider
 configuration, secrets, frontend UI, and sync engine behavior remain deferred.
 
+Slice 6H defines the live-integration decisions in
+[notes-live-auth-supabase-plan.md](notes-live-auth-supabase-plan.md): use
+JWKS-backed asymmetric verification by default, keep HS256 only as an explicit
+legacy mode, and use a user-scoped Data API client with the caller JWT.
+
 ## Current Implemented Surface
 
 - Shared Notes CRUD contracts exist in `@synapse/shared`.
@@ -155,11 +160,11 @@ Implementation expectations:
 - The bearer token will be passed to the Supabase user-scoped client so RLS is
   active once live client wiring is implemented.
 
-Required settings names, with no values committed:
+Existing scaffold settings names, with no values committed:
 
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
-- `SUPABASE_JWT_SECRET`
+- `SUPABASE_JWT_SECRET` (legacy verification mode only under the Slice 6H plan)
 
 Service-role keys must not be used in request-handling code.
 
@@ -291,8 +296,9 @@ The server contract should still remain compatible with future local-first sync:
 
 ## Implementation Order
 
-1. Add API settings for Supabase URL, anon key, and JWT secret without committing
-   values.
+1. Add API settings for the selected JWKS verifier path and preferred publishable
+   Data API key without committing values; retain HS256/anon configuration only
+   where a legacy deployment explicitly requires it.
 2. Add an auth dependency and tests for public/private route behavior.
 3. Add the Notes migration contract with RLS and indexes.
 4. Add a user-scoped Supabase client factory.
@@ -311,12 +317,11 @@ The server contract should still remain compatible with future local-first sync:
 - Cross-user access returns `404`, not `403`.
 - Soft delete remains an update, not a physical delete.
 
-## Open Decisions
+## Resolved Follow-Up Decisions
 
-- Whether to include a user-facing physical `DELETE` RLS policy for Notes. The
-  recommended Slice 6E default is no policy for request-path physical deletion.
-- Whether default CI should start a local Supabase stack or keep Supabase tests
-  optional until a later infrastructure slice.
-- Whether the JWT validator should use `python-jose`, `PyJWT`, or Supabase JWKS
-  helpers. The accepted architecture currently describes HS256 validation with
-  `SUPABASE_JWT_SECRET`.
+- Notes request-path deletion remains a soft-delete `UPDATE`; no user-facing
+  physical `DELETE` policy is needed for this path.
+- Default CI remains independent of live Supabase. Local/staging RLS validation
+  is opt-in until its dedicated implementation slice.
+- Slice 6H selects `PyJWT[crypto]` with asymmetric JWKS verification as the
+  default verifier path. HS256 with `SUPABASE_JWT_SECRET` is legacy-only.

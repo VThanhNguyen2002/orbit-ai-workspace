@@ -48,6 +48,12 @@ local/test-only deterministic path, while `SYNAPSE_AUTH_MODE=jwt` fails closed
 for missing, malformed, unconfigured, or unverified bearer tokens. Unknown auth
 modes also fail closed instead of silently becoming dev auth.
 
+Slice 6H planning selects asymmetric Supabase JWT verification through JWKS as
+the normal live mode, with shared-secret verification limited to an explicit
+legacy deployment. Future request-path Data API clients must use a public
+publishable key (or a documented legacy anon key) plus the verified caller JWT;
+they must never use a service-role credential.
+
 ### API-Level Isolation
 
 Even though RLS handles authorization, the API adds defense-in-depth:
@@ -125,11 +131,11 @@ CREATE POLICY "Users can manage own voice memos"
 ### Backend API Keys
 
 ```
-OPENAI_API_KEY=sk-...
-GROQ_API_KEY=gsk_...
-GOOGLE_AI_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=eyJ...
-SUPABASE_JWT_SECRET=...
+OPENAI_API_KEY=replace-with-openai-api-key
+GROQ_API_KEY=replace-with-groq-api-key
+GOOGLE_AI_KEY=replace-with-google-ai-key
+SUPABASE_SERVICE_ROLE_KEY=replace-with-service-role-key
+SUPABASE_JWT_SECRET=replace-with-legacy-jwt-secret
 ```
 
 **Rules:**
@@ -143,7 +149,8 @@ SUPABASE_JWT_SECRET=...
 
 The client only holds:
 - `SUPABASE_URL` — public, safe to embed
-- `SUPABASE_ANON_KEY` — public, safe to embed (RLS protects data)
+- `SUPABASE_PUBLISHABLE_KEY` — preferred future public Data API key (RLS protects data)
+- `SUPABASE_ANON_KEY` — legacy public key only when an existing deployment requires it
 
 No other secrets on the client. All AI operations go through the backend.
 
