@@ -4,7 +4,8 @@
 
 Slice 6H is planning/design only. It does not add a JWT library, live Supabase
 client wiring, migration execution, credentials, frontend UI, sync engine, or AI
-integration.
+integration. A subsequent security patch removed the executable Notes SQL draft;
+no executable Supabase migration is currently committed.
 
 ## Objective
 
@@ -17,7 +18,8 @@ enabled and validated.
 
 - No runtime code, dependencies, Supabase client, or JWT verifier is added in
   this slice.
-- No database migration is executed or treated as production-ready.
+- No executable database migration is committed, executed, or treated as
+  production-ready without explicit approval and security review.
 - No real key, token, password, URL, or `.env` file is added.
 - No frontend auth, Expo, offline sync, AI, Storage, Realtime, or background
   cleanup implementation is added.
@@ -35,8 +37,8 @@ enabled and validated.
 - The memory Notes repository remains the default.
 - `apps/api/app/repositories/notes_supabase.py` is scaffold-only and requires an
   injected user-scoped client before use.
-- `supabase/migrations/20260522000000_create_notes.sql` is a draft and is not
-  executed in CI.
+- Notes table and RLS intent now exist only as sanitized architecture
+  documentation; no executable Supabase migration is tracked.
 - FastAPI still uses Pydantic models directly; generated shared JSON Schemas are
   not consumed by the backend yet.
 
@@ -198,25 +200,31 @@ Test levels:
 
 - Required CI: unit tests with memory repository and fake verifier/client.
 - Optional CI: local Supabase integration tests gated behind an explicit flag.
-- Manual/staging: run the migration and RLS tests against a real Supabase
-  project before enabling production traffic.
+- Manual/staging: after a future migration is explicitly approved and reviewed,
+  validate its RLS outcomes against an approved non-production Supabase
+  environment before enabling production traffic.
 
-## Migration Execution Plan
+## Future Migration Approval And Execution Plan
 
-The current migration is a draft. Before execution:
+There is no committed executable migration. The Notes table/RLS descriptions in
+these documents are non-deployable architecture summaries. Before a future
+migration may be created, committed, or executed:
 
-1. Confirm a `public.users` table exists and is populated from `auth.users`.
-2. Add or verify the trigger/function that creates `public.users` rows from
-   Supabase Auth users.
-3. Run the Notes migration in a local Supabase stack.
-4. Verify indexes and `notes_set_updated_at` trigger behavior.
-5. Verify RLS policies with two real Supabase users.
-6. Run application-level Notes CRUD smoke tests.
-7. Apply to staging.
-8. Promote to production only after rollback and cleanup plans are documented.
+1. Obtain explicit approval to introduce a minimal, environment-independent
+   migration under the database migration policy.
+2. Security-review the proposed artifact before commit; it must contain no
+   credentials, real data, dumps, or environment-specific identifiers.
+3. Confirm any required user identity/table dependency in an approved
+   non-production environment.
+4. Validate indexes, timestamp/version behavior, and RLS outcomes with synthetic
+   users only after the migration artifact is approved.
+5. Run application-level Notes CRUD smoke tests in that approved environment.
+6. Apply to staging and production only under separately reviewed rollout and
+   rollback instructions.
 
-The migration is not executed in default CI. Optional migration validation can be
-added later with Supabase CLI and an explicit integration-test environment.
+Default CI does not run database migrations. See
+[database-migration-policy.md](security/database-migration-policy.md) for the
+artifact and approval gate.
 
 ## Env And Config Plan
 
@@ -281,6 +289,7 @@ Optional integration tests should require all of:
 | Service-role misuse | Do not import or inject service-role credentials into request-path dependencies. |
 | RLS bypass via API bug | Keep explicit `user_id` filters in every query. |
 | RLS policy drift | Add user A/user B RLS tests before live enablement. |
+| Premature operational schema artifact | Ignore Supabase migration SQL and require explicit security review before any exception. |
 | Key rotation outage | Prefer JWKS/asymmetric keys and refresh cache on unknown `kid`. |
 | Legacy secret exposure | Use `SUPABASE_JWT_SECRET` only for legacy HS256 verification; never commit it. |
 | CI flakiness | Keep default tests fake/local; gate live Supabase tests. |
@@ -297,9 +306,10 @@ Optional integration tests should require all of:
 3. **Slice 6H-3 - Supabase Notes repository wiring**
    Wire the scaffold behind config, preserve memory default, and verify
    repository semantics with mocked Supabase responses.
-4. **Slice 6H-4 - Local/staging migration and RLS validation**
-   Add gated integration tests and migration validation. Default CI remains
-   deterministic without Supabase.
+4. **Slice 6H-4 - Approved migration and RLS validation**
+   Only after explicit security approval, introduce the minimum reviewed
+   migration artifact and add gated validation. Default CI remains deterministic
+   without Supabase.
 5. **Slice 6H-5 - Controlled live rollout**
    Execute migration in staging, validate RLS, verify Notes CRUD with real users,
    then document production rollout steps.
@@ -313,7 +323,7 @@ Optional integration tests should require all of:
 Slice 6H planning is done when this document records the verifier, client,
 migration, RLS, configuration, testing, and risk decisions; related architecture
 docs no longer prescribe HS256 as the default; and the next task is
-`Slice 6H-1`.
+`Slice 6H-1`. No executable database migration is part of that implementation.
 
 Later live enablement is done only when:
 

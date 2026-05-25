@@ -4,8 +4,10 @@
 
 Slice 6E foundation is now in place. The Notes backend has an auth context
 boundary, a repository protocol, the deterministic in-memory repository remains
-the default, and a Supabase-ready repository scaffold plus draft migration/RLS
-file exist. Live Supabase client wiring, full JWT verification, provider
+the default, and a Supabase-ready repository scaffold exists. The formerly
+tracked executable migration draft has been removed under the database artifact
+policy; Notes table and RLS intent is retained here as sanitized architecture
+documentation only. Live Supabase client wiring, full JWT verification, provider
 configuration, secrets, frontend UI, and sync engine behavior remain deferred.
 
 Slice 6H defines the live-integration decisions in
@@ -23,8 +25,9 @@ legacy mode, and use a user-scoped Data API client with the caller JWT.
 - API auth uses `get_auth_context`. Local/test `dev` mode returns the safe
   `dev_user` identity; future `jwt` mode validation is isolated behind the same
   dependency.
-- `supabase/migrations/20260522000000_create_notes.sql` drafts `public.notes`,
-  indexes, soft-delete/version fields, and own-user RLS policies.
+- Sanitized documentation below describes intended Notes ownership,
+  soft-delete/version fields, indexing goals, and RLS outcomes; no executable
+  Supabase migration is committed.
 - `apps/api/app/repositories/notes_supabase.py` contains the mapping and
   conditional write scaffold, but requires an injected user-scoped Supabase
   client before it can be used in request paths.
@@ -44,7 +47,8 @@ Notes CRUD should become a normal authenticated backend path:
 
 ## Remaining Non-Goals
 
-- No database migration is executed in CI.
+- No executable database migration is committed or executed without explicit
+  approval and security review.
 - No Supabase Python client is added or constructed in request handlers yet.
 - No service role key is introduced to request handlers.
 - No frontend auth flow, local persistence adapter, Realtime subscription, or sync
@@ -52,31 +56,18 @@ Notes CRUD should become a normal authenticated backend path:
 - No Note summarization, embeddings, search, or AI behavior is added.
 - No secrets or environment values are written to the repository.
 
-## Database Migration Contract
+## Sanitized Database Design Summary
 
-The Slice 6E draft migration is
-`supabase/migrations/20260522000000_create_notes.sql`. Its table contract is:
+This section describes intended behavior and is not an executable migration or
+authorization to create one.
 
-```sql
-CREATE TABLE public.notes (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  title text NOT NULL CHECK (char_length(title) BETWEEN 1 AND 500),
-  content text NOT NULL DEFAULT '' CHECK (char_length(content) <= 50000),
-  content_type text NOT NULL DEFAULT 'plain'
-    CHECK (content_type IN ('plain', 'markdown')),
-  is_archived boolean NOT NULL DEFAULT false,
-  is_deleted boolean NOT NULL DEFAULT false,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  deleted_at timestamptz NULL,
-  version bigint NOT NULL DEFAULT 1 CHECK (version >= 1),
-  CHECK (
-    (is_deleted = false AND deleted_at IS NULL)
-    OR (is_deleted = true AND deleted_at IS NOT NULL)
-  )
-);
-```
+| Concept | Intended design |
+|---------|-----------------|
+| Identity | Server-generated UUID note id and authenticated owner id |
+| Content | Required title, bounded text content, plain/markdown content type |
+| State | Archived flag plus soft-delete flag and deletion timestamp |
+| Concurrency | Server timestamp and monotonically increasing version |
+| Integrity | Deleted status and deletion timestamp remain consistent |
 
 Expected indexes:
 
@@ -100,30 +91,17 @@ Direct CRUD `POST /notes` should keep server-generated ids. Future sync push may
 accept a client-generated UUID for offline-created entities after the sync
 contract explicitly supports idempotent create operations.
 
-## RLS Policy Contract
+## Sanitized RLS Design Summary
 
-Enable RLS in the same migration that creates `public.notes`:
+If a future executable migration is explicitly approved, it must enable RLS for
+the Notes table and enforce these ownership outcomes:
 
-```sql
-ALTER TABLE public.notes ENABLE ROW LEVEL SECURITY;
-```
-
-Policies should use the caller JWT through `auth.uid()`:
-
-```sql
-CREATE POLICY "Users can view own notes"
-  ON public.notes FOR SELECT
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Users can create own notes"
-  ON public.notes FOR INSERT
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Users can update own notes"
-  ON public.notes FOR UPDATE
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
-```
+| Operation | Intended ownership rule |
+|-----------|-------------------------|
+| Read | Authenticated users may see only their own rows |
+| Create | Authenticated users may create only rows owned by themselves |
+| Update / soft delete | Authenticated users may modify only their own rows |
+| Physical delete | Not exposed through Notes CRUD request paths |
 
 Do not rely on a user-facing physical `DELETE` path for Notes CRUD. The HTTP
 `DELETE /notes/{note_id}` route is a soft delete implemented as an `UPDATE`.
@@ -198,39 +176,14 @@ RLS also enforces ownership.
 
 ## Version And Delete Semantics
 
-Update should be a single conditional write:
+Update should be one conditional operation scoped to the authenticated owner, a
+non-deleted note, and the expected current version. On success it changes only
+requested editable fields, updates the server timestamp, and increments the
+version.
 
-```sql
-UPDATE public.notes
-SET
-  title = COALESCE(:title, title),
-  content = COALESCE(:content, content),
-  content_type = COALESCE(:content_type, content_type),
-  is_archived = COALESCE(:is_archived, is_archived),
-  updated_at = now(),
-  version = version + 1
-WHERE id = :note_id
-  AND user_id = :user_id
-  AND is_deleted = false
-  AND version = :expected_version
-RETURNING *;
-```
-
-Delete should also be a conditional write:
-
-```sql
-UPDATE public.notes
-SET
-  is_deleted = true,
-  deleted_at = now(),
-  updated_at = now(),
-  version = version + 1
-WHERE id = :note_id
-  AND user_id = :user_id
-  AND is_deleted = false
-  AND version = :expected_version
-RETURNING *;
-```
+Delete should be a similarly version-gated soft-delete operation for the
+authenticated owner: mark deleted, set its server deletion/update timestamps,
+and increment the version. It must not physically delete the row.
 
 If the conditional write returns no rows:
 
@@ -300,7 +253,8 @@ The server contract should still remain compatible with future local-first sync:
    Data API key without committing values; retain HS256/anon configuration only
    where a legacy deployment explicitly requires it.
 2. Add an auth dependency and tests for public/private route behavior.
-3. Add the Notes migration contract with RLS and indexes.
+3. Seek explicit approval and security review before creating any executable
+   Notes migration with RLS and indexes.
 4. Add a user-scoped Supabase client factory.
 5. Implement the Supabase Notes repository behind the existing service boundary.
 6. Preserve fake/in-memory repository tests for fast unit coverage.
@@ -312,6 +266,8 @@ The server contract should still remain compatible with future local-first sync:
 - No service role key in request handlers.
 - No token, email, title, or content values in logs.
 - No real secrets in docs, fixtures, tests, or environment examples.
+- No executable Supabase migrations, generated database state, or dumps are
+  committed before explicit security approval.
 - All Notes queries include `user_id` filters.
 - RLS enabled before any user-owned table is considered production-ready.
 - Cross-user access returns `404`, not `403`.
@@ -325,3 +281,6 @@ The server contract should still remain compatible with future local-first sync:
   is opt-in until its dedicated implementation slice.
 - Slice 6H selects `PyJWT[crypto]` with asymmetric JWKS verification as the
   default verifier path. HS256 with `SUPABASE_JWT_SECRET` is legacy-only.
+- The executable Notes SQL draft was removed. Future migration artifacts require
+  explicit approval and the review gate in
+  [database-migration-policy.md](security/database-migration-policy.md).

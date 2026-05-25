@@ -49,10 +49,12 @@ API keys are accepted from clients.
 
 Current backend status: the Slice 6B FastAPI Notes routes exist, Slice 6C added
 typed API client methods, and Slice 6E added an auth context dependency,
-repository interface, memory default, Supabase repository scaffold, and draft
-Notes migration/RLS file. Runtime storage still defaults to process-local memory
-for deterministic local and CI runs. Full Supabase JWT validation and live
-user-scoped Supabase client wiring remain deferred and are tracked in
+repository interface, memory default, and Supabase repository scaffold.
+Notes/RLS persistence design is sanitized documentation only; no executable
+Supabase migration is currently committed. Runtime storage still defaults to
+process-local memory for deterministic local and CI runs. Full Supabase JWT
+validation and live user-scoped Supabase client wiring remain deferred and are
+tracked in
 [notes-live-auth-supabase-plan.md](../notes-live-auth-supabase-plan.md).
 
 ### Tasks

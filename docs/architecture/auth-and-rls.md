@@ -26,7 +26,8 @@ Minimum enforcement before feature work:
 Implementation order:
 
 1. Create tables with `user_id`, `version`, timestamps, and `is_deleted` where applicable.
-2. Enable RLS in the same migration that creates each user-owned table.
+2. After explicit migration approval and security review, require RLS in the
+   same minimal migration that creates each user-owned table.
 3. Add route dependencies and repository helpers that require `current_user`.
 4. Add tests proving user A cannot read or mutate user B data through the API or direct Supabase client.
 
@@ -35,6 +36,8 @@ plan is documented in
 [notes-persistence-auth-integration-plan.md](../notes-persistence-auth-integration-plan.md).
 The selected live integration sequence and verifier/client decisions are in
 [notes-live-auth-supabase-plan.md](../notes-live-auth-supabase-plan.md).
+Database artifact restrictions and the future migration approval gate are in
+[database-migration-policy.md](../security/database-migration-policy.md).
 
 Slice 6E implementation status:
 
@@ -46,8 +49,8 @@ Slice 6E implementation status:
   `jwt` mode currently rejects requests rather than accepting unverified tokens.
 - The Notes repository boundary exists with a memory default and a Supabase
   scaffold that requires a future injected user-scoped client.
-- `supabase/migrations/20260522000000_create_notes.sql` drafts the Notes table,
-  indexes, soft-delete/version metadata, and own-user RLS policies.
+- No executable Supabase migration is currently committed. Notes table,
+  soft-delete/version, index, and RLS intent is architecture documentation only.
 
 Slice 6G hardening status:
 
@@ -162,32 +165,11 @@ Every table containing user data has RLS enabled. Policies ensure users can only
 
 ### Policy Pattern
 
-User-owned tables follow this policy shape unless a resource has stricter
-semantics:
-
-```sql
--- Enable RLS
-ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
-
--- Users can only see their own rows
-CREATE POLICY "Users can view own notes"
-  ON notes FOR SELECT
-  USING (user_id = auth.uid());
-
--- Users can only insert rows for themselves
-CREATE POLICY "Users can create own notes"
-  ON notes FOR INSERT
-  WITH CHECK (user_id = auth.uid());
-
--- Users can only update their own rows
-CREATE POLICY "Users can update own notes"
-  ON notes FOR UPDATE
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
-
--- Physical delete policies are resource-specific.
--- Notes CRUD uses UPDATE for soft delete rather than SQL DELETE.
-```
+User-owned tables should enforce ownership through `auth.uid()` if a future
+minimal migration is approved. For Notes, reads, inserts, updates, and
+soft-deletes are limited to rows owned by the caller; Notes CRUD does not expose
+a physical-delete operation. This describes the intended outcome, not an
+executable policy artifact.
 
 ### RLS Policy Map
 
@@ -208,11 +190,11 @@ All policies use `auth.uid()` which extracts the `sub` claim from the JWT in the
 |---------|----------|-------------|
 | Client → Supabase direct (Realtime, Auth) | Publishable key + user JWT; legacy anon key only where required | Yes |
 | Backend → Supabase (normal queries) | Publishable key + user JWT; legacy anon key only where required | Yes |
-| Backend → Supabase (migrations, admin) | Service role key | No (bypasses RLS) |
+| Backend → Supabase (approved migrations, admin) | Service role key | No (bypasses RLS) |
 | Backend → Supabase (background jobs) | Service role key | No — must add `WHERE user_id = ?` manually |
 
 **Rule:** The service role key is ONLY used for:
-1. Database migrations
+1. Explicitly approved database migration tooling
 2. Background jobs that need cross-user access (e.g., cleanup of expired soft-deleted rows)
 3. NEVER in request-handling code paths
 

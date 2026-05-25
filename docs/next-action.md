@@ -9,12 +9,17 @@ asymmetric Supabase signing keys and JWKS verification as the default live auth
 path, retain HS256 only as an explicit legacy mode, and do not wire live
 Supabase persistence until authenticated identity is verified.
 
+Security gate: no executable Supabase migration is committed. Notes/RLS design
+remains sanitized documentation only, and any future migration artifact requires
+explicit approval and security review under
+[database-migration-policy.md](security/database-migration-policy.md).
+
 ## Expected Files To Change
 
 - API auth/config modules, dependency metadata, and deterministic auth tests
   needed for the verifier interface and its selected adapters.
 - Documentation/config placeholders only when required by implemented settings.
-- Do not add the user-scoped Supabase client factory or execute the RLS
+- Do not add the user-scoped Supabase client factory or create/execute an RLS
   migration in this slice.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
@@ -48,8 +53,8 @@ pnpm build
   without requiring Supabase or network calls.
 - A verified `sub` is the only source for `AuthContext.user_id`, and errors/logs
   never expose bearer-token values.
-- Memory persistence remains the default; no live Supabase client or migration
-  execution is introduced.
+- Memory persistence remains the default; no live Supabase client or executable
+  migration is introduced.
 - No real credentials, UI, Expo, AI, or sync engine work is added.
 
 ## Risks
@@ -60,8 +65,8 @@ pnpm build
   Bearer-shape checks because no verifier is wired yet.
 - JWKS cache and key-rotation handling require careful deterministic tests before
   production enablement.
-- The SQL RLS draft still needs execution against a real Supabase project and
-  integration tests using user-scoped tokens.
+- The Notes/RLS design has no executable migration artifact. Any later migration
+  and user-scoped validation must pass explicit security approval first.
 - Contract drift can still appear between shared Zod schemas and FastAPI
   Pydantic models until the separate `Slice 6H-6` drift guard is completed.
 
@@ -69,7 +74,8 @@ pnpm build
 
 If Slice 6H-1 implementation is unsuitable, revert only that implementation.
 Keep completed shared contracts, backend skeleton, API client methods, Slice
-6E/6G auth/repository boundaries, Slice 6H plan, and migration/RLS draft intact.
+6E/6G auth/repository boundaries, Slice 6H plan, and the database artifact
+security policy intact.
 
 ## External Review Gate
 

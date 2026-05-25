@@ -36,11 +36,11 @@ and process-local storage. Dev auth is deterministic and local/test-only; do not
 use it in production. That default keeps CI deterministic and requires no
 Supabase project or secrets.
 
-Slice 6E adds a Supabase-ready repository scaffold plus the draft
-`supabase/migrations/20260522000000_create_notes.sql` migration with Notes RLS
-policies. Live Supabase client wiring and full JWT validation remain
-environment-gated follow-up work; request-path code does not use the service
-role key.
+Slice 6E adds a Supabase-ready repository scaffold. Notes/RLS persistence intent
+is maintained as sanitized architecture documentation only; no executable
+Supabase migration is currently committed. Live Supabase client wiring and full
+JWT validation remain environment-gated follow-up work; request-path code does
+not use the service role key.
 
 Slice 6G hardens auth mode handling. Supported modes are `dev` and `jwt`.
 Unknown modes fail closed with `401 UNAUTHORIZED`; `jwt` mode requires a Bearer

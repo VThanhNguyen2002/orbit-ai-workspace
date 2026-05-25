@@ -19,17 +19,10 @@ Synapse handles sensitive personal data: notes, tasks, voice recordings, AI-gene
 
 ### Supabase Row Level Security (RLS)
 
-Every table with user data has RLS enabled. Policies enforce:
-
-```sql
--- Example: notes table
-ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can only access own notes"
-  ON notes FOR ALL
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-```
+Every live table with user data must have RLS enabled. For Notes, the intended
+policy outcome is that an authenticated user may create, read, update, and
+soft-delete only rows they own. This is a sanitized design statement, not an
+executable database artifact.
 
 **Rules:**
 - RLS is enabled on every user-data table — no exceptions
@@ -37,11 +30,12 @@ CREATE POLICY "Users can only access own notes"
 - Service role key is used only for system operations (embedding generation, scheduled cleanup)
 - Service role key never leaves the backend environment
 
-Slice 6E adds the first Notes RLS draft in
-`supabase/migrations/20260522000000_create_notes.sql`. The API still defaults to
-the memory repository for local/test determinism, and the Supabase request path
-will require an injected user-scoped client before live use. No service-role key
-is used by Notes request handlers.
+The executable Notes migration draft was removed from the current repository.
+Only sanitized Notes/RLS design documentation remains; future migration files
+require explicit approval and security review under
+[database-migration-policy.md](database-migration-policy.md). Private repository
+status does not reduce this review requirement. The API still defaults to the
+memory repository, and no service-role key is used by Notes request handlers.
 
 Slice 6G hardens the API auth mode boundary. `SYNAPSE_AUTH_MODE=dev` remains a
 local/test-only deterministic path, while `SYNAPSE_AUTH_MODE=jwt` fails closed
@@ -190,14 +184,9 @@ Data stored locally in WatermelonDB (SQLite on mobile, web adapter storage in th
 
 ### Soft Delete
 
-All entity deletions are soft deletes (`is_deleted = true`). Physical deletion occurs via scheduled cleanup:
-
-```sql
--- Runs weekly via Supabase scheduled function
-DELETE FROM notes WHERE is_deleted = true AND updated_at < now() - interval '30 days';
-DELETE FROM tasks WHERE is_deleted = true AND updated_at < now() - interval '30 days';
--- Cascade: embeddings, summaries deleted via FK cascade
-```
+All entity deletions are intended to be soft deletes. Any future physical
+cleanup or retention implementation requires a separately approved,
+security-reviewed administrative path; no cleanup query is committed here.
 
 ### Account Deletion
 

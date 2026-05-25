@@ -12,6 +12,21 @@ test-results/
 .env*
 !.env.example
 
+# Database and local Supabase artifacts
+supabase/.branches/
+supabase/.temp/
+supabase/.cache/
+supabase/.env
+supabase/.env.*
+supabase/migrations/*.sql
+*.dump
+*.backup
+*.bak
+*.sql.gz
+*.psql
+*.sqlite
+*.db
+
 # Secret and credential material
 *secret*.json
 *secrets*.json

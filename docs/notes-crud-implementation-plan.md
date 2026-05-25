@@ -19,13 +19,14 @@ existing envelope/error behavior.
 Status update: Slice 6D now documents the Notes persistence/auth integration
 plan in [notes-persistence-auth-integration-plan.md](notes-persistence-auth-integration-plan.md).
 It served as the planning source for the Slice 6E auth/repository boundary and
-migration/RLS draft.
+sanitized Notes/RLS design.
 
 Status update: Slice 6E now includes the auth context boundary, repository
 protocol, deterministic memory repository default, Supabase repository scaffold,
-draft Notes SQL migration/RLS policy file, and tests for config, ownership,
-version conflicts, and soft delete semantics. Live Supabase client injection and
-full JWT validation remain deferred.
+and tests for config, ownership, version conflicts, and soft delete semantics.
+An executable Notes migration draft was later removed under the database
+artifact security policy; live Supabase client injection and full JWT validation
+remain deferred.
 
 ## Non-Goals
 
@@ -235,8 +236,9 @@ and future sync push do not diverge.
   request bodies.
 - Missing, deleted, or cross-user notes return `404 NOT_FOUND`.
 - Server logs must not include note `title` or `content`.
-- RLS remains required when live Supabase persistence is wired. Slice 6E adds the
-  draft Notes migration/RLS policy file.
+- RLS remains required when live Supabase persistence is wired. Notes/RLS design
+  is documentation only until a future migration receives explicit approval and
+  security review.
 - No service-role key or provider key is exposed to the client.
 - Note content is sensitive local data and follows the local storage risk model
   already documented for Phase 1.
@@ -290,8 +292,8 @@ Future app/local persistence:
    Plan database migrations, RLS, auth dependency, and local persistence mapping
    before implementation.
 5. **Slice 6E — Notes Supabase persistence/auth implementation**
-   Add auth and repository boundaries, a migration/RLS draft, Supabase scaffold,
-   and deterministic tests without live Supabase.
+   Add auth and repository boundaries, sanitized RLS planning, Supabase
+   scaffold, and deterministic tests without live Supabase.
 6. **Slice 6F — Notes integration verification**
    Verify package, API, contract, and build integration before live Supabase
    wiring.
