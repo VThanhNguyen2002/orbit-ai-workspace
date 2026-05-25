@@ -22,10 +22,14 @@ All endpoints are prefixed with `/v1`. Version bumps only on breaking changes.
 Every request (except `/v1/health` and `/v1/version`) requires a valid Supabase JWT in the `Authorization` header.
 
 ```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Authorization: Bearer <supabase-access-token>
 ```
 
-The backend validates the JWT against Supabase's JWT secret. The `sub` claim becomes `user_id` for all downstream operations. No session cookies, no API keys for clients.
+The target backend verifies Supabase access tokens against asymmetric signing
+keys exposed through JWKS. HS256 validation with a shared JWT secret is an
+explicit legacy compatibility mode only. The verified `sub` claim becomes
+`user_id` for all downstream operations. No session cookies or backend-secret
+API keys are accepted from clients.
 
 ## Endpoint Map
 
@@ -49,7 +53,7 @@ repository interface, memory default, Supabase repository scaffold, and draft
 Notes migration/RLS file. Runtime storage still defaults to process-local memory
 for deterministic local and CI runs. Full Supabase JWT validation and live
 user-scoped Supabase client wiring remain deferred and are tracked in
-[notes-persistence-auth-integration-plan.md](../notes-persistence-auth-integration-plan.md).
+[notes-live-auth-supabase-plan.md](../notes-live-auth-supabase-plan.md).
 
 ### Tasks
 
