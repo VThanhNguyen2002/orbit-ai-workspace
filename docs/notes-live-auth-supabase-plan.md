@@ -2,12 +2,12 @@
 
 ## Status
 
-Slice 6H-1 adds the API JWT verifier boundary and deterministic local-key tests.
-It includes a configured RS256 adapter, but does not add live Supabase JWKS
-discovery, Supabase client wiring, migration execution, credentials, frontend
-UI, sync engine, or AI integration. A prior security patch removed the
-executable Notes SQL draft; no executable Supabase migration is currently
-committed.
+Slice 6H-2 adds a user-scoped Supabase client factory boundary represented by
+an inert, redacted descriptor. Slice 6H-1 already added the API JWT verifier
+boundary and deterministic local-key tests. Neither slice adds live Supabase
+SDK transport, JWKS discovery, migration execution, credentials, frontend UI,
+sync engine, or AI integration. A prior security patch removed the executable
+Notes SQL draft; no executable Supabase migration is currently committed.
 
 ## Objective
 
@@ -18,8 +18,8 @@ enabled and validated.
 
 ## Non-Goals
 
-- No live Supabase client, network-backed JWKS retrieval, or legacy shared-secret
-  JWT adapter is added in this slice.
+- No live Supabase SDK client or transport, network-backed JWKS retrieval, or
+  legacy shared-secret JWT adapter is added in this slice.
 - No executable database migration is committed, executed, or treated as
   production-ready without explicit approval and security review.
 - No real key, token, password, URL, or `.env` file is added.
@@ -38,10 +38,13 @@ enabled and validated.
   verifies signature, expiry, UUID `sub`, and authenticated role.
 - If JWT verifier configuration is absent or token verification fails, `jwt`
   mode fails closed with `401 UNAUTHORIZED`.
+- `apps/api/app/core/supabase_client.py` accepts verified JWT auth context and
+  returns only redacted request-scoped client inputs; it creates no live client.
 - Unknown auth modes fail closed with `401 UNAUTHORIZED`.
 - The memory Notes repository remains the default.
-- `apps/api/app/repositories/notes_supabase.py` is scaffold-only and requires an
-  injected user-scoped client before use.
+- `apps/api/app/repositories/notes_supabase.py` is scaffold-only, recognizes a
+  publishable or legacy anon public key, and still requires an injected
+  user-scoped client before use.
 - Notes table and RLS intent now exist only as sanitized architecture
   documentation; no executable Supabase migration is tracked.
 - FastAPI still uses Pydantic models directly; generated shared JSON Schemas are
@@ -67,6 +70,8 @@ enabled and validated.
    Supabase Postgres RLS evaluates the same user identity as the API.
 9. Keep explicit `user_id` filters in application queries even when RLS is active.
 10. Never use `SUPABASE_SERVICE_ROLE_KEY` in normal request-path code.
+11. Keep the Slice 6H-2 factory inert until a reviewed SDK adapter and
+    repository integration are deliberately implemented.
 
 ## JWT Verification Strategy
 
@@ -167,23 +172,31 @@ Supabase:
 
 ## User-Scoped Supabase Client Strategy
 
-Add a request-scoped Supabase client factory after JWT verification exists:
+Slice 6H-2 adds this request-scoped factory boundary after JWT verification:
 
 ```python
 def get_supabase_user_client(
     auth_context: AuthContext,
     settings: Settings,
-) -> SupabaseClient:
+) -> UserScopedSupabaseClientDescriptor:
     ...
 ```
 
-Rules:
+Implemented behavior:
 
-- Construct the client with `SUPABASE_URL` and a public Data API key:
-  `SUPABASE_PUBLISHABLE_KEY` is preferred for future live deployment;
-  `SUPABASE_ANON_KEY` is retained only for legacy compatibility.
+- Reject `dev` auth contexts and JWT contexts without an access token.
+- Require `SUPABASE_URL` and a public Data API key;
+  `SUPABASE_PUBLISHABLE_KEY` is preferred and `SUPABASE_ANON_KEY` is a legacy
+  fallback.
+- Store retained auth-context tokens and descriptor token/public-key inputs as
+  redacted `SecretStr` values for a future SDK adapter.
+- Never select `SUPABASE_SERVICE_ROLE_KEY`.
+- Build no live Supabase SDK object and make no network request.
+
+Deferred adapter/repository rules:
+
 - Attach the verified caller access token as the authorization token used by
-  PostgREST.
+  PostgREST when the live adapter is explicitly implemented.
 - Do not mutate a global Supabase client with per-request credentials.
 - Do not use service-role credentials in the request path.
 - Keep the memory repository as the default unless
@@ -194,10 +207,10 @@ Rules:
 - Map version conditional-write misses to `NoteVersionConflictError` only after
   fetching current non-deleted server data for the same user.
 
-The future implementation should validate the exact `supabase-py` API for
-injecting the caller token before coding. The repository should keep depending on
-a minimal query-builder protocol where possible so tests can remain fake-client
-based.
+The future adapter implementation should validate the exact `supabase-py` API
+for injecting the caller token before coding. The repository should keep
+depending on a minimal query-builder protocol where possible so tests remain
+fake-client based.
 
 ## RLS Validation Strategy
 
@@ -256,6 +269,7 @@ Currently implemented settings remain safe because the live path is unwired:
 - `SYNAPSE_JWT_AUDIENCE`
 - `SYNAPSE_JWT_PUBLIC_KEY` (RS256 verification key; optional in default mode)
 - `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY` (preferred public Data API key)
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_JWT_SECRET`
 - `SUPABASE_SERVICE_ROLE_KEY` (present in settings only; prohibited from the
@@ -279,9 +293,9 @@ implementation slices:
 `SUPABASE_SERVICE_ROLE_KEY` may exist for migration/admin tooling, but the API
 request path must not read or inject it into a user request client.
 
-`.env.example` contains placeholders for the configured local RS256 verifier
-only. Files containing real environment values remain gitignored, and no test
-or runtime credential is committed.
+`.env.example` contains placeholders for the configured local RS256 verifier and
+public Data API key selection only. Files containing real environment values
+remain gitignored, and no test or runtime credential is committed.
 
 ## Deterministic CI And Test Strategy
 
@@ -290,6 +304,7 @@ Default CI must remain independent of live Supabase:
 - `SYNAPSE_AUTH_MODE=dev`
 - `SYNAPSE_NOTES_REPOSITORY=memory`
 - JWT verifier tests generate local RSA keys in test fixtures
+- client-factory tests build redacted descriptors and block network construction
 - fake Supabase repository/client tests use deterministic in-memory responses
 - no live network calls
 - no required Supabase environment variables
@@ -309,6 +324,7 @@ Optional integration tests should require all of:
 | Fake JWT accepted | `jwt` requires successful RS256 verification; tests reject invalid signatures and `alg=none`. |
 | Token leakage | Never log token values, refresh tokens, email, note title, or note content. |
 | Service-role misuse | Do not import or inject service-role credentials into request-path dependencies. |
+| Accidental token rendering | Store retained auth and descriptor key/token values as `SecretStr` and test redacted `repr`/`str`. |
 | RLS bypass via API bug | Keep explicit `user_id` filters in every query. |
 | RLS policy drift | Add user A/user B RLS tests before live enablement. |
 | Premature operational schema artifact | Ignore Supabase migration SQL and require explicit security review before any exception. |
@@ -322,12 +338,13 @@ Optional integration tests should require all of:
    The injected boundary, configured RS256 adapter, placeholder configuration,
    generated-local-key tests, and route-level success/failure coverage exist.
    JWKS and legacy shared-secret adapters remain intentionally deferred.
-2. **Slice 6H-2 - User-scoped Supabase client factory (recommended next)**
-   Add request-scoped client construction with caller token and fake-client tests.
-   Keep memory repository default and do not connect to live Supabase.
-3. **Slice 6H-3 - Supabase Notes repository wiring**
-   Wire the scaffold behind config, preserve memory default, and verify
-   repository semantics with mocked Supabase responses.
+2. **Slice 6H-2 - User-scoped Supabase client factory (completed)**
+   The inert redacted descriptor factory accepts verified JWT context, prefers a
+   publishable public key, rejects service-role-only configuration, and makes no
+   network call. Memory remains the default.
+3. **Slice 6H-3 - Supabase repository live implementation planning (recommended next)**
+   Plan the reviewed SDK adapter and later repository injection path, preserving
+   memory default and deterministic fakes. Do not connect to live Supabase.
 4. **Slice 6H-4 - Approved migration and RLS validation**
    Only after explicit security approval, introduce the minimum reviewed
    migration artifact and add gated validation. Default CI remains deterministic
@@ -342,9 +359,9 @@ Optional integration tests should require all of:
 
 ## Definition Of Done
 
-Slice 6H-1 is complete when the configured local verifier accepts only valid
-RS256 test tokens, maps verified UUID `sub` to `AuthContext.user_id`, and fails
-closed for unavailable configuration and invalid input without live services.
+Slice 6H-2 is complete when the user-scoped factory accepts only JWT contexts
+with caller access tokens and configured public Data API inputs, yields redacted
+inert descriptors, ignores service-role credentials, and makes no live request.
 No executable database migration is part of this implementation.
 
 Later live enablement is done only when:
@@ -356,7 +373,7 @@ Later live enablement is done only when:
   invalid-signature tokens return `401`.
 - `AuthContext.user_id` comes only from verified `sub`.
 - `AuthContext.access_token` is available only for request-scoped Supabase client
-  construction.
+  construction; the implemented descriptor is not yet an SDK transport.
 - Supabase request-path clients use a publishable key (or documented legacy
   anon key) plus the caller token.
 - Service-role key is absent from request-path code.

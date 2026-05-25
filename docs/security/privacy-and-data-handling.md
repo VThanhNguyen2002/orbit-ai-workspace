@@ -54,6 +54,12 @@ legacy deployment if required. Future request-path Data API clients must use a
 public publishable key (or a documented legacy anon key) plus the verified
 caller JWT; they must never use a service-role credential.
 
+Slice 6H-2 adds the request-scoped client factory boundary as an inert
+descriptor. It accepts JWT auth context only, stores the caller token and public
+Data API key as redacted values, prefers `SUPABASE_PUBLISHABLE_KEY`, and never
+selects `SUPABASE_SERVICE_ROLE_KEY`. Its tests make no network requests. Live
+repository wiring and RLS validation remain deferred.
+
 ### API-Level Isolation
 
 Even though RLS handles authorization, the API adds defense-in-depth:

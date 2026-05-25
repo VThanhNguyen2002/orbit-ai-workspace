@@ -77,6 +77,16 @@ Slice 6H-1 verification status:
 - Tests generate ephemeral local RSA keypairs. Supabase JWKS discovery and live
   request-scoped Supabase clients are still deferred.
 
+Slice 6H-2 client-boundary status:
+
+- `get_supabase_user_client` accepts only JWT auth context containing a caller
+  access token and returns a redacted, inert descriptor for later SDK wiring.
+- `SUPABASE_PUBLISHABLE_KEY` is the preferred public Data API key;
+  `SUPABASE_ANON_KEY` remains a legacy public fallback.
+- Service-role configuration is not accepted by the request-scoped factory.
+- Descriptor tests perform no network access. The Notes repository still
+  requires a separately injected client and remains unwired for live data.
+
 ## Authentication Flow
 
 ### Client-Side (Expo / React Native Web)
@@ -152,7 +162,7 @@ Validation checks:
    default).
 3. Require a non-empty UUID `sub`, which becomes `AuthContext.user_id`.
 4. Retain the verified access token only for construction of the user-scoped
-   Data API client.
+   Data API client descriptor and a future reviewed adapter.
 5. Reject every failure with a coarse `401 UNAUTHORIZED` envelope and never log
    token content.
 
@@ -167,8 +177,9 @@ fallback from JWKS mode, and unsigned tokens are never accepted.
 - Calls Supabase Auth admin APIs (Phase 1)
 
 Current implementation note: Slice 6H-1 adds the verifier interface and local
-configured RS256 adapter. It does not fetch Supabase JWKS, wire a Supabase
-repository/client, or require live Supabase settings in default CI.
+configured RS256 adapter. Slice 6H-2 adds only a redacted, no-network
+request-scoped client descriptor boundary. Neither slice fetches Supabase JWKS,
+wires live repository access, or requires live Supabase settings in default CI.
 
 ## Row-Level Security (RLS)
 

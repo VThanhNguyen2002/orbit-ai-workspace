@@ -106,6 +106,19 @@ def test_supabase_repository_requires_injected_user_scoped_client() -> None:
         get_supabase_notes_repository(settings)
 
 
+def test_supabase_repository_accepts_publishable_key_configuration_but_remains_scaffolded(
+) -> None:
+    settings = Settings(
+        notes_repository="supabase",
+        supabase_url="https://example.supabase.co",
+        supabase_publishable_key="placeholder-publishable-key",
+    )
+
+    assert is_supabase_notes_repository_configured(settings) is True
+    with pytest.raises(NotesRepositoryNotConfiguredError):
+        get_supabase_notes_repository(settings)
+
+
 def test_supabase_scaffold_maps_rows_without_network() -> None:
     row = {
         "id": "22222222-2222-4222-8222-222222222222",

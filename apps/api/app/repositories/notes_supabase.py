@@ -191,7 +191,7 @@ def get_supabase_notes_repository(
 ) -> SupabaseNotesRepository:
     if not is_supabase_notes_repository_configured(settings):
         raise NotesRepositoryNotConfiguredError(
-            "Supabase Notes repository requires SUPABASE_URL and SUPABASE_ANON_KEY"
+            "Supabase Notes repository requires SUPABASE_URL and a public Data API key"
         )
 
     if client is None:
@@ -203,7 +203,10 @@ def get_supabase_notes_repository(
 
 
 def is_supabase_notes_repository_configured(settings: Settings) -> bool:
-    return bool(settings.supabase_url and settings.supabase_anon_key)
+    return bool(
+        settings.supabase_url
+        and (settings.supabase_publishable_key or settings.supabase_anon_key)
+    )
 
 
 def note_from_supabase_row(row: Mapping[str, Any]) -> Note:

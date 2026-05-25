@@ -14,6 +14,7 @@ def test_settings_do_not_require_supabase_environment(monkeypatch: pytest.Monkey
         "SYNAPSE_JWT_AUDIENCE",
         "SYNAPSE_JWT_PUBLIC_KEY",
         "SUPABASE_URL",
+        "SUPABASE_PUBLISHABLE_KEY",
         "SUPABASE_ANON_KEY",
         "SUPABASE_JWT_SECRET",
         "SUPABASE_SERVICE_ROLE_KEY",
@@ -29,6 +30,7 @@ def test_settings_do_not_require_supabase_environment(monkeypatch: pytest.Monkey
     assert settings.jwt_audience is None
     assert settings.jwt_public_key is None
     assert settings.supabase_url is None
+    assert settings.supabase_publishable_key is None
     assert settings.supabase_anon_key is None
     assert settings.supabase_jwt_secret is None
     assert settings.supabase_service_role_key is None
@@ -108,6 +110,19 @@ def test_settings_read_local_jwt_verifier_configuration(monkeypatch: pytest.Monk
     assert settings.jwt_issuer == "https://issuer.example.invalid/auth/v1"
     assert settings.jwt_audience == "authenticated"
     assert settings.jwt_public_key == "public-key-placeholder"
+
+
+def test_settings_read_public_supabase_client_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SUPABASE_URL", "https://project.example.invalid")
+    monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", "publishable-placeholder-key")
+    get_settings.cache_clear()
+
+    settings = get_settings()
+
+    assert settings.supabase_url == "https://project.example.invalid"
+    assert settings.supabase_publishable_key == "publishable-placeholder-key"
 
 
 def test_unsupported_auth_mode_fails_closed() -> None:

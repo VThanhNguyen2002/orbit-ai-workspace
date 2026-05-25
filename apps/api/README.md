@@ -53,6 +53,14 @@ UNAUTHORIZED`. Tests generate local RSA keys at runtime and make no Supabase
 network calls. Live Supabase JWKS discovery and the user-scoped repository
 client remain deferred.
 
+Slice 6H-2 adds a user-scoped Supabase client factory boundary. It accepts only
+a JWT `AuthContext` with a verified caller access token, selects a publishable
+public Data API key (or legacy anon fallback), and returns an inert redacted
+descriptor for a future SDK adapter. It performs no network calls and does not
+use service-role credentials. Retained bearer values are represented as
+redacted secrets in auth/client objects. Notes still run against memory by
+default; live Supabase repository wiring remains deferred.
+
 ## Configuration
 
 Supported local placeholders:
@@ -65,6 +73,7 @@ SYNAPSE_JWT_ISSUER=https://issuer.example.invalid/auth/v1
 SYNAPSE_JWT_AUDIENCE=authenticated
 SYNAPSE_JWT_PUBLIC_KEY=replace-with-rs256-public-key-pem
 SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_PUBLISHABLE_KEY=replace-with-supabase-publishable-key
 SUPABASE_ANON_KEY=replace-with-supabase-anon-key
 SUPABASE_JWT_SECRET=replace-with-legacy-jwt-secret
 SUPABASE_SERVICE_ROLE_KEY=replace-with-service-role-key
@@ -73,6 +82,8 @@ SUPABASE_SERVICE_ROLE_KEY=replace-with-service-role-key
 Use `.env` for real local values; it is gitignored. Commit only `.env.example`
 placeholders. The `SYNAPSE_JWT_*` values are optional in default `dev` mode and
 must all be configured before `jwt` mode will accept an RS256 token.
+`SUPABASE_PUBLISHABLE_KEY` is preferred for the deferred user-scoped data path;
+`SUPABASE_ANON_KEY` is a legacy public-key fallback only.
 
 ## Local Checks
 

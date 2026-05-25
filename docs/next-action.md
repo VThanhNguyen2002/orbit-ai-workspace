@@ -2,11 +2,12 @@
 
 ## Objective
 
-Start **Slice 6H-2 - User-scoped Supabase client factory**. Slice 6H-1 now
-provides an injected verifier boundary and a configured RS256 adapter with
-local-key tests; it does not perform Supabase JWKS discovery or contact a live
-service. The next factory should propagate the already verified caller token
-through a narrowly scoped client boundary using fakes in tests.
+Start **Slice 6H-3 - Supabase repository live implementation planning**. Slice
+6H-2 now provides an inert, redacted user-scoped client descriptor boundary
+which accepts the verified caller token and selects only public Data API
+configuration. The repository remains scaffold-only, so the next bounded step
+is to plan how a reviewed SDK adapter would be injected without enabling live
+access or migrations.
 
 Security gate: no executable Supabase migration is committed. Notes/RLS design
 remains sanitized documentation only, and any future migration artifact requires
@@ -15,11 +16,12 @@ explicit approval and security review under
 
 ## Expected Files To Change
 
-- API client-factory/repository-boundary modules and deterministic fake-client
-  tests required to model caller-scoped data access.
-- Documentation/config placeholders only when required by implemented settings.
-- Do not connect to live Supabase, wire live Notes persistence, add JWKS network
-  retrieval, or create/execute an RLS migration in this slice.
+- Documentation and, only where needed for deterministic planning validation,
+  minimal fake-client/repository-boundary tests.
+- Specify how the descriptor feeds a later SDK adapter and how the adapter is
+  injected into the existing repository scaffold.
+- Do not connect to live Supabase, enable live Notes persistence, add JWKS
+  network retrieval, or create/execute an RLS migration in this slice.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, live Notes Supabase repository
@@ -44,19 +46,18 @@ pnpm build
 
 ## Definition Of Done
 
-- A request-scoped factory consumes the verified caller access token without
-  mutating global authentication state.
-- Tests use fake client construction only and demonstrate that caller identity
-  and token handoff stay scoped to the request.
-- No service-role credential is read or used in the request path.
-- Memory persistence remains the default; no live Supabase client or executable
+- The SDK-adapter and repository injection plan preserves verified caller-token
+  pass-through, explicit user scoping, and public-key-only request handling.
+- Any new validation remains fake/local and makes no live Supabase request.
+- No service-role credential is introduced into the request path.
+- Memory persistence remains the default; no live SDK client or executable
   migration is introduced.
 - No real credentials, UI, Expo, AI, or sync engine work is added.
 
 ## Risks
 
-- The Supabase repository remains scaffolded only; live client injection still
-  needs its later implementation slice.
+- The Supabase repository remains scaffold-only; implementation and RLS
+  validation still require separately reviewed later slices.
 - The configured RS256 verifier is suitable for deterministic boundary tests,
   but JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
@@ -67,10 +68,11 @@ pnpm build
 
 ## Rollback Notes
 
-If Slice 6H-2 implementation is unsuitable, revert only that factory work. Keep
+If Slice 6H-3 planning is unsuitable, revert only that planning work. Keep
 completed shared contracts, backend skeleton, API client methods, Slice 6E/6G
-boundaries, Slice 6H-1 verifier boundary/tests, the Slice 6H plan, and the
-database artifact security policy intact.
+boundaries, Slice 6H-1 verifier boundary/tests, Slice 6H-2 descriptor
+factory/tests, the Slice 6H plan, and the database artifact security policy
+intact.
 
 ## External Review Gate
 

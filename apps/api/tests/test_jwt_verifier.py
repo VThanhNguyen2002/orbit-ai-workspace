@@ -54,6 +54,10 @@ def test_jwt_mode_maps_verified_subject_to_auth_context(rsa_keys: RsaKeys) -> No
     )
 
     assert auth_context == AuthContext(user_id=SUBJECT, auth_mode="jwt", access_token=token)
+    assert auth_context.access_token is not None
+    assert auth_context.access_token.get_secret_value() == token
+    assert token not in repr(auth_context)
+    assert token not in str(auth_context)
 
 
 def test_notes_route_works_with_valid_jwt_auth_context(

@@ -23,6 +23,7 @@ class Settings:
     jwt_public_key: str | None = None
     notes_repository: NotesRepositoryMode = "memory"
     supabase_url: str | None = None
+    supabase_publishable_key: str | None = None
     supabase_anon_key: str | None = None
     supabase_jwt_secret: str | None = None
     supabase_service_role_key: str | None = None
@@ -41,6 +42,7 @@ def get_settings() -> Settings:
             os.getenv("SYNAPSE_NOTES_REPOSITORY", Settings.notes_repository)
         ),
         supabase_url=os.getenv("SUPABASE_URL"),
+        supabase_publishable_key=os.getenv("SUPABASE_PUBLISHABLE_KEY"),
         supabase_anon_key=os.getenv("SUPABASE_ANON_KEY"),
         supabase_jwt_secret=os.getenv("SUPABASE_JWT_SECRET"),
         supabase_service_role_key=os.getenv("SUPABASE_SERVICE_ROLE_KEY"),

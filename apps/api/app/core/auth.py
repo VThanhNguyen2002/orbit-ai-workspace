@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, Request
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from app.core.config import AuthMode, Settings, get_settings
 from app.core.errors import ApiError
@@ -16,7 +16,7 @@ class AuthContext(BaseModel):
 
     user_id: str = Field(min_length=1)
     auth_mode: AuthContextMode
-    access_token: str | None = Field(default=None, min_length=1)
+    access_token: SecretStr | None = Field(default=None, min_length=1)
 
 
 def get_auth_context(
