@@ -10,6 +10,7 @@ except ImportError:  # pragma: no cover - local fallback for Python 3.10 runners
     UTC = timezone.utc  # noqa: UP017
 
 from app.core.config import Settings
+from app.core.supabase_client import UserScopedSupabaseClient, UserScopedSupabaseQuery
 from app.repositories.notes import (
     NoteNotFoundError,
     NotesRepository,
@@ -38,7 +39,7 @@ class SupabaseNotesRepository(NotesRepository):
     subset of the Supabase query-builder API used here.
     """
 
-    def __init__(self, *, client: Any | None, settings: Settings) -> None:
+    def __init__(self, *, client: UserScopedSupabaseClient | None, settings: Settings) -> None:
         self._client = client
         self._settings = settings
 
@@ -175,7 +176,7 @@ class SupabaseNotesRepository(NotesRepository):
 
         return note_from_supabase_row(rows[0])
 
-    def _table(self) -> Any:
+    def _table(self) -> UserScopedSupabaseQuery:
         if self._client is None:
             raise NotesRepositoryNotConfiguredError(
                 "Supabase Notes repository is configured but no user-scoped client is available"
@@ -187,7 +188,7 @@ class SupabaseNotesRepository(NotesRepository):
 def get_supabase_notes_repository(
     settings: Settings,
     *,
-    client: Any | None = None,
+    client: UserScopedSupabaseClient | None = None,
 ) -> SupabaseNotesRepository:
     if not is_supabase_notes_repository_configured(settings):
         raise NotesRepositoryNotConfiguredError(

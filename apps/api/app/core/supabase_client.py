@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, runtime_checkable
 
 from pydantic import SecretStr
 
@@ -13,8 +13,32 @@ class SupabaseUserClientConfigurationError(Exception):
     """Raised when a request-scoped Supabase client cannot be safely created."""
 
 
+@runtime_checkable
+class UserScopedSupabaseQuery(Protocol):
+    """Minimal query-builder operations required by the Notes repository."""
+
+    def select(self, fields: str, *, count: str | None = None) -> "UserScopedSupabaseQuery": ...
+
+    def insert(self, payload: dict[str, Any]) -> "UserScopedSupabaseQuery": ...
+
+    def update(self, payload: dict[str, Any]) -> "UserScopedSupabaseQuery": ...
+
+    def eq(self, field: str, value: object) -> "UserScopedSupabaseQuery": ...
+
+    def order(self, field: str, *, desc: bool) -> "UserScopedSupabaseQuery": ...
+
+    def range(self, start: int, end: int) -> "UserScopedSupabaseQuery": ...
+
+    def limit(self, value: int) -> "UserScopedSupabaseQuery": ...
+
+    def execute(self) -> Any: ...
+
+
+@runtime_checkable
 class UserScopedSupabaseClient(Protocol):
-    def table(self, table_name: str) -> Any: ...
+    """Request-local Data API client surface consumed by repositories."""
+
+    def table(self, table_name: str) -> UserScopedSupabaseQuery: ...
 
 
 @dataclass(frozen=True)
@@ -37,6 +61,16 @@ class UserScopedSupabaseClientDescriptor:
         )
 
     __str__ = __repr__
+
+
+@runtime_checkable
+class UserScopedSupabaseClientAdapter(Protocol):
+    """Implementation-neutral factory for a future request-local SDK client."""
+
+    def build(
+        self,
+        descriptor: UserScopedSupabaseClientDescriptor,
+    ) -> UserScopedSupabaseClient: ...
 
 
 def get_supabase_user_client(

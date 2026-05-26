@@ -6,8 +6,18 @@ from app.core.auth import AuthContext
 from app.core.config import Settings
 from app.core.supabase_client import (
     SupabaseUserClientConfigurationError,
+    UserScopedSupabaseClient,
+    UserScopedSupabaseClientAdapter,
     UserScopedSupabaseClientDescriptor,
+    UserScopedSupabaseQuery,
     get_supabase_user_client,
+)
+from app.repositories.notes_supabase import get_supabase_notes_repository
+from tests.helpers.notes_supabase_fake_client import (
+    NOTE_ID,
+    FakeResponse,
+    FakeSupabaseClient,
+    note_row,
 )
 
 USER_ID = "11111111-1111-4111-8111-111111111111"
@@ -16,6 +26,22 @@ PROJECT_URL = "https://project.example.invalid"
 PUBLISHABLE_KEY = "publishable-placeholder-key"
 ANON_KEY = "legacy-anon-placeholder-key"
 SERVICE_ROLE_KEY = "service-role-placeholder-key"
+SECOND_ACCESS_TOKEN = "second-verified-local-access-token"
+
+
+class FakeUserScopedSupabaseClientAdapter:
+    def __init__(self, response_batches: list[list[FakeResponse]]) -> None:
+        self._response_batches = response_batches
+        self.safe_build_calls: list[tuple[str, str, str]] = []
+        self.clients: list[FakeSupabaseClient] = []
+
+    def build(self, descriptor: UserScopedSupabaseClientDescriptor) -> FakeSupabaseClient:
+        self.safe_build_calls.append(
+            (descriptor.project_url, descriptor.user_id, descriptor.key_source)
+        )
+        client = FakeSupabaseClient(self._response_batches.pop(0))
+        self.clients.append(client)
+        return client
 
 
 def test_user_scoped_client_rejects_dev_auth_context() -> None:
@@ -110,8 +136,55 @@ def test_user_scoped_client_descriptor_construction_makes_no_network_request(
     assert descriptor.user_id == USER_ID
 
 
-def _jwt_context() -> AuthContext:
-    return AuthContext(user_id=USER_ID, auth_mode="jwt", access_token=ACCESS_TOKEN)
+def test_fake_adapter_satisfies_protocol_and_supports_notes_query_flow(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def reject_network(*args: object, **kwargs: object) -> None:
+        raise AssertionError("network access attempted")
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    descriptor = get_supabase_user_client(auth_context=_jwt_context(), settings=_settings())
+    adapter = FakeUserScopedSupabaseClientAdapter([[FakeResponse(data=[note_row()])]])
+
+    assert isinstance(adapter, UserScopedSupabaseClientAdapter)
+    client = adapter.build(descriptor)
+    assert isinstance(client, UserScopedSupabaseClient)
+
+    repository = get_supabase_notes_repository(_settings(), client=client)
+    note = repository.get_note(user_id=USER_ID, note_id=NOTE_ID)
+
+    assert note.user_id == USER_ID
+    assert isinstance(client.queries[0], UserScopedSupabaseQuery)
+    assert adapter.safe_build_calls == [(PROJECT_URL, USER_ID, "publishable")]
+
+
+def test_fake_adapter_builds_distinct_request_clients_without_secret_propagation() -> None:
+    settings = Settings(
+        supabase_url=PROJECT_URL,
+        supabase_publishable_key=PUBLISHABLE_KEY,
+        supabase_service_role_key=SERVICE_ROLE_KEY,
+    )
+    first_descriptor = get_supabase_user_client(
+        auth_context=_jwt_context(), settings=settings
+    )
+    second_descriptor = get_supabase_user_client(
+        auth_context=_jwt_context(access_token=SECOND_ACCESS_TOKEN), settings=settings
+    )
+    adapter = FakeUserScopedSupabaseClientAdapter([[], []])
+
+    first_client = adapter.build(first_descriptor)
+    second_client = adapter.build(second_descriptor)
+
+    assert first_client is not second_client
+    assert first_descriptor.access_token != second_descriptor.access_token
+    rendered_calls = repr(adapter.safe_build_calls)
+    assert ACCESS_TOKEN not in rendered_calls
+    assert SECOND_ACCESS_TOKEN not in rendered_calls
+    assert SERVICE_ROLE_KEY not in rendered_calls
+
+
+def _jwt_context(*, access_token: str = ACCESS_TOKEN) -> AuthContext:
+    return AuthContext(user_id=USER_ID, auth_mode="jwt", access_token=access_token)
 
 
 def _settings() -> Settings:

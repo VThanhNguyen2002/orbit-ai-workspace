@@ -10,8 +10,9 @@ behavior. Slice 6H-6 adds a lightweight contract drift guard between exported
 shared Notes JSON Schemas and backend expectations. Slice 6H-3B records the
 future live adapter contract in
 [notes-supabase-live-adapter-plan.md](notes-supabase-live-adapter-plan.md).
-None of these slices adds an SDK client, network transport, executable
-migration, RLS execution, or live test.
+Slice 6H-3B-1 adds the implementation-neutral adapter protocol boundary and
+fake-adapter proof. None of these slices adds an SDK client, network transport,
+executable migration, RLS execution, or live test.
 
 ## Objective
 
@@ -40,9 +41,10 @@ an approved schema exists.
 - `apps/api/app/repositories/notes_supabase.py` already describes Supabase query
   intent for list, create, get, update, and soft delete, but requires an
   injected user-scoped client and therefore remains scaffold-only.
-- `apps/api/app/core/supabase_client.py` accepts verified JWT auth context and
-  returns an inert `UserScopedSupabaseClientDescriptor`. It stores the caller
-  token and public key as redacted values and does not construct a transport.
+- `apps/api/app/core/supabase_client.py` accepts verified JWT auth context,
+  returns an inert `UserScopedSupabaseClientDescriptor`, and now defines the
+  minimal application-owned query/client/adapter protocols. It stores caller
+  token and public key values redacted and constructs no transport.
 - Request-path public configuration prefers `SUPABASE_PUBLISHABLE_KEY`, with
   `SUPABASE_ANON_KEY` as a legacy public fallback. The factory does not select
   `SUPABASE_SERVICE_ROLE_KEY`.
@@ -59,8 +61,9 @@ an approved schema exists.
 | `update_note` | Conditional update on owner, visibility, and version | Keep atomic version guard and map misses after scoped lookup |
 | `delete_note` | Conditional soft-delete update on owner and version | Never issue a physical delete for the Notes API path |
 
-The existing protocol remains the integration point. A future adapter should
-implement only the client/query behavior needed by `SupabaseNotesRepository`,
+The implemented `UserScopedSupabaseQuery` and `UserScopedSupabaseClient`
+protocols now express only the client/query behavior needed by
+`SupabaseNotesRepository`. A future SDK adapter must implement that surface
 without changing service or route ownership of API concerns.
 
 ## User-Scoped Client Usage
@@ -226,6 +229,17 @@ stale but otherwise valid `version` is a business conflict and remains `409`.
 - CI exports the generated schemas before API tests; FastAPI runtime code does
   not depend on Node or load these files.
 
+### Slice 6H-3B-1 SDK Adapter Interface (Implemented)
+
+- `UserScopedSupabaseQuery` specifies only the chainable query methods already
+  used by Notes; `UserScopedSupabaseClient` specifies only `table()`.
+- `UserScopedSupabaseClientAdapter` models future construction from the
+  existing redacted descriptor without importing an SDK or opening a network
+  connection.
+- Deterministic fake-adapter tests prove the protocol can drive the current
+  Notes query flow, create distinct fake clients for separate descriptor
+  builds, and avoid rendering caller tokens or service-role configuration.
+
 ### Default CI
 
 - Keep `SYNAPSE_NOTES_REPOSITORY=memory` as the active default.
@@ -274,10 +288,10 @@ be validated first in an approved non-production environment.
    The new live adapter plan defines request-scoped construction, caller-token
    propagation, public-key/service-role policy, SDK assumptions, and gated test
    and RLS work without adding transport.
-4. **Slice 6H-3B-1 - Supabase SDK adapter interface (recommended next)**
-   Add only the application-owned interface and disabled-by-default
-   configuration/injection contract after review.
-5. **Slice 6H-3B-2 - Fake SDK transport tests**
+4. **Slice 6H-3B-1 - Supabase SDK adapter interface (completed)**
+   Minimal application-owned query/client/adapter protocols and deterministic
+   fake-adapter tests now exist without any live SDK dependency.
+5. **Slice 6H-3B-2 - Supabase fake SDK transport tests (recommended next)**
    Prove pinned SDK authorization/header, redaction, and isolation behavior
    without Supabase credentials or network access.
 6. **Slice 6H-3B-3 - Opt-in live Supabase test harness**
@@ -295,7 +309,8 @@ Slice 6H-3 planning is complete when:
   future injection sequence without implementing them.
 - CRUD, version-conflict, soft-delete, RLS, error, test, migration, and security
   decisions are explicit.
-- The next implementation step is restricted to fake-client repository tests.
+- At completion of the original planning slice, the next implementation step
+  was restricted to fake-client repository tests.
 - No SDK wiring, network access, migration, RLS execution, credential, UI, AI,
   or sync implementation is introduced.
 - Memory repository behavior remains the default for local/test/CI.
@@ -312,3 +327,8 @@ live Supabase wiring, or database artifacts.
 Slice 6H-3B is complete when the adapter plan fixes the future interface,
 caller-token, public-key, SDK-assumption, error, RLS, test, and security
 constraints without adding a live client, credential, or database artifact.
+
+Slice 6H-3B-1 is complete when the application-owned protocols represent only
+the existing Notes query surface, injected fake-adapter tests preserve
+request-local/redacted/no-network guarantees, and no live SDK, activation,
+credential, migration, or RLS execution is introduced.

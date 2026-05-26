@@ -2,16 +2,16 @@
 
 ## Status
 
-Slice 6H-3B is a planning-only step. It defines the future live SDK adapter
-contract constrained by the implemented user-scoped descriptor and the
-Supabase-shaped Notes repository tests. It does not add `supabase-py`, create a
-live client, enable Supabase persistence, introduce credentials, add a
-migration, or execute RLS validation.
+Slice 6H-3B defines the future live SDK adapter contract constrained by the
+implemented user-scoped descriptor and the Supabase-shaped Notes repository
+tests. Slice 6H-3B-1 now adds the application-owned query/client/adapter
+protocol boundary and deterministic fake-adapter coverage. It does not add
+`supabase-py`, create a live client, enable Supabase persistence, introduce
+credentials, add a migration, or execute RLS validation.
 
-The next bounded task is **Slice 6H-3B-1 - Supabase SDK adapter interface**.
-That task may introduce the application-owned interface and disabled-by-default
-configuration boundary after review, but it must not silently turn on live
-traffic.
+The next bounded task is **Slice 6H-3B-2 - Supabase fake SDK transport tests**.
+That task must validate a pinned candidate SDK construction shape using fakes
+only; it must not silently turn on live traffic.
 
 ## 1. Objective
 
@@ -38,33 +38,36 @@ replacement for application scoping.
 
 ## 3. Current Baseline
 
-- `apps/api/app/core/supabase_client.py` defines
-  `UserScopedSupabaseClientDescriptor` and `UserScopedSupabaseClient`. The
-  descriptor accepts only JWT-authenticated contexts with a retained verified
-  access token, prefers a publishable public key, allows a legacy anon public
-  key fallback, stores key/token values as `SecretStr`, and constructs no
-  transport.
+- `apps/api/app/core/supabase_client.py` defines the redacted
+  `UserScopedSupabaseClientDescriptor` plus implementation-neutral
+  `UserScopedSupabaseQuery`, `UserScopedSupabaseClient`, and
+  `UserScopedSupabaseClientAdapter` protocols. The descriptor accepts only
+  JWT-authenticated contexts with a retained verified access token, prefers a
+  publishable public key, allows a legacy anon public key fallback, stores
+  key/token values as `SecretStr`, and constructs no transport.
 - `apps/api/app/repositories/notes_supabase.py` implements the
-  `NotesRepository` query shape against an injected client's `table()` method.
-  It does not import or construct a Supabase SDK client.
+  `NotesRepository` query shape against an injected
+  `UserScopedSupabaseClient`. It does not import or construct a Supabase SDK
+  client.
 - `SYNAPSE_NOTES_REPOSITORY=memory` is the default. Choosing `supabase` today
   remains unwired and fails closed because no user-scoped client is injected by
   the normal factory.
-- Fake-client repository tests cover owner predicates, pagination and deleted
-  filtering, insert ownership, conditional update/delete, conflict lookup,
-  soft deletion, no-network behavior, and service-role non-propagation.
+- Fake-client tests cover owner predicates, pagination and deleted filtering,
+  insert ownership, conditional update/delete, conflict lookup, soft deletion,
+  adapter protocol compatibility, distinct request client creation, no-network
+  behavior, redaction, and service-role non-propagation.
 - The contract drift guard covers stable Notes shared-schema and backend
   behavior boundaries without adding runtime schema loading.
 - No approved executable Notes migration or performed RLS validation exists.
 
 ## 4. Required Adapter Boundary
 
-The future adapter must consume the existing inert descriptor and expose only
-the table-client behavior already used by `SupabaseNotesRepository`. It must
-not change the repository protocol or require routes/services to know about
-the Supabase SDK.
+The implemented protocol boundary requires any future adapter to consume the
+existing inert descriptor and expose only the table-client behavior already
+used by `SupabaseNotesRepository`. It does not change the repository protocol
+or require routes/services to know about the Supabase SDK.
 
-Planned application-owned interface:
+Implemented application-owned adapter interface:
 
 ```python
 class UserScopedSupabaseClientAdapter(Protocol):
@@ -74,7 +77,11 @@ class UserScopedSupabaseClientAdapter(Protocol):
     ) -> UserScopedSupabaseClient: ...
 ```
 
-Planned construction sequence:
+`UserScopedSupabaseQuery` models only `select`, `insert`, `update`, `eq`,
+`order`, `range`, `limit`, and `execute`; `UserScopedSupabaseClient` models
+only `table`. No SDK-specific API or transport is represented.
+
+Future construction sequence:
 
 1. Existing authentication verifies the bearer token and supplies
    `AuthContext(user_id=<verified sub>, auth_mode="jwt", access_token=<redacted>)`.
@@ -158,7 +165,7 @@ created with:
 - automatic token refresh disabled; and
 - session persistence disabled.
 
-This is an assumption, not implemented code. Slice 6H-3B-1/2 must pin the SDK
+This is an assumption, not implemented code. Slice 6H-3B-2 must pin the SDK
 version chosen for implementation and prove with fake transport tests that:
 
 - table requests actually carry the caller bearer authorization header;
@@ -297,6 +304,9 @@ requires explicit approval under
   for CRUD query shaping, owner constraints, conflicts, and soft deletion.
 - Existing descriptor tests remain no-network checks for public-key selection,
   redaction, and JWT-only caller inputs.
+- Slice 6H-3B-1 tests now prove that an injected fake satisfies the protocol
+  boundary, drives the existing Notes query flow without network access, and
+  constructs distinct safe fake clients without retaining secret inputs.
 - Slice 6H-3B-2 should fake SDK client construction and outgoing Data API
   headers without connecting to Supabase or logging credential values.
 - CI must not require a Supabase URL, API key, JWT, database, migration, or
@@ -328,11 +338,10 @@ requires explicit approval under
 
 ## 15. Implementation Slices
 
-1. **Slice 6H-3B-1 - Supabase SDK adapter interface (recommended next)**
-   Introduce only the application-owned adapter interface and
-   disabled-by-default configuration/injection contract after review. Keep
-   memory as default and do not enable live transport silently.
-2. **Slice 6H-3B-2 - Fake SDK transport tests**
+1. **Slice 6H-3B-1 - Supabase SDK adapter interface (completed)**
+   Application-owned query/client/adapter protocols and deterministic
+   fake-adapter tests now exist without adding an SDK or enabling transport.
+2. **Slice 6H-3B-2 - Supabase fake SDK transport tests (recommended next)**
    Pin/review the candidate SDK usage and test caller authorization header
    propagation, public key usage, no refresh/session persistence, redaction,
    request isolation, and coarse error mapping with fakes only.
@@ -356,10 +365,22 @@ Slice 6H-3B planning is complete when:
   caller-token propagation, public-key-only policy, SDK assumptions, CRUD
   mapping, conflict/delete semantics, error mapping, RLS gates, tests, risks,
   and staged implementation order.
-- Related planning documents point to this plan and recommend only
-  Slice 6H-3B-1 next.
+- At completion of the planning slice, related planning documents pointed to
+  this plan and recommended Slice 6H-3B-1 next.
 - The repository still has no live SDK adapter, live network access, Supabase
   dependency, credential, executable migration, RLS execution, UI, AI, sync
   implementation, or changed public Notes API behavior.
 - Memory persistence remains the default and all existing local/CI
   verification continues to pass without live Supabase configuration.
+
+Slice 6H-3B-1 is complete when:
+
+- Application-owned query/client/adapter protocols express only the table
+  operations currently required by the Notes repository.
+- The repository accepts the protocol boundary while preserving existing API
+  behavior and remaining unwired for live data.
+- Deterministic fake-adapter tests prove no-network construction/query use,
+  per-request fake client isolation, redacted inputs, and no service-role
+  propagation.
+- The next recommended task is Slice 6H-3B-2; no SDK transport, live
+  activation, migration, or RLS execution has been introduced.
