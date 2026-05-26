@@ -2,12 +2,12 @@
 
 ## Objective
 
-Start **Slice 6H-3 - Supabase repository live implementation planning**. Slice
-6H-2 now provides an inert, redacted user-scoped client descriptor boundary
-which accepts the verified caller token and selects only public Data API
-configuration. The repository remains scaffold-only, so the next bounded step
-is to plan how a reviewed SDK adapter would be injected without enabling live
-access or migrations.
+Start **Slice 6H-3A - Supabase repository fake-client tests**. Slice 6H-3 now
+records the future implementation sequence in
+[notes-supabase-repository-implementation-plan.md](notes-supabase-repository-implementation-plan.md).
+The next bounded step is deterministic test coverage for the existing
+Supabase-shaped repository scaffold, without adding an SDK adapter or enabling
+live access.
 
 Security gate: no executable Supabase migration is committed. Notes/RLS design
 remains sanitized documentation only, and any future migration artifact requires
@@ -16,12 +16,13 @@ explicit approval and security review under
 
 ## Expected Files To Change
 
-- Documentation and, only where needed for deterministic planning validation,
-  minimal fake-client/repository-boundary tests.
-- Specify how the descriptor feeds a later SDK adapter and how the adapter is
-  injected into the existing repository scaffold.
-- Do not connect to live Supabase, enable live Notes persistence, add JWKS
-  network retrieval, or create/execute an RLS migration in this slice.
+- API repository test files and, only if required for accurate test
+  documentation, small planning-document updates.
+- Inject deterministic fake client/query objects into the current repository
+  scaffold to prove CRUD query shaping, user scoping, soft deletion, and
+  conflict classification.
+- Do not add a live SDK adapter, connect to Supabase, enable live Notes
+  persistence, add JWKS retrieval, or create/execute an RLS migration.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, live Notes Supabase repository
@@ -46,9 +47,9 @@ pnpm build
 
 ## Definition Of Done
 
-- The SDK-adapter and repository injection plan preserves verified caller-token
-  pass-through, explicit user scoping, and public-key-only request handling.
-- Any new validation remains fake/local and makes no live Supabase request.
+- Fake-client tests prove the repository preserves explicit `user_id` scoping,
+  soft-delete semantics, and version-conflict/not-found classification.
+- Test execution remains fake/local and makes no live Supabase request.
 - No service-role credential is introduced into the request path.
 - Memory persistence remains the default; no live SDK client or executable
   migration is introduced.
@@ -56,8 +57,8 @@ pnpm build
 
 ## Risks
 
-- The Supabase repository remains scaffold-only; implementation and RLS
-  validation still require separately reviewed later slices.
+- Fake query-builder tests cannot prove SDK compatibility or RLS enforcement;
+  those remain separately reviewed later slices.
 - The configured RS256 verifier is suitable for deterministic boundary tests,
   but JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
@@ -68,11 +69,11 @@ pnpm build
 
 ## Rollback Notes
 
-If Slice 6H-3 planning is unsuitable, revert only that planning work. Keep
+If Slice 6H-3A fake-client tests are unsuitable, revert only those tests. Keep
 completed shared contracts, backend skeleton, API client methods, Slice 6E/6G
 boundaries, Slice 6H-1 verifier boundary/tests, Slice 6H-2 descriptor
-factory/tests, the Slice 6H plan, and the database artifact security policy
-intact.
+factory/tests, the Slice 6H-3 repository implementation plan, the Slice 6H
+plan, and the database artifact security policy intact.
 
 ## External Review Gate
 

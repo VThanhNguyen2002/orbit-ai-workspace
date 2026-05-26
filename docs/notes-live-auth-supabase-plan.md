@@ -2,12 +2,15 @@
 
 ## Status
 
+Slice 6H-3 records the future Supabase Notes repository implementation path in
+[notes-supabase-repository-implementation-plan.md](notes-supabase-repository-implementation-plan.md).
 Slice 6H-2 adds a user-scoped Supabase client factory boundary represented by
-an inert, redacted descriptor. Slice 6H-1 already added the API JWT verifier
-boundary and deterministic local-key tests. Neither slice adds live Supabase
-SDK transport, JWKS discovery, migration execution, credentials, frontend UI,
-sync engine, or AI integration. A prior security patch removed the executable
-Notes SQL draft; no executable Supabase migration is currently committed.
+an inert, redacted descriptor, and Slice 6H-1 added the API JWT verifier
+boundary and deterministic local-key tests. None of these slices adds live
+Supabase SDK transport, JWKS discovery, migration execution, credentials,
+frontend UI, sync engine, or AI integration. A prior security patch removed
+the executable Notes SQL draft; no executable Supabase migration is currently
+committed.
 
 ## Objective
 
@@ -342,27 +345,33 @@ Optional integration tests should require all of:
    The inert redacted descriptor factory accepts verified JWT context, prefers a
    publishable public key, rejects service-role-only configuration, and makes no
    network call. Memory remains the default.
-3. **Slice 6H-3 - Supabase repository live implementation planning (recommended next)**
-   Plan the reviewed SDK adapter and later repository injection path, preserving
-   memory default and deterministic fakes. Do not connect to live Supabase.
-4. **Slice 6H-4 - Approved migration and RLS validation**
-   Only after explicit security approval, introduce the minimum reviewed
-   migration artifact and add gated validation. Default CI remains deterministic
-   without Supabase.
-5. **Slice 6H-5 - Controlled live rollout**
-   Execute migration in staging, validate RLS, verify Notes CRUD with real users,
-   then document production rollout steps.
-6. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic**
+3. **Slice 6H-3 - Supabase repository live implementation planning (completed)**
+   The repository implementation plan records future adapter injection, CRUD
+   mapping, RLS expectations, security controls, and the approval gate without
+   adding live code or migrations.
+4. **Slice 6H-3A - Supabase repository fake-client tests (recommended next)**
+   Verify current scaffold query shaping and error classification using
+   deterministic injected fakes only.
+5. **Slice 6H-3B - Live SDK adapter behind feature flag**
+   After review, add the caller-scoped transport gated off by default.
+6. **Slice 6H-3C - Approved migration and RLS validation**
+   Only after explicit security approval, introduce and validate the minimum
+   reviewed schema/RLS artifact.
+7. **Slice 6H-3D - Opt-in live integration tests**
+   Add non-production/local integration coverage only after adapter and RLS
+   approval, disabled by default.
+8. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic**
    Complete the backend schema-consumption/drift guard independently of live
    authentication. It is important, but it does not unblock authenticated RLS
    evaluation and therefore is not the next task.
 
 ## Definition Of Done
 
-Slice 6H-2 is complete when the user-scoped factory accepts only JWT contexts
-with caller access tokens and configured public Data API inputs, yields redacted
-inert descriptors, ignores service-role credentials, and makes no live request.
-No executable database migration is part of this implementation.
+Slice 6H-3 is complete when the new repository implementation plan specifies
+caller-scoped injection, CRUD/conflict/delete semantics, RLS expectations,
+security controls, and staged test/live work without adding runtime transport
+or a database artifact. No executable database migration is part of this
+planning slice.
 
 Later live enablement is done only when:
 
