@@ -2,11 +2,13 @@
 
 ## Objective
 
-Start **Slice 6H-3A - Supabase repository fake-client tests**. Slice 6H-3 now
-records the future implementation sequence in
+Start **Slice 6H-6 - Contract drift guard between Zod JSON Schema and
+Pydantic**. Slice 6H-3A now adds deterministic fake-client coverage for the
+existing Supabase-shaped repository scaffold described in
 [notes-supabase-repository-implementation-plan.md](notes-supabase-repository-implementation-plan.md).
-The next bounded step is deterministic test coverage for the existing
-Supabase-shaped repository scaffold, without adding an SDK adapter or enabling
+Those tests parse fake repository rows through backend Pydantic models, while
+shared Zod-generated schemas remain a separate contract surface. The next
+bounded step is to detect that drift before adding an SDK adapter or enabling
 live access.
 
 Security gate: no executable Supabase migration is committed. Notes/RLS design
@@ -16,11 +18,10 @@ explicit approval and security review under
 
 ## Expected Files To Change
 
-- API repository test files and, only if required for accurate test
-  documentation, small planning-document updates.
-- Inject deterministic fake client/query objects into the current repository
-  scaffold to prove CRUD query shaping, user scoping, soft deletion, and
-  conflict classification.
+- Shared/backend contract validation tests and, only where needed, narrow
+  contract bridge documentation updates.
+- Compare generated Zod JSON Schema artifacts with the Pydantic Notes request
+  and response expectations using deterministic local fixtures.
 - Do not add a live SDK adapter, connect to Supabase, enable live Notes
   persistence, add JWKS retrieval, or create/execute an RLS migration.
 
@@ -47,9 +48,9 @@ pnpm build
 
 ## Definition Of Done
 
-- Fake-client tests prove the repository preserves explicit `user_id` scoping,
-  soft-delete semantics, and version-conflict/not-found classification.
-- Test execution remains fake/local and makes no live Supabase request.
+- A deterministic guard reports material Notes contract mismatch between
+  generated Zod JSON Schema and backend Pydantic expectations.
+- Test execution remains local and makes no live Supabase request.
 - No service-role credential is introduced into the request path.
 - Memory persistence remains the default; no live SDK client or executable
   migration is introduced.
@@ -57,8 +58,8 @@ pnpm build
 
 ## Risks
 
-- Fake query-builder tests cannot prove SDK compatibility or RLS enforcement;
-  those remain separately reviewed later slices.
+- The fake-client repository tests do not prove SDK compatibility or RLS
+  enforcement; those remain separately reviewed later slices.
 - The configured RS256 verifier is suitable for deterministic boundary tests,
   but JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
@@ -69,11 +70,12 @@ pnpm build
 
 ## Rollback Notes
 
-If Slice 6H-3A fake-client tests are unsuitable, revert only those tests. Keep
+If Slice 6H-6 contract-drift work is unsuitable, revert only that work. Keep
 completed shared contracts, backend skeleton, API client methods, Slice 6E/6G
 boundaries, Slice 6H-1 verifier boundary/tests, Slice 6H-2 descriptor
 factory/tests, the Slice 6H-3 repository implementation plan, the Slice 6H
-plan, and the database artifact security policy intact.
+plan, Slice 6H-3A fake-client repository tests, and the database artifact
+security policy intact.
 
 ## External Review Gate
 

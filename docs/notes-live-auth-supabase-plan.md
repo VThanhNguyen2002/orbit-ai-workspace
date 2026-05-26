@@ -349,21 +349,22 @@ Optional integration tests should require all of:
    The repository implementation plan records future adapter injection, CRUD
    mapping, RLS expectations, security controls, and the approval gate without
    adding live code or migrations.
-4. **Slice 6H-3A - Supabase repository fake-client tests (recommended next)**
-   Verify current scaffold query shaping and error classification using
-   deterministic injected fakes only.
-5. **Slice 6H-3B - Live SDK adapter behind feature flag**
+4. **Slice 6H-3A - Supabase repository fake-client tests (completed)**
+   Deterministic injected fakes verify scaffold query shaping, explicit owner
+   scoping, conflict classification, and soft-delete behavior without network
+   access.
+5. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic (recommended next)**
+   Fake repository response rows are validated through backend Pydantic models,
+   while shared Zod schemas remain separately generated. Add the drift guard
+   before introducing live transport.
+6. **Slice 6H-3B - Live SDK adapter behind feature flag**
    After review, add the caller-scoped transport gated off by default.
-6. **Slice 6H-3C - Approved migration and RLS validation**
+7. **Slice 6H-3C - Approved migration and RLS validation**
    Only after explicit security approval, introduce and validate the minimum
    reviewed schema/RLS artifact.
-7. **Slice 6H-3D - Opt-in live integration tests**
+8. **Slice 6H-3D - Opt-in live integration tests**
    Add non-production/local integration coverage only after adapter and RLS
    approval, disabled by default.
-8. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic**
-   Complete the backend schema-consumption/drift guard independently of live
-   authentication. It is important, but it does not unblock authenticated RLS
-   evaluation and therefore is not the next task.
 
 ## Definition Of Done
 

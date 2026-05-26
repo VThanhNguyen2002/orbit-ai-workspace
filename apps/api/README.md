@@ -61,6 +61,12 @@ use service-role credentials. Retained bearer values are represented as
 redacted secrets in auth/client objects. Notes still run against memory by
 default; live Supabase repository wiring remains deferred.
 
+Slice 6H-3A adds deterministic fake-client coverage for the scaffolded
+Supabase Notes repository. Tests assert explicit user scoping, version-gated
+updates and soft deletes, conflict lookup behavior, service-role avoidance, and
+no-network execution. The tests do not construct an SDK client or validate
+RLS; memory persistence remains the default.
+
 ## Configuration
 
 Supported local placeholders:

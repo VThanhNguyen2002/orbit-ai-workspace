@@ -2,10 +2,12 @@
 
 ## Status
 
-Slice 6H-3 is planning only. It defines the bounded path from the existing
-Supabase-shaped Notes repository scaffold and inert user-scoped client
-descriptor to a future reviewed implementation. This slice does not add an SDK
-client, network transport, executable migration, RLS execution, or live test.
+Slice 6H-3 defines the bounded path from the existing Supabase-shaped Notes
+repository scaffold and inert user-scoped client descriptor to a future
+reviewed implementation. Slice 6H-3A adds deterministic fake-client tests for
+the scaffold's query shaping, owner scoping, version conflict, and soft-delete
+behavior. Neither slice adds an SDK client, network transport, executable
+migration, RLS execution, or live test.
 
 ## Objective
 
@@ -184,16 +186,21 @@ stale but otherwise valid `version` is a business conflict and remains `409`.
 
 ## Test Strategy
 
-### Slice 6H-3A Unit Tests With Fake Client
+### Slice 6H-3A Unit Tests With Fake Client (Implemented)
 
-- Inject a deterministic fake client/query builder into the existing
+- Tests inject a deterministic fake client/query builder into the existing
   `SupabaseNotesRepository`; do not construct a real SDK client.
-- Prove each operation adds the authenticated `user_id` predicate or payload.
-- Cover pagination/filter ordering, row conversion, non-deleted visibility,
+- Tests prove each operation adds the authenticated `user_id` predicate or
+  payload.
+- Coverage includes pagination/filter ordering, row conversion, non-deleted visibility,
   version-gated update/delete, follow-up not-found/conflict classification, and
   soft-delete payload behavior.
-- Include cross-user-shaped fake responses only to prove repository scoping and
+- Empty fake responses model invisible/missing records only to prove repository
+  scoping and
   non-disclosing error mapping; these are not RLS tests.
+- A fake-client construction test blocks socket connections, and service-role
+  placeholder configuration is verified not to reach injected client
+  operations.
 
 ### Default CI
 
@@ -231,16 +238,21 @@ be validated first in an approved non-production environment.
 
 ## Implementation Slices
 
-1. **Slice 6H-3A - Supabase repository fake-client tests**
-   Add deterministic tests around the current repository query and error
-   behavior without adding SDK transport or contacting Supabase.
-2. **Slice 6H-3B - Live SDK adapter behind feature flag**
+1. **Slice 6H-3A - Supabase repository fake-client tests (completed)**
+   Deterministic injected-fake tests now cover query shaping, user filters,
+   version/conflict handling, soft deletion, no-network behavior, and
+   service-role avoidance without contacting Supabase.
+2. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic (recommended next)**
+   The fake repository rows are validated through backend Pydantic models, while
+   shared Zod-generated schemas remain a separate contract surface. Add a
+   deterministic drift guard before introducing a live adapter.
+3. **Slice 6H-3B - Live SDK adapter behind feature flag**
    After review, add a request-scoped adapter using the public key and caller
    JWT, gated off by default; keep memory persistence as the default.
-3. **Slice 6H-3C - Approved migration and RLS validation**
+4. **Slice 6H-3C - Approved migration and RLS validation**
    Only after explicit database-artifact approval, add the reviewed minimum
    schema/RLS work and validate ownership outcomes with synthetic users.
-4. **Slice 6H-3D - Opt-in live integration tests**
+5. **Slice 6H-3D - Opt-in live integration tests**
    Add explicitly enabled non-production/local integration coverage only after
    the adapter and approved RLS surface exist.
 
@@ -256,3 +268,7 @@ Slice 6H-3 planning is complete when:
 - No SDK wiring, network access, migration, RLS execution, credential, UI, AI,
   or sync implementation is introduced.
 - Memory repository behavior remains the default for local/test/CI.
+
+Slice 6H-3A is complete when deterministic fake-client tests lock down existing
+repository query, visibility, conflict, and soft-delete behavior without
+constructing a live SDK client or testing RLS.
