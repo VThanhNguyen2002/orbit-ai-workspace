@@ -147,6 +147,15 @@ Soft delete should set:
 Deletion also requires version conflict protection. Slice 6A chose a request
 body shape with `version`.
 
+### Validation And Conflict Status
+
+The implemented Notes contract uses `400 VALIDATION_ERROR` for request
+DTO/schema failures, such as server-controlled create fields or an omitted
+required `version`. Malformed request syntax is a distinct bad-request case
+that should be documented and tested explicitly if custom handling is added.
+Requests that pass validation but carry a stale `version` return `409 CONFLICT`
+with current `server_data`, not a validation error.
+
 ## Backend Structure Plan
 
 Use the existing FastAPI baseline:

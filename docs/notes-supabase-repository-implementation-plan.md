@@ -173,13 +173,14 @@ enabled. RLS and API filtering are complementary controls.
 | Missing, malformed, or rejected authentication | `401` | Auth boundary rejects before constructing a user-scoped client |
 | Missing, deleted, or cross-user note | `404` | Repository returns not found without confirming existence |
 | Stale update or soft-delete version | `409` | Repository supplies current owner-visible `server_data` |
-| Invalid request payload or query parameter | `422` | Validation rejects input before repository execution |
+| Invalid request DTO or query parameter | `400` | Existing Notes validation contract rejects input before repository execution |
 | Configuration, transport, SDK, or unexpected persistence failure | `500` | Return a coarse server error; never expose tokens, keys, queries, or note content |
 
-Earlier integration documentation records validation failures as `400`. Before
-live repository work changes endpoint behavior, the route/shared-contract
-decision must be reconciled and covered by contract tests; this plan records
-`422` as the target requested for the future mapping.
+The implemented Notes route tests establish `400 VALIDATION_ERROR` for
+request-schema failures, including rejected server-controlled fields and
+missing required versions. Malformed request syntax is a distinct bad-request
+case and must be specified and tested before custom handling is introduced. A
+stale but otherwise valid `version` is a business conflict and remains `409`.
 
 ## Test Strategy
 

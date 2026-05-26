@@ -157,14 +157,21 @@ Every error follows this shape — no exceptions:
 
 | HTTP | Code | Meaning |
 |------|------|---------|
-| 400 | `VALIDATION_ERROR` | Request body/params failed validation |
+| 400 | `VALIDATION_ERROR` | Request body/params failed validation or explicitly handled malformed request input |
 | 401 | `UNAUTHORIZED` | Missing or invalid JWT |
 | 403 | `FORBIDDEN` | Valid JWT but insufficient permissions |
 | 404 | `NOT_FOUND` | Entity doesn't exist or belongs to another user |
 | 409 | `CONFLICT` | Version mismatch (optimistic concurrency) |
-| 422 | `UNPROCESSABLE` | Valid format but semantically wrong |
+| 422 | `UNPROCESSABLE` | Reserved for an explicitly documented semantic rejection outside current Notes DTO validation |
 | 429 | `RATE_LIMITED` | Too many requests |
 | 500 | `INTERNAL_ERROR` | Server fault |
+
+For the implemented Notes routes, request DTO/schema failures are normalized to
+`400 VALIDATION_ERROR`, including rejected server-controlled fields and missing
+required `version` values. Malformed request syntax is a separate bad-request
+category and should be documented and tested if custom handling is introduced.
+A valid request with a stale `version` is not validation failure; it returns
+`409 CONFLICT` with current `server_data`.
 
 ### Conflict Response (409)
 
