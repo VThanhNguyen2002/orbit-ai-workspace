@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.core.auth import AuthContext, get_auth_context
 from app.repositories.notes_memory import get_memory_notes_repository
+from tests.helpers.notes_assertions import create_note as _create_note
 
 
 @pytest.fixture(autouse=True)
@@ -310,22 +311,3 @@ def test_note_responses_use_snake_case(client: TestClient) -> None:
     assert "createdAt" not in note
     assert "updatedAt" not in note
     assert "deletedAt" not in note
-
-
-def _create_note(
-    client: TestClient,
-    *,
-    title: str = "Planning note",
-    content: str = "Decisions and follow-up items.",
-    content_type: str = "plain",
-) -> dict:
-    response = client.post(
-        "/v1/notes",
-        json={
-            "title": title,
-            "content": content,
-            "content_type": content_type,
-        },
-    )
-    assert response.status_code == 201
-    return response.json()["data"]

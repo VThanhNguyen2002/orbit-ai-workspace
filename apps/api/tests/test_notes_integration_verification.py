@@ -1,27 +1,6 @@
-from collections.abc import Mapping
-
 from fastapi.testclient import TestClient
 
-NOTE_FIELDS = {
-    "id",
-    "user_id",
-    "title",
-    "content",
-    "content_type",
-    "is_archived",
-    "is_deleted",
-    "created_at",
-    "updated_at",
-    "deleted_at",
-    "version",
-}
-
-PAGINATION_FIELDS = {
-    "page",
-    "per_page",
-    "total",
-    "has_next",
-}
+from tests.helpers.notes_assertions import PAGINATION_FIELDS, assert_note_contract
 
 
 def test_notes_backend_wire_contract_round_trip(client: TestClient) -> None:
@@ -121,14 +100,3 @@ def test_notes_conflict_error_contract_includes_full_server_data(client: TestCli
     assert detail["actual"] == note["version"]
     assert_note_contract(detail["server_data"])
     assert detail["server_data"] == note
-
-
-def assert_note_contract(note: Mapping[str, object]) -> None:
-    assert set(note) == NOTE_FIELDS
-    assert all(field == field.lower() for field in note)
-    assert "contentType" not in note
-    assert "isArchived" not in note
-    assert "isDeleted" not in note
-    assert "createdAt" not in note
-    assert "updatedAt" not in note
-    assert "deletedAt" not in note
