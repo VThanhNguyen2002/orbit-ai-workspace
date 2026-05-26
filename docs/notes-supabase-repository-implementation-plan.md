@@ -7,9 +7,11 @@ repository scaffold and inert user-scoped client descriptor to a future
 reviewed implementation. Slice 6H-3A adds deterministic fake-client tests for
 the scaffold's query shaping, owner scoping, version conflict, and soft-delete
 behavior. Slice 6H-6 adds a lightweight contract drift guard between exported
-shared Notes JSON Schemas and backend expectations. None of these slices adds
-an SDK client, network transport, executable migration, RLS execution, or live
-test.
+shared Notes JSON Schemas and backend expectations. Slice 6H-3B records the
+future live adapter contract in
+[notes-supabase-live-adapter-plan.md](notes-supabase-live-adapter-plan.md).
+None of these slices adds an SDK client, network transport, executable
+migration, RLS execution, or live test.
 
 ## Objective
 
@@ -76,8 +78,10 @@ Future live wiring must follow this request-local sequence:
 5. The request-scoped client is injected into `SupabaseNotesRepository`.
 
 The adapter must not mutate a global client's auth state, render token values
-in diagnostics, or be constructed in default unit tests. Exact `supabase-py`
-token-injection APIs must be verified in Slice 6H-3B before implementation.
+in diagnostics, or be constructed in default unit tests. The Slice 6H-3B plan
+requires request-local access-token-only authorization, disables session
+refresh/persistence assumptions, and reserves pinned SDK behavior proof for
+fake transport tests before live enablement.
 
 ## No Service-Role Request-Path Policy
 
@@ -266,15 +270,22 @@ be validated first in an approved non-production environment.
    Deterministic backend tests now compare the stable exported Notes schema
    shapes and status contract to Pydantic/route expectations without runtime
    code generation or network access.
-3. **Slice 6H-3B - Supabase live SDK adapter planning (recommended next)**
-   Review the precise request-scoped adapter API, caller-token injection,
-   feature flag, and test/security gates before approving any live wiring.
-4. **Slice 6H-3C - Approved migration and RLS validation**
-   Only after explicit database-artifact approval, add the reviewed minimum
-   schema/RLS work and validate ownership outcomes with synthetic users.
-5. **Slice 6H-3D - Opt-in live integration tests**
-   Add explicitly enabled non-production/local integration coverage only after
-   the adapter and approved RLS surface exist.
+3. **Slice 6H-3B - Supabase live SDK adapter planning (completed)**
+   The new live adapter plan defines request-scoped construction, caller-token
+   propagation, public-key/service-role policy, SDK assumptions, and gated test
+   and RLS work without adding transport.
+4. **Slice 6H-3B-1 - Supabase SDK adapter interface (recommended next)**
+   Add only the application-owned interface and disabled-by-default
+   configuration/injection contract after review.
+5. **Slice 6H-3B-2 - Fake SDK transport tests**
+   Prove pinned SDK authorization/header, redaction, and isolation behavior
+   without Supabase credentials or network access.
+6. **Slice 6H-3B-3 - Opt-in live Supabase test harness**
+   Keep live/local coverage separately enabled, synthetic, and outside default
+   CI.
+7. **Slice 6H-3B-4 - Approved migration/RLS validation**
+   Add and validate a minimum reviewed artifact only after explicit security
+   approval.
 
 ## Definition Of Done
 
@@ -297,3 +308,7 @@ Slice 6H-6 is complete when exported shared Notes artifacts are compared during
 backend verification for stable field/envelope/default/version/status behavior,
 with the comparison limitations documented and without adding runtime Node,
 live Supabase wiring, or database artifacts.
+
+Slice 6H-3B is complete when the adapter plan fixes the future interface,
+caller-token, public-key, SDK-assumption, error, RLS, test, and security
+constraints without adding a live client, credential, or database artifact.

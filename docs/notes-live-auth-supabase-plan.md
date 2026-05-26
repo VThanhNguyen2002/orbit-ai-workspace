@@ -4,6 +4,8 @@
 
 Slice 6H-3 records the future Supabase Notes repository implementation path in
 [notes-supabase-repository-implementation-plan.md](notes-supabase-repository-implementation-plan.md).
+Slice 6H-3B now records the future request-scoped SDK adapter contract in
+[notes-supabase-live-adapter-plan.md](notes-supabase-live-adapter-plan.md).
 Slice 6H-2 adds a user-scoped Supabase client factory boundary represented by
 an inert, redacted descriptor, and Slice 6H-1 added the API JWT verifier
 boundary and deterministic local-key tests. None of these slices adds live
@@ -50,8 +52,8 @@ enabled and validated.
   user-scoped client before use.
 - Notes table and RLS intent now exist only as sanitized architecture
   documentation; no executable Supabase migration is tracked.
-- FastAPI still uses Pydantic models directly; generated shared JSON Schemas are
-  not consumed by the backend yet.
+- FastAPI runtime code still uses Pydantic models directly; the Slice 6H-6
+  test-only drift guard loads exported shared Notes JSON Schemas after export.
 
 ## Architectural Decisions
 
@@ -210,10 +212,13 @@ Deferred adapter/repository rules:
 - Map version conditional-write misses to `NoteVersionConflictError` only after
   fetching current non-deleted server data for the same user.
 
-The future adapter implementation should validate the exact `supabase-py` API
-for injecting the caller token before coding. The repository should keep
-depending on a minimal query-builder protocol where possible so tests remain
-fake-client based.
+The reviewed adapter plan in
+[notes-supabase-live-adapter-plan.md](notes-supabase-live-adapter-plan.md)
+constrains future SDK wiring to request-local, access-token-only Data API
+authorization with no refresh-token/session handling. Slice 6H-3B-1 remains
+the next interface step; SDK behavior must be pinned and proven with fakes
+before live enablement. The repository should keep depending on a minimal
+query-builder protocol where possible so tests remain fake-client based.
 
 ## RLS Validation Strategy
 
@@ -353,18 +358,18 @@ Optional integration tests should require all of:
    Deterministic injected fakes verify scaffold query shaping, explicit owner
    scoping, conflict classification, and soft-delete behavior without network
    access.
-5. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic (recommended next)**
-   Fake repository response rows are validated through backend Pydantic models,
-   while shared Zod schemas remain separately generated. Add the drift guard
-   before introducing live transport.
-6. **Slice 6H-3B - Live SDK adapter behind feature flag**
-   After review, add the caller-scoped transport gated off by default.
-7. **Slice 6H-3C - Approved migration and RLS validation**
-   Only after explicit security approval, introduce and validate the minimum
-   reviewed schema/RLS artifact.
-8. **Slice 6H-3D - Opt-in live integration tests**
-   Add non-production/local integration coverage only after adapter and RLS
-   approval, disabled by default.
+5. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic (completed)**
+   Backend tests compare stable exported Notes artifacts to bounded
+   Pydantic/route expectations without runtime schema loading or live transport.
+6. **Slice 6H-3B - Supabase live SDK adapter planning (completed)**
+   The adapter plan fixes the caller-token, public-key, SDK-assumption,
+   feature-gating, test, RLS, and security constraints without adding live code.
+7. **Slice 6H-3B-1 - Supabase SDK adapter interface (recommended next)**
+   Add only the reviewed application-owned interface and disabled-by-default
+   injection/configuration contract before any live transport is enabled.
+8. **Slice 6H-3B-2 through 6H-3B-4 - Transport tests, opt-in harness, and approved RLS validation**
+   Proceed incrementally with fake transport proof first, opt-in live testing
+   only later, and migration/RLS work only after explicit approval.
 
 ## Definition Of Done
 
@@ -373,6 +378,11 @@ caller-scoped injection, CRUD/conflict/delete semantics, RLS expectations,
 security controls, and staged test/live work without adding runtime transport
 or a database artifact. No executable database migration is part of this
 planning slice.
+
+Slice 6H-3B is complete when the live adapter plan specifies the exact
+application-owned boundary, caller-token-only propagation strategy, public-key
+and service-role policy, SDK assumptions, and incremental security/test gates
+without constructing a live client or changing Notes behavior.
 
 Later live enablement is done only when:
 
