@@ -44,6 +44,9 @@ jobs:
         working-directory: apps/api
         run: python -m pip install -e ".[dev]"
 
+      - name: Export shared contracts for API drift guard
+        run: pnpm --filter @synapse/shared contracts:export
+
       - name: API lint
         working-directory: apps/api
         run: python -m ruff check .

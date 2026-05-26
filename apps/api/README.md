@@ -67,6 +67,13 @@ updates and soft deletes, conflict lookup behavior, service-role avoidance, and
 no-network execution. The tests do not construct an SDK client or validate
 RLS; memory persistence remains the default.
 
+Slice 6H-6 adds a deterministic Notes contract drift guard. Backend tests read
+the JSON Schema artifacts exported from `@synapse/shared` and compare stable
+Notes fields, effectively required request fields, response envelope shape,
+version requirements, and validation/conflict status behavior with the
+existing Pydantic and route surface. The guard is deliberately not generated
+Python code or runtime JSON Schema validation.
+
 ## Configuration
 
 Supported local placeholders:
@@ -93,7 +100,13 @@ must all be configured before `jwt` mode will accept an RS256 token.
 
 ## Local Checks
 
-From this directory:
+Export shared contracts from the repository root before running API tests:
+
+```bash
+pnpm --filter @synapse/shared contracts:export
+```
+
+Then, from this directory:
 
 ```bash
 python -m pip install -e ".[dev]"
@@ -115,6 +128,13 @@ pnpm --filter @synapse/shared build
 The generated files live under `packages/shared/dist/schemas/`. Future FastAPI
 routes should load schemas by the stable entries in `manifest.json` and use them
 for request/response validation before business endpoint logic is added.
+
+`tests/test_contract_drift.py` currently consumes the generated Notes artifacts
+only during verification. It checks field names and effective required/optional
+status, treating Zod fields with defaults as omittable inputs. Shared optional
+`sync_metadata` and response metadata `pagination` are documented extensions
+not emitted by the current Notes routes. Exact type/format equivalence and
+runtime JSON Schema validation are deferred.
 
 No secrets, environment values, Supabase clients, auth providers, or AI providers
 belong in this bridge.

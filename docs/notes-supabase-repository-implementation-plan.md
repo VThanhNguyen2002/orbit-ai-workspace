@@ -6,8 +6,10 @@ Slice 6H-3 defines the bounded path from the existing Supabase-shaped Notes
 repository scaffold and inert user-scoped client descriptor to a future
 reviewed implementation. Slice 6H-3A adds deterministic fake-client tests for
 the scaffold's query shaping, owner scoping, version conflict, and soft-delete
-behavior. Neither slice adds an SDK client, network transport, executable
-migration, RLS execution, or live test.
+behavior. Slice 6H-6 adds a lightweight contract drift guard between exported
+shared Notes JSON Schemas and backend expectations. None of these slices adds
+an SDK client, network transport, executable migration, RLS execution, or live
+test.
 
 ## Objective
 
@@ -202,6 +204,24 @@ stale but otherwise valid `version` is a business conflict and remains `409`.
   placeholder configuration is verified not to reach injected client
   operations.
 
+### Slice 6H-6 Notes Contract Drift Guard (Implemented)
+
+- `apps/api/tests/test_contract_drift.py` loads the ten stable exported Notes
+  JSON Schemas after `@synapse/shared contracts:export`.
+- It compares snake_case field presence and effective required status against
+  Pydantic Notes models; `ListNotesRequest` is compared to the implemented
+  route query signature because no backend DTO exists for query parameters.
+- It verifies create defaults and server-controlled-field exclusion,
+  update/delete `version`, response envelopes, `data.items` and
+  `data.pagination`, and the existing `400 VALIDATION_ERROR` versus
+  `409 CONFLICT` behavior.
+- It deliberately does not claim complete type equivalence: exported Zod
+  defaulted fields are treated as omittable inputs, optional shared
+  `sync_metadata` and response metadata `pagination` are not backend-emitted
+  fields, and UUID/date-time precision remains outside this lightweight test.
+- CI exports the generated schemas before API tests; FastAPI runtime code does
+  not depend on Node or load these files.
+
 ### Default CI
 
 - Keep `SYNAPSE_NOTES_REPOSITORY=memory` as the active default.
@@ -242,13 +262,13 @@ be validated first in an approved non-production environment.
    Deterministic injected-fake tests now cover query shaping, user filters,
    version/conflict handling, soft deletion, no-network behavior, and
    service-role avoidance without contacting Supabase.
-2. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic (recommended next)**
-   The fake repository rows are validated through backend Pydantic models, while
-   shared Zod-generated schemas remain a separate contract surface. Add a
-   deterministic drift guard before introducing a live adapter.
-3. **Slice 6H-3B - Live SDK adapter behind feature flag**
-   After review, add a request-scoped adapter using the public key and caller
-   JWT, gated off by default; keep memory persistence as the default.
+2. **Slice 6H-6 - Contract drift guard between Zod JSON Schema and Pydantic (completed)**
+   Deterministic backend tests now compare the stable exported Notes schema
+   shapes and status contract to Pydantic/route expectations without runtime
+   code generation or network access.
+3. **Slice 6H-3B - Supabase live SDK adapter planning (recommended next)**
+   Review the precise request-scoped adapter API, caller-token injection,
+   feature flag, and test/security gates before approving any live wiring.
 4. **Slice 6H-3C - Approved migration and RLS validation**
    Only after explicit database-artifact approval, add the reviewed minimum
    schema/RLS work and validate ownership outcomes with synthetic users.
@@ -272,3 +292,8 @@ Slice 6H-3 planning is complete when:
 Slice 6H-3A is complete when deterministic fake-client tests lock down existing
 repository query, visibility, conflict, and soft-delete behavior without
 constructing a live SDK client or testing RLS.
+
+Slice 6H-6 is complete when exported shared Notes artifacts are compared during
+backend verification for stable field/envelope/default/version/status behavior,
+with the comparison limitations documented and without adding runtime Node,
+live Supabase wiring, or database artifacts.

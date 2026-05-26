@@ -278,15 +278,16 @@ The generated artifacts are written to `packages/shared/dist/schemas/`:
 - `manifest.json` lists every exported contract with a stable `$id` and file path
 - `<group>/<name>.schema.json` contains a draft-07 JSON Schema artifact
 
-FastAPI should treat these files as generated validation inputs. Future backend
-routes can load schemas by manifest entry, validate incoming request bodies and
-outgoing response payloads, then call business logic. The bridge does not create
+Slice 6H-6 adds `apps/api/tests/test_contract_drift.py`, which loads the
+generated Notes artifacts after `contracts:export` during tests. CI exports
+the artifacts before running the API suite. FastAPI request handling does not
+load JSON Schema files or invoke Node at runtime. The bridge does not create
 Pydantic models, endpoints, auth, Supabase clients, or provider integrations.
 
 Example — Note creation schema:
 
 ```typescript
-// @synapse/shared/src/validation/note.ts
+// @synapse/shared/src/domain/index.ts
 import { z } from 'zod';
 
 export const CreateNoteRequestSchema = z.object({
@@ -304,7 +305,21 @@ export const UpdateNoteRequestSchema = z.object({
 });
 ```
 
-The frontend validates before sending. The backend validates again using the equivalent JSON Schema. Two validation passes, identical rules, zero divergence.
+The drift guard compares the ten stable Notes schemas with the current backend
+Pydantic/route surface at the level needed to prevent accidental wire-shape
+drift: snake_case field presence, effectively required request fields, default
+values for create/list inputs, response envelopes, pagination placement,
+server-controlled create exclusions, required versions, and the implemented
+`400 VALIDATION_ERROR` / `409 CONFLICT` status contract.
+
+This is intentionally not full type equivalence. Zod JSON Schema output marks
+fields with defaults as required, while both Zod parsing and current backend
+inputs accept omission and apply defaults; the guard compares those fields as
+effectively optional and verifies the defaults. Shared Notes responses also
+allow optional local `sync_metadata` and optional envelope metadata
+`pagination`, neither of which is emitted by the implemented Notes routes.
+Format precision such as UUID/date-time validation, runtime JSON Schema
+validation, and non-Notes contracts remain outside this lightweight guard.
 
 ## Partial Updates (PATCH)
 
