@@ -5,13 +5,16 @@
 Slice 6H-3B defines the future live SDK adapter contract constrained by the
 implemented user-scoped descriptor and the Supabase-shaped Notes repository
 tests. Slice 6H-3B-1 now adds the application-owned query/client/adapter
-protocol boundary and deterministic fake-adapter coverage. It does not add
-`supabase-py`, create a live client, enable Supabase persistence, introduce
-credentials, add a migration, or execute RLS validation.
+protocol boundary and deterministic fake-adapter coverage. Slice 6H-3B-2 now
+adds deterministic fake SDK transport coverage for caller-token propagation,
+public-key metadata, redaction, request isolation, and no session/refresh
+handling. It does not add `supabase-py`, create a live client, enable Supabase
+persistence, introduce credentials, add a migration, or execute RLS validation.
 
-The next bounded task is **Slice 6H-3B-2 - Supabase fake SDK transport tests**.
-That task must validate a pinned candidate SDK construction shape using fakes
-only; it must not silently turn on live traffic.
+The next bounded task is **Slice 6H-3B-3 - Opt-in live Supabase test harness
+planning**. That task should define a disabled-by-default harness plan using
+synthetic data and explicit opt-in gates; it must not silently turn on live
+traffic or introduce database artifacts.
 
 ## 1. Objective
 
@@ -56,6 +59,11 @@ replacement for application scoping.
   insert ownership, conditional update/delete, conflict lookup, soft deletion,
   adapter protocol compatibility, distinct request client creation, no-network
   behavior, redaction, and service-role non-propagation.
+- Fake SDK transport tests cover the candidate request-local construction
+  shape: descriptor input, outgoing caller authorization metadata, publishable
+  or legacy anon public-key metadata, no session/refresh calls, per-request
+  client isolation, redacted representations/errors, no-network execution, and
+  compatibility with the existing Notes repository query flow.
 - The contract drift guard covers stable Notes shared-schema and backend
   behavior boundaries without adding runtime schema loading.
 - No approved executable Notes migration or performed RLS validation exists.
@@ -165,8 +173,10 @@ created with:
 - automatic token refresh disabled; and
 - session persistence disabled.
 
-This is an assumption, not implemented code. Slice 6H-3B-2 must pin the SDK
-version chosen for implementation and prove with fake transport tests that:
+This is an assumption, not implemented code. Slice 6H-3B-2 codifies the
+candidate request-local transport shape with fakes only; it still does not add
+or pin a real SDK dependency. Before implementation, the exact SDK version and
+API names must be re-reviewed. The fake transport tests prove that:
 
 - table requests actually carry the caller bearer authorization header;
 - the public API key remains the project key header;
@@ -307,8 +317,11 @@ requires explicit approval under
 - Slice 6H-3B-1 tests now prove that an injected fake satisfies the protocol
   boundary, drives the existing Notes query flow without network access, and
   constructs distinct safe fake clients without retaining secret inputs.
-- Slice 6H-3B-2 should fake SDK client construction and outgoing Data API
-  headers without connecting to Supabase or logging credential values.
+- Slice 6H-3B-2 tests now fake SDK client construction and outgoing Data API
+  metadata without connecting to Supabase or logging credential values. They
+  prove caller bearer propagation, publishable/anon key metadata, no
+  service-role propagation, no session/refresh calls, redacted failures, and
+  isolated clients per request.
 - CI must not require a Supabase URL, API key, JWT, database, migration, or
   network connection.
 
@@ -341,12 +354,12 @@ requires explicit approval under
 1. **Slice 6H-3B-1 - Supabase SDK adapter interface (completed)**
    Application-owned query/client/adapter protocols and deterministic
    fake-adapter tests now exist without adding an SDK or enabling transport.
-2. **Slice 6H-3B-2 - Supabase fake SDK transport tests (recommended next)**
-   Pin/review the candidate SDK usage and test caller authorization header
-   propagation, public key usage, no refresh/session persistence, redaction,
-   request isolation, and coarse error mapping with fakes only.
-3. **Slice 6H-3B-3 - Opt-in live Supabase test harness**
-   Add an explicitly enabled local/non-production harness using synthetic data
+2. **Slice 6H-3B-2 - Supabase fake SDK transport tests (completed)**
+   Candidate request-local transport coverage now proves caller authorization
+   metadata, public-key metadata, no refresh/session persistence, redaction,
+   request isolation, and repository compatibility with fakes only.
+3. **Slice 6H-3B-3 - Opt-in live Supabase test harness planning (recommended next)**
+   Plan an explicitly enabled local/non-production harness using synthetic data
    only; keep default CI credential-free and offline from Supabase.
 4. **Slice 6H-3B-4 - Approved migration/RLS validation**
    Only after explicit database-artifact approval, introduce/review the minimum
@@ -384,3 +397,17 @@ Slice 6H-3B-1 is complete when:
   propagation.
 - The next recommended task is Slice 6H-3B-2; no SDK transport, live
   activation, migration, or RLS execution has been introduced.
+
+Slice 6H-3B-2 is complete when:
+
+- Test-only fake SDK transport coverage proves the future adapter shape
+  receives `UserScopedSupabaseClientDescriptor` and sends the verified caller
+  token only as request authorization metadata.
+- Tests prove publishable or legacy anon key metadata is used as the public
+  Data API key, while service-role values are not accepted or propagated.
+- Tests prove request-scoped client isolation, no global auth-header mutation,
+  no session persistence, no refresh-token handling, redacted representations
+  and errors, no network access, and compatibility with the current Notes
+  repository query flow.
+- The next recommended task is Slice 6H-3B-3 harness planning; no real SDK,
+  live activation, credential, migration, or RLS execution has been introduced.

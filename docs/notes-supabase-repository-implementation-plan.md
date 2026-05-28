@@ -11,8 +11,11 @@ shared Notes JSON Schemas and backend expectations. Slice 6H-3B records the
 future live adapter contract in
 [notes-supabase-live-adapter-plan.md](notes-supabase-live-adapter-plan.md).
 Slice 6H-3B-1 adds the implementation-neutral adapter protocol boundary and
-fake-adapter proof. None of these slices adds an SDK client, network transport,
-executable migration, RLS execution, or live test.
+fake-adapter proof. Slice 6H-3B-2 adds deterministic fake SDK transport tests
+for caller authorization metadata, public-key metadata, request isolation,
+redaction, and no session/refresh calls. None of these slices adds an SDK
+client, live network transport, executable migration, RLS execution, or live
+test.
 
 ## Objective
 
@@ -83,8 +86,8 @@ Future live wiring must follow this request-local sequence:
 The adapter must not mutate a global client's auth state, render token values
 in diagnostics, or be constructed in default unit tests. The Slice 6H-3B plan
 requires request-local access-token-only authorization, disables session
-refresh/persistence assumptions, and reserves pinned SDK behavior proof for
-fake transport tests before live enablement.
+refresh/persistence assumptions, and now includes fake transport tests for the
+candidate request-local SDK shape before any live enablement.
 
 ## No Service-Role Request-Path Policy
 
@@ -240,6 +243,19 @@ stale but otherwise valid `version` is a business conflict and remains `409`.
   Notes query flow, create distinct fake clients for separate descriptor
   builds, and avoid rendering caller tokens or service-role configuration.
 
+### Slice 6H-3B-2 Fake SDK Transport Tests (Implemented)
+
+- Test-only fake SDK objects model candidate client construction, outgoing
+  request metadata, auth/session boundaries, sanitized transport failure, and
+  repository-compatible query execution without importing a real SDK.
+- Tests prove the adapter receives `UserScopedSupabaseClientDescriptor`, unwraps
+  the caller token only for request authorization metadata, and uses
+  publishable or legacy anon key metadata as the public Data API key.
+- Tests prove service-role values are not accepted or propagated, clients are
+  request-scoped, shared auth headers are not globally mutated, token/session
+  refresh and persistence are not called, representations/errors are redacted,
+  and no socket network call occurs.
+
 ### Default CI
 
 - Keep `SYNAPSE_NOTES_REPOSITORY=memory` as the active default.
@@ -291,12 +307,13 @@ be validated first in an approved non-production environment.
 4. **Slice 6H-3B-1 - Supabase SDK adapter interface (completed)**
    Minimal application-owned query/client/adapter protocols and deterministic
    fake-adapter tests now exist without any live SDK dependency.
-5. **Slice 6H-3B-2 - Supabase fake SDK transport tests (recommended next)**
-   Prove pinned SDK authorization/header, redaction, and isolation behavior
-   without Supabase credentials or network access.
-6. **Slice 6H-3B-3 - Opt-in live Supabase test harness**
-   Keep live/local coverage separately enabled, synthetic, and outside default
-   CI.
+5. **Slice 6H-3B-2 - Supabase fake SDK transport tests (completed)**
+   Deterministic fake transport tests now prove request authorization metadata,
+   public-key metadata, redaction, isolation, no session/refresh handling, and
+   repository compatibility without Supabase credentials or network access.
+6. **Slice 6H-3B-3 - Opt-in live Supabase test harness planning (recommended next)**
+   Plan live/local coverage as separately enabled, synthetic, and outside
+   default CI before any live infrastructure work.
 7. **Slice 6H-3B-4 - Approved migration/RLS validation**
    Add and validate a minimum reviewed artifact only after explicit security
    approval.
@@ -332,3 +349,10 @@ Slice 6H-3B-1 is complete when the application-owned protocols represent only
 the existing Notes query surface, injected fake-adapter tests preserve
 request-local/redacted/no-network guarantees, and no live SDK, activation,
 credential, migration, or RLS execution is introduced.
+
+Slice 6H-3B-2 is complete when test-only fake SDK transport coverage proves
+descriptor consumption, caller authorization metadata, publishable/anon
+public-key metadata, service-role exclusion, per-request client isolation,
+redacted representations/errors, no session or refresh handling, no network
+access, and compatibility with the current Notes repository query flow without
+adding a live SDK, credential, migration, or RLS execution.
