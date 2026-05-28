@@ -8,13 +8,16 @@ tests. Slice 6H-3B-1 now adds the application-owned query/client/adapter
 protocol boundary and deterministic fake-adapter coverage. Slice 6H-3B-2 now
 adds deterministic fake SDK transport coverage for caller-token propagation,
 public-key metadata, redaction, request isolation, and no session/refresh
-handling. It does not add `supabase-py`, create a live client, enable Supabase
+handling. Slice 6H-3B-3 now adds a planning document for a disabled-by-default
+live/local Supabase harness in
+[notes-supabase-live-test-harness-plan.md](notes-supabase-live-test-harness-plan.md).
+It does not add `supabase-py`, create a live client, enable Supabase
 persistence, introduce credentials, add a migration, or execute RLS validation.
 
-The next bounded task is **Slice 6H-3B-3 - Opt-in live Supabase test harness
-planning**. That task should define a disabled-by-default harness plan using
-synthetic data and explicit opt-in gates; it must not silently turn on live
-traffic or introduce database artifacts.
+The next bounded task is **Slice 6H-3B-3A - Opt-in live test harness
+skeleton**. That task may add skipped-by-default test scaffolding and
+fail-closed configuration guards; it must not silently turn on live traffic or
+introduce database artifacts.
 
 ## 1. Objective
 
@@ -64,6 +67,10 @@ replacement for application scoping.
   or legacy anon public-key metadata, no session/refresh calls, per-request
   client isolation, redacted representations/errors, no-network execution, and
   compatibility with the existing Notes repository query flow.
+- The live test harness plan defines future local and hosted staging modes,
+  placeholder-only environment requirements, default-CI exclusion, synthetic
+  data rules, adapter validation, RLS validation expectations, cleanup
+  expectations, and migration prerequisites.
 - The contract drift guard covers stable Notes shared-schema and backend
   behavior boundaries without adding runtime schema loading.
 - No approved executable Notes migration or performed RLS validation exists.
@@ -335,6 +342,8 @@ requires explicit approval under
   keys, tokens, authorization headers, or note content.
 - It cannot claim RLS coverage until the specific migration/RLS artifact has
   been explicitly approved and applied in that test environment.
+- The detailed harness requirements are recorded in
+  [notes-supabase-live-test-harness-plan.md](notes-supabase-live-test-harness-plan.md).
 
 ## 14. Security Risks
 
@@ -358,10 +367,20 @@ requires explicit approval under
    Candidate request-local transport coverage now proves caller authorization
    metadata, public-key metadata, no refresh/session persistence, redaction,
    request isolation, and repository compatibility with fakes only.
-3. **Slice 6H-3B-3 - Opt-in live Supabase test harness planning (recommended next)**
-   Plan an explicitly enabled local/non-production harness using synthetic data
-   only; keep default CI credential-free and offline from Supabase.
-4. **Slice 6H-3B-4 - Approved migration/RLS validation**
+3. **Slice 6H-3B-3 - Opt-in live Supabase test harness planning (completed)**
+   The harness plan now defines local and hosted staging modes, explicit
+   opt-in gates, synthetic data and cleanup rules, adapter/RLS validation
+   expectations, and migration prerequisites without adding live execution.
+4. **Slice 6H-3B-3A - Opt-in live test harness skeleton (recommended next)**
+   Add skipped-by-default markers, configuration guards, and placeholder tests
+   that prove the harness cannot run without explicit opt-in.
+5. **Slice 6H-3B-3B - Local Supabase setup guide**
+   Document local-only setup and cleanup instructions with placeholder values
+   and approved prerequisites.
+6. **Slice 6H-3B-3C - Hosted staging opt-in test plan**
+   Document controlled non-production staging validation, secret-store rules,
+   CI/manual workflow separation, and redaction requirements.
+7. **Slice 6H-3B-4 - Approved migration/RLS validation**
    Only after explicit database-artifact approval, introduce/review the minimum
    migration and validate owner isolation and soft-delete outcomes in an
    approved environment.
@@ -411,3 +430,15 @@ Slice 6H-3B-2 is complete when:
   repository query flow.
 - The next recommended task is Slice 6H-3B-3 harness planning; no real SDK,
   live activation, credential, migration, or RLS execution has been introduced.
+
+Slice 6H-3B-3 is complete when:
+
+- A harness plan defines local and hosted staging modes, placeholder-only
+  environment variables, default-skip behavior, explicit opt-in flags, and
+  normal push-CI exclusion.
+- The plan defines synthetic user/data rules, cleanup expectations, adapter
+  validation checks, user A/user B RLS validation expectations, and migration
+  prerequisites.
+- The next recommended task is Slice 6H-3B-3A; no live SDK adapter, network
+  behavior, credential, `.env` file, migration, SQL artifact, or RLS execution
+  has been introduced.

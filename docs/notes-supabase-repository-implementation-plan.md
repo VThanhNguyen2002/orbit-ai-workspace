@@ -13,9 +13,11 @@ future live adapter contract in
 Slice 6H-3B-1 adds the implementation-neutral adapter protocol boundary and
 fake-adapter proof. Slice 6H-3B-2 adds deterministic fake SDK transport tests
 for caller authorization metadata, public-key metadata, request isolation,
-redaction, and no session/refresh calls. None of these slices adds an SDK
-client, live network transport, executable migration, RLS execution, or live
-test.
+redaction, and no session/refresh calls. Slice 6H-3B-3 adds the opt-in
+live/local harness plan in
+[notes-supabase-live-test-harness-plan.md](notes-supabase-live-test-harness-plan.md).
+None of these slices adds an SDK client, live network transport, executable
+migration, RLS execution, or live test.
 
 ## Objective
 
@@ -256,6 +258,17 @@ stale but otherwise valid `version` is a business conflict and remains `409`.
   refresh and persistence are not called, representations/errors are redacted,
   and no socket network call occurs.
 
+### Slice 6H-3B-3 Opt-In Live Test Harness Plan (Implemented)
+
+- `docs/notes-supabase-live-test-harness-plan.md` defines future local and
+  hosted staging harness modes without adding live execution.
+- It requires default-skip behavior, explicit opt-in flags, placeholder-only
+  environment variables, synthetic user/data rules, cleanup expectations, and
+  normal push-CI exclusion.
+- It separates adapter validation from RLS validation and states that RLS
+  coverage cannot be claimed until an approved migration/RLS artifact exists
+  and is applied in the target environment.
+
 ### Default CI
 
 - Keep `SYNAPSE_NOTES_REPOSITORY=memory` as the active default.
@@ -311,10 +324,14 @@ be validated first in an approved non-production environment.
    Deterministic fake transport tests now prove request authorization metadata,
    public-key metadata, redaction, isolation, no session/refresh handling, and
    repository compatibility without Supabase credentials or network access.
-6. **Slice 6H-3B-3 - Opt-in live Supabase test harness planning (recommended next)**
-   Plan live/local coverage as separately enabled, synthetic, and outside
-   default CI before any live infrastructure work.
-7. **Slice 6H-3B-4 - Approved migration/RLS validation**
+6. **Slice 6H-3B-3 - Opt-in live Supabase test harness planning (completed)**
+   The harness plan now defines local/staging modes, explicit opt-in gates,
+   synthetic data rules, adapter/RLS validation expectations, cleanup
+   expectations, and migration prerequisites without live execution.
+7. **Slice 6H-3B-3A - Opt-in live test harness skeleton (recommended next)**
+   Add skipped-by-default markers, configuration guards, and placeholder tests
+   that cannot run without explicit opt-in.
+8. **Slice 6H-3B-4 - Approved migration/RLS validation**
    Add and validate a minimum reviewed artifact only after explicit security
    approval.
 
@@ -356,3 +373,9 @@ public-key metadata, service-role exclusion, per-request client isolation,
 redacted representations/errors, no session or refresh handling, no network
 access, and compatibility with the current Notes repository query flow without
 adding a live SDK, credential, migration, or RLS execution.
+
+Slice 6H-3B-3 is complete when a concrete harness plan defines local/staging
+opt-in modes, placeholder-only configuration, default-CI exclusion, synthetic
+data and cleanup rules, adapter validation, RLS validation expectations,
+migration prerequisites, and the next skipped-skeleton task without adding a
+live SDK, credential, migration, SQL artifact, network execution, or RLS test.
