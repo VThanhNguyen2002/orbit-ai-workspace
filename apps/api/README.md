@@ -74,6 +74,12 @@ version requirements, and validation/conflict status behavior with the
 existing Pydantic and route surface. The guard is deliberately not generated
 Python code or runtime JSON Schema validation.
 
+Slice 6H-3B-3A adds a skipped-by-default Supabase live/local harness skeleton
+under `tests/integration/`. The skeleton defines pytest markers and fail-closed
+configuration guards only. It does not import the Supabase SDK, connect to
+Supabase, execute migrations or RLS tests, enable live Notes persistence, or
+require credentials in normal CI.
+
 ## Configuration
 
 Supported local placeholders:
@@ -97,6 +103,13 @@ placeholders. The `SYNAPSE_JWT_*` values are optional in default `dev` mode and
 must all be configured before `jwt` mode will accept an RS256 token.
 `SUPABASE_PUBLISHABLE_KEY` is preferred for the deferred user-scoped data path;
 `SUPABASE_ANON_KEY` is a legacy public-key fallback only.
+
+Optional live/local harness placeholders are documented in
+`docs/notes-supabase-live-test-harness-plan.md`. The harness is skipped unless
+`SYNAPSE_SUPABASE_INTEGRATION_TESTS=1` and `SYNAPSE_SUPABASE_TEST_MODE` is
+`local` or `staging`. Even then, the current skeleton contains no live adapter
+or approved RLS validation and remains placeholder-only. Request-path harness
+tests must not use `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Local Checks
 

@@ -2,17 +2,18 @@
 
 ## Status
 
-Slice 6H-3B-3 is a planning-only step for a future opt-in live/local Supabase
-test harness. It follows the implemented descriptor boundary, adapter protocol,
-fake SDK transport tests, and Supabase-shaped Notes repository coverage. It
-does not add a live Supabase SDK adapter, connect to Supabase, introduce
-credentials, add `.env` files, add migrations or SQL, execute RLS tests, or
-enable live Notes persistence.
+Slice 6H-3B-3 established the plan for a future opt-in live/local Supabase test
+harness. It follows the implemented descriptor boundary, adapter protocol,
+fake SDK transport tests, and Supabase-shaped Notes repository coverage. Slice
+6H-3B-3A now adds skipped-by-default pytest scaffolding and gating helpers
+under `apps/api/tests/integration/`. It does not add a live Supabase SDK
+adapter, connect to Supabase, introduce credentials, add `.env` files, add
+migrations or SQL, execute RLS tests, or enable live Notes persistence.
 
-The next bounded task is **Slice 6H-3B-3A - Opt-in live test harness
-skeleton**. That task may add skipped-by-default test scaffolding and safe
-configuration gates, but it must not require live credentials or run in normal
-push CI.
+The next bounded task is **Slice 6H-3B-3B - Local Supabase setup guide**. That
+task should document local-only setup, synthetic test users, placeholder
+configuration, and cleanup expectations without adding migrations, credentials,
+or live execution.
 
 ## 1. Objective
 
@@ -65,6 +66,15 @@ The harness eventually needs to prove:
 - Fake SDK transport tests prove the candidate adapter shape for caller-token
   authorization metadata, public-key metadata, request isolation, no
   session/refresh calls, redaction, and no network.
+- `apps/api/tests/integration/supabase_live_harness.py` provides test-only
+  decision/config helpers that require explicit opt-in, explicit mode,
+  required environment names, no service-role key, and redacted config
+  rendering.
+- `apps/api/tests/integration/test_supabase_live_harness.py` verifies the
+  default skip path, missing/invalid configuration, service-role rejection,
+  synthetic naming rules, redaction, and no-network default behavior. Its
+  placeholder live test is marked `supabase_live` and `integration`, and skips
+  until later slices add a live adapter and approved migration/RLS artifact.
 - No executable Notes migration exists. RLS intent is documentation only until
   the database artifact policy approves a specific migration.
 
@@ -163,7 +173,7 @@ role.
 ## 7. Test Gating Strategy
 
 Future live/local tests must be skipped by default. A safe pytest skeleton
-should require all of:
+now requires all of:
 
 - an explicit flag, for example `SYNAPSE_SUPABASE_INTEGRATION_TESTS=1`;
 - an explicit mode, for example `SYNAPSE_SUPABASE_TEST_MODE=local` or
@@ -171,8 +181,8 @@ should require all of:
 - `SUPABASE_URL`;
 - `SUPABASE_PUBLISHABLE_KEY` or an explicitly accepted legacy `SUPABASE_ANON_KEY`;
 - synthetic user A and user B access-token sources; and
-- a marker such as `@pytest.mark.supabase_live` so normal test selection can
-  exclude the harness.
+- markers `@pytest.mark.supabase_live` and `@pytest.mark.integration` so normal
+  test selection can identify the harness.
 
 The skeleton should fail closed:
 
@@ -182,6 +192,9 @@ The skeleton should fail closed:
 - Normal push CI must not set the flag.
 - A later manual workflow, if added, must be separate from `ci.yml` or gated so
   it cannot run on ordinary pushes.
+- Even with all opt-in variables present, the current placeholder live test
+  skips because no live adapter, approved migration, or RLS validation target
+  exists yet.
 
 ## 8. Synthetic Data Rules
 
@@ -294,11 +307,12 @@ exercise.
 
 ## 13. Future Implementation Slices
 
-1. **Slice 6H-3B-3A - Opt-in live test harness skeleton (recommended next)**
-   Add skipped-by-default pytest markers, configuration guards, and placeholder
-   tests that prove the harness cannot run without explicit opt-in. Do not add
-   SDK transport, credentials, migrations, or RLS execution.
-2. **Slice 6H-3B-3B - Local Supabase setup guide**
+1. **Slice 6H-3B-3A - Opt-in live test harness skeleton (completed)**
+   Skipped-by-default pytest markers, redacted configuration guards, synthetic
+   naming helpers, and placeholder tests now prove the harness cannot run
+   without explicit opt-in. No SDK transport, credentials, migrations, or RLS
+   execution were added.
+2. **Slice 6H-3B-3B - Local Supabase setup guide (recommended next)**
    Document local-only setup steps, synthetic test users, placeholder
    configuration, cleanup expectations, and how the skipped skeleton would be
    enabled manually after approved prerequisites exist.
@@ -327,3 +341,17 @@ Slice 6H-3B-3 is complete when:
 - No SDK implementation, live network behavior, credential, `.env` file,
   migration, SQL artifact, RLS execution, UI, AI, sync work, or public Notes API
   behavior change is introduced.
+
+Slice 6H-3B-3A is complete when:
+
+- Test-only integration scaffolding defines the `supabase_live` and
+  `integration` markers and keeps the placeholder live test skipped by default.
+- Gating helpers require the explicit opt-in flag, explicit local/staging mode,
+  required placeholder environment names, and reject service-role request-path
+  inputs.
+- Tests prove default skip behavior, missing/invalid configuration handling,
+  service-role rejection, redacted config/error rendering, synthetic naming
+  rules, and no network access in the default path.
+- The next recommended task is Slice 6H-3B-3B; no live SDK adapter, network
+  behavior, credential, `.env` file, migration, SQL artifact, or RLS execution
+  has been introduced.

@@ -11,12 +11,13 @@ public-key metadata, redaction, request isolation, and no session/refresh
 handling. Slice 6H-3B-3 now adds a planning document for a disabled-by-default
 live/local Supabase harness in
 [notes-supabase-live-test-harness-plan.md](notes-supabase-live-test-harness-plan.md).
-It does not add `supabase-py`, create a live client, enable Supabase
+Slice 6H-3B-3A now adds skipped-by-default harness scaffolding and gating
+tests. It does not add `supabase-py`, create a live client, enable Supabase
 persistence, introduce credentials, add a migration, or execute RLS validation.
 
-The next bounded task is **Slice 6H-3B-3A - Opt-in live test harness
-skeleton**. That task may add skipped-by-default test scaffolding and
-fail-closed configuration guards; it must not silently turn on live traffic or
+The next bounded task is **Slice 6H-3B-3B - Local Supabase setup guide**. That
+task should document local-only setup and cleanup expectations with
+placeholder configuration; it must not silently turn on live traffic or
 introduce database artifacts.
 
 ## 1. Objective
@@ -71,6 +72,10 @@ replacement for application scoping.
   placeholder-only environment requirements, default-CI exclusion, synthetic
   data rules, adapter validation, RLS validation expectations, cleanup
   expectations, and migration prerequisites.
+- The skipped-by-default harness skeleton defines `supabase_live` and
+  `integration` pytest markers, fail-closed gating helpers, synthetic naming
+  helpers, service-role rejection, redaction checks, and a placeholder live
+  test that still skips because no live adapter or approved migration exists.
 - The contract drift guard covers stable Notes shared-schema and backend
   behavior boundaries without adding runtime schema loading.
 - No approved executable Notes migration or performed RLS validation exists.
@@ -344,6 +349,8 @@ requires explicit approval under
   been explicitly approved and applied in that test environment.
 - The detailed harness requirements are recorded in
   [notes-supabase-live-test-harness-plan.md](notes-supabase-live-test-harness-plan.md).
+- Slice 6H-3B-3A adds only skipped-by-default test scaffolding. It cannot make
+  live requests, cannot execute RLS tests, and cannot claim RLS coverage.
 
 ## 14. Security Risks
 
@@ -371,10 +378,11 @@ requires explicit approval under
    The harness plan now defines local and hosted staging modes, explicit
    opt-in gates, synthetic data and cleanup rules, adapter/RLS validation
    expectations, and migration prerequisites without adding live execution.
-4. **Slice 6H-3B-3A - Opt-in live test harness skeleton (recommended next)**
-   Add skipped-by-default markers, configuration guards, and placeholder tests
-   that prove the harness cannot run without explicit opt-in.
-5. **Slice 6H-3B-3B - Local Supabase setup guide**
+4. **Slice 6H-3B-3A - Opt-in live test harness skeleton (completed)**
+   Skipped-by-default markers, fail-closed configuration guards, synthetic
+   naming helpers, and placeholder tests now prove the harness cannot run
+   without explicit opt-in.
+5. **Slice 6H-3B-3B - Local Supabase setup guide (recommended next)**
    Document local-only setup and cleanup instructions with placeholder values
    and approved prerequisites.
 6. **Slice 6H-3B-3C - Hosted staging opt-in test plan**
@@ -442,3 +450,17 @@ Slice 6H-3B-3 is complete when:
 - The next recommended task is Slice 6H-3B-3A; no live SDK adapter, network
   behavior, credential, `.env` file, migration, SQL artifact, or RLS execution
   has been introduced.
+
+Slice 6H-3B-3A is complete when:
+
+- The test-only harness skeleton is marked and skipped by default in normal
+  pytest and normal push CI.
+- Gating helpers require explicit opt-in, local/staging mode, required
+  environment names, no service-role request-path input, and redacted config
+  rendering.
+- Tests prove skip/default behavior, safe missing/invalid configuration,
+  service-role rejection, synthetic naming rules, and no-network default
+  execution.
+- The next recommended task is Slice 6H-3B-3B; no live SDK adapter, credential,
+  `.env` file, migration, SQL artifact, network execution, or RLS test has been
+  introduced.

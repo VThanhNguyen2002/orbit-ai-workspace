@@ -2,17 +2,16 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-3A - Opt-in live test harness skeleton**. Slice 6H-3B-3
-now adds the concrete opt-in live/local harness plan in
-[notes-supabase-live-test-harness-plan.md](notes-supabase-live-test-harness-plan.md),
-covering local and hosted staging modes, placeholder-only configuration,
-default-CI exclusion, synthetic data rules, adapter/RLS validation
-expectations, cleanup, risks, and migration prerequisites.
+Prepare **Slice 6H-3B-3B - Local Supabase setup guide**. Slice 6H-3B-3A now
+adds skipped-by-default harness scaffolding under `apps/api/tests/integration/`
+with explicit opt-in gates, local/staging mode validation, required placeholder
+environment names, service-role rejection, synthetic naming helpers, redaction,
+and a placeholder live test that still skips until later slices.
 
-The next bounded step is to add skipped-by-default test scaffolding and
-fail-closed configuration guards only. Keep live transport, RLS execution,
-migrations, credentials, and live enablement deferred to separately reviewed
-slices.
+The next bounded step is to document local-only Supabase setup and cleanup for
+the skipped skeleton, using placeholder values and synthetic users only. Keep
+live transport, RLS execution, migrations, credentials, and live enablement
+deferred to separately reviewed slices.
 
 Security gate: no executable Supabase migration is committed. Notes/RLS design
 remains sanitized documentation only, and any future migration artifact requires
@@ -21,11 +20,11 @@ explicit approval and security review under
 
 ## Expected Files To Change
 
-- Skipped-by-default API test scaffolding for the future live/local harness,
-  including markers and configuration guards that prove the harness cannot run
-  without explicit opt-in.
-- Minimal documentation updates reflecting the skeleton and preserving the
-  planning constraints.
+- A local setup guide for the skipped harness, covering local Supabase
+  prerequisites, synthetic test users, placeholder environment values, cleanup
+  expectations, and manual enablement steps after approved prerequisites exist.
+- Minimal documentation updates reflecting the guide and preserving the
+  no-live-default constraints.
 - Do not add the live SDK transport/dependency, connect to Supabase, enable
   live Notes persistence, add JWKS retrieval, or create/execute an RLS
   migration.
@@ -55,20 +54,21 @@ pnpm build
 
 ## Definition Of Done
 
-- The skeleton is skipped by default in normal pytest and normal push CI.
-- Running live/local tests requires an explicit flag, explicit mode, and
-  placeholder-only required environment configuration.
-- Missing opt-in configuration produces skip or redacted configuration failure,
-  not accidental network execution.
-- No service-role credential is introduced into the request path, skeleton, or
-  default tests.
+- The guide explains how to prepare a local-only environment without committing
+  secrets or database artifacts.
+- The guide keeps the skeleton disabled by default and does not require real
+  Supabase values in normal CI.
+- The guide distinguishes adapter smoke validation from RLS validation and
+  keeps RLS claims blocked until an approved migration exists.
+- No service-role credential is introduced into the request path or default
+  tests.
 - Memory persistence remains the default; no live SDK client or executable
   migration is introduced.
 - No real credentials, UI, Expo, AI, or sync engine work is added.
 
 ## Risks
 
-- A skipped skeleton still does not prove real SDK compatibility or RLS
+- A local setup guide still does not prove real SDK compatibility or RLS
   enforcement; implementation and approved RLS validation remain later slices.
 - The configured RS256 verifier is suitable for deterministic boundary tests,
   but JWKS cache and key-rotation handling remain required before production
@@ -80,13 +80,14 @@ pnpm build
 
 ## Rollback Notes
 
-If Slice 6H-3B-3A harness skeleton work is unsuitable, revert only that work. Keep
+If Slice 6H-3B-3B local setup guide work is unsuitable, revert only that work. Keep
 completed shared contracts, backend skeleton, API client methods, Slice 6E/6G
 boundaries, Slice 6H-1 verifier boundary/tests, Slice 6H-2 descriptor
 factory/tests, the Slice 6H-3 and Slice 6H-3B plans, Slice 6H-3A fake-client
 repository tests, Slice 6H-6 contract drift guard, Slice 6H-3B-1 adapter
 interface/tests, Slice 6H-3B-2 fake SDK transport tests, Slice 6H-3B-3 harness
-plan, and the database artifact security policy intact.
+plan, Slice 6H-3B-3A skipped harness skeleton, and the database artifact
+security policy intact.
 
 ## External Review Gate
 

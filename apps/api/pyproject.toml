@@ -19,6 +19,10 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = [
+  "integration: opt-in integration harness tests",
+  "supabase_live: skipped-by-default Supabase live/local harness tests"
+]
 
 [tool.ruff]
 line-length = 100
