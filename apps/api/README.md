@@ -80,6 +80,12 @@ configuration guards only. It does not import the Supabase SDK, connect to
 Supabase, execute migrations or RLS tests, enable live Notes persistence, or
 require credentials in normal CI.
 
+Slice 6H-3B-3B adds a documentation-only local Supabase setup guide for that
+future harness. The guide keeps local setup placeholder-only, prohibits
+committed `.env` files, generated Supabase state, SQL/migrations, service-role
+keys, and real tokens, and records approved migration/RLS validation planning
+as the blocker before local RLS coverage can be claimed.
+
 ## Configuration
 
 Supported local placeholders:
@@ -105,11 +111,13 @@ must all be configured before `jwt` mode will accept an RS256 token.
 `SUPABASE_ANON_KEY` is a legacy public-key fallback only.
 
 Optional live/local harness placeholders are documented in
-`docs/notes-supabase-live-test-harness-plan.md`. The harness is skipped unless
-`SYNAPSE_SUPABASE_INTEGRATION_TESTS=1` and `SYNAPSE_SUPABASE_TEST_MODE` is
-`local` or `staging`. Even then, the current skeleton contains no live adapter
-or approved RLS validation and remains placeholder-only. Request-path harness
-tests must not use `SUPABASE_SERVICE_ROLE_KEY`.
+`docs/notes-supabase-live-test-harness-plan.md` and the local-only setup posture
+is documented in `docs/notes-local-supabase-setup-guide.md`. The harness is
+skipped unless `SYNAPSE_SUPABASE_INTEGRATION_TESTS=1` and
+`SYNAPSE_SUPABASE_TEST_MODE` is `local` or `staging`. Even then, the current
+skeleton contains no live adapter or approved RLS validation and remains
+placeholder-only. Request-path harness tests must not use
+`SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Local Checks
 

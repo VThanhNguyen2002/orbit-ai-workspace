@@ -2,16 +2,17 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-3B - Local Supabase setup guide**. Slice 6H-3B-3A now
-adds skipped-by-default harness scaffolding under `apps/api/tests/integration/`
-with explicit opt-in gates, local/staging mode validation, required placeholder
-environment names, service-role rejection, synthetic naming helpers, redaction,
-and a placeholder live test that still skips until later slices.
+Prepare **Slice 6H-3B-4 - Approved migration/RLS validation planning**.
+Slice 6H-3B-3B adds a documentation-only local Supabase setup guide for the
+skipped harness, but meaningful local or hosted RLS validation remains blocked
+until a specific Notes migration/RLS artifact is approved and reviewed.
 
-The next bounded step is to document local-only Supabase setup and cleanup for
-the skipped skeleton, using placeholder values and synthetic users only. Keep
-live transport, RLS execution, migrations, credentials, and live enablement
-deferred to separately reviewed slices.
+The next bounded step is to plan that approval and validation path without
+adding executable SQL yet. The plan should define the minimum migration/RLS
+artifact review requirements, synthetic user A/B validation matrix,
+non-production application path, rollback considerations, cleanup expectations,
+and evidence required before any later slice commits a migration or runs RLS
+tests.
 
 Security gate: no executable Supabase migration is committed. Notes/RLS design
 remains sanitized documentation only, and any future migration artifact requires
@@ -20,18 +21,18 @@ explicit approval and security review under
 
 ## Expected Files To Change
 
-- A local setup guide for the skipped harness, covering local Supabase
-  prerequisites, synthetic test users, placeholder environment values, cleanup
-  expectations, and manual enablement steps after approved prerequisites exist.
-- Minimal documentation updates reflecting the guide and preserving the
-  no-live-default constraints.
-- Do not add the live SDK transport/dependency, connect to Supabase, enable
-  live Notes persistence, add JWKS retrieval, or create/execute an RLS
-  migration.
+- A migration/RLS validation planning document or updates to the existing
+  Supabase harness/adapter plans that define the approval gate and validation
+  matrix.
+- Minimal documentation updates reflecting that local setup remains
+  placeholder-only until the migration/RLS gate is cleared.
+- Do not add SQL, migrations, Supabase generated state, live SDK transport,
+  credentials, `.env` files, live repository wiring, or RLS execution.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
-methods, sync engine implementation, AI behavior, live Notes Supabase repository
-wiring, or service-role usage in request handlers.
+methods, sync engine implementation, AI behavior, hosted staging workflow
+execution, live Notes Supabase repository wiring, or service-role usage in
+request handlers.
 
 ## Commands To Run
 
@@ -54,12 +55,14 @@ pnpm build
 
 ## Definition Of Done
 
-- The guide explains how to prepare a local-only environment without committing
-  secrets or database artifacts.
-- The guide keeps the skeleton disabled by default and does not require real
-  Supabase values in normal CI.
-- The guide distinguishes adapter smoke validation from RLS validation and
-  keeps RLS claims blocked until an approved migration exists.
+- The plan identifies the exact approval evidence required before an executable
+  Notes migration/RLS artifact may be committed.
+- The plan defines synthetic user A/B RLS validation outcomes for create, list,
+  get, update, soft delete, cross-user denial, and owner-mismatch insert
+  rejection.
+- The plan separates adapter validation from RLS validation.
+- The plan documents non-production application, rollback, cleanup, and logging
+  expectations without executing them.
 - No service-role credential is introduced into the request path or default
   tests.
 - Memory persistence remains the default; no live SDK client or executable
@@ -68,26 +71,26 @@ pnpm build
 
 ## Risks
 
-- A local setup guide still does not prove real SDK compatibility or RLS
-  enforcement; implementation and approved RLS validation remain later slices.
+- Planning migration/RLS validation still does not prove real RLS enforcement;
+  the approved artifact and opt-in execution remain later work.
 - The configured RS256 verifier is suitable for deterministic boundary tests,
   but JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
-- The Notes/RLS design has no executable migration artifact. Any later migration
-  and user-scoped validation must pass explicit security approval first.
+- A future migration could expose data if RLS or ownership predicates are
+  incomplete; security review must happen before commit or execution.
 - The Slice 6H-6 guard covers stable Notes field/envelope/default/version/status
   behavior, not complete type-format equivalence or runtime schema validation.
 
 ## Rollback Notes
 
-If Slice 6H-3B-3B local setup guide work is unsuitable, revert only that work. Keep
+If Slice 6H-3B-4 planning work is unsuitable, revert only that work. Keep
 completed shared contracts, backend skeleton, API client methods, Slice 6E/6G
 boundaries, Slice 6H-1 verifier boundary/tests, Slice 6H-2 descriptor
 factory/tests, the Slice 6H-3 and Slice 6H-3B plans, Slice 6H-3A fake-client
 repository tests, Slice 6H-6 contract drift guard, Slice 6H-3B-1 adapter
 interface/tests, Slice 6H-3B-2 fake SDK transport tests, Slice 6H-3B-3 harness
-plan, Slice 6H-3B-3A skipped harness skeleton, and the database artifact
-security policy intact.
+plan, Slice 6H-3B-3A skipped harness skeleton, Slice 6H-3B-3B local setup
+guide, and the database artifact security policy intact.
 
 ## External Review Gate
 

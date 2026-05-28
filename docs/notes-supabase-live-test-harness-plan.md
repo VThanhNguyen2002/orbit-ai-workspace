@@ -5,15 +5,17 @@
 Slice 6H-3B-3 established the plan for a future opt-in live/local Supabase test
 harness. It follows the implemented descriptor boundary, adapter protocol,
 fake SDK transport tests, and Supabase-shaped Notes repository coverage. Slice
-6H-3B-3A now adds skipped-by-default pytest scaffolding and gating helpers
-under `apps/api/tests/integration/`. It does not add a live Supabase SDK
-adapter, connect to Supabase, introduce credentials, add `.env` files, add
-migrations or SQL, execute RLS tests, or enable live Notes persistence.
+6H-3B-3A adds skipped-by-default pytest scaffolding and gating helpers under
+`apps/api/tests/integration/`. Slice 6H-3B-3B now adds the documentation-only
+local setup guide in
+[notes-local-supabase-setup-guide.md](notes-local-supabase-setup-guide.md).
+Neither slice adds a live Supabase SDK adapter, connects to Supabase,
+introduces credentials, adds `.env` files, adds migrations or SQL, executes RLS
+tests, or enables live Notes persistence.
 
-The next bounded task is **Slice 6H-3B-3B - Local Supabase setup guide**. That
-task should document local-only setup, synthetic test users, placeholder
-configuration, and cleanup expectations without adding migrations, credentials,
-or live execution.
+The next bounded task is **Slice 6H-3B-4 - Approved migration/RLS validation
+planning**. Local setup can be prepared safely with placeholders, but RLS
+validation remains blocked until a migration/RLS artifact is approved.
 
 ## 1. Objective
 
@@ -77,6 +79,9 @@ The harness eventually needs to prove:
   until later slices add a live adapter and approved migration/RLS artifact.
 - No executable Notes migration exists. RLS intent is documentation only until
   the database artifact policy approves a specific migration.
+- `docs/notes-local-supabase-setup-guide.md` documents the future local-only
+  setup posture, placeholder variables, synthetic data rules, cleanup
+  expectations, troubleshooting, and artifact/credential restrictions.
 
 ## 4. Default CI Must Remain Credential-Free
 
@@ -312,7 +317,7 @@ exercise.
    naming helpers, and placeholder tests now prove the harness cannot run
    without explicit opt-in. No SDK transport, credentials, migrations, or RLS
    execution were added.
-2. **Slice 6H-3B-3B - Local Supabase setup guide (recommended next)**
+2. **Slice 6H-3B-3B - Local Supabase setup guide (completed)**
    Document local-only setup steps, synthetic test users, placeholder
    configuration, cleanup expectations, and how the skipped skeleton would be
    enabled manually after approved prerequisites exist.
@@ -320,10 +325,10 @@ exercise.
    Document the controlled staging workflow, secret-store expectations,
    CI/manual workflow separation, redaction requirements, and rollback
    expectations for non-production hosted validation.
-4. **Slice 6H-3B-4 - Approved migration/RLS validation**
-   Only after explicit database-artifact approval, add/review the minimal
-   migration/RLS artifact and validate owner isolation and soft-delete outcomes
-   in an approved environment.
+4. **Slice 6H-3B-4 - Approved migration/RLS validation planning (recommended next)**
+   Plan the explicit database-artifact approval, security review, non-production
+   application path, and synthetic owner-isolation validation before any
+   executable migration or RLS test is added.
 
 ## 14. Definition Of Done
 
@@ -355,3 +360,16 @@ Slice 6H-3B-3A is complete when:
 - The next recommended task is Slice 6H-3B-3B; no live SDK adapter, network
   behavior, credential, `.env` file, migration, SQL artifact, or RLS execution
   has been introduced.
+
+Slice 6H-3B-3B is complete when:
+
+- A local setup guide documents local-only/non-production prerequisites,
+  placeholder environment names, synthetic user/token source expectations,
+  cleanup rules, troubleshooting, and security checklist items.
+- The guide states that `.env` files, real credentials, generated Supabase
+  state, dumps/backups/database files, service-role keys, access tokens, SQL,
+  and migrations must not be committed.
+- The guide keeps the future harness env-gated and default CI disabled.
+- The next recommended task is Slice 6H-3B-4 migration/RLS validation planning;
+  no live SDK adapter, network behavior, credential, `.env` file, migration,
+  SQL artifact, or RLS execution has been introduced.

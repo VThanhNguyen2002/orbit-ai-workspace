@@ -12,13 +12,16 @@ handling. Slice 6H-3B-3 now adds a planning document for a disabled-by-default
 live/local Supabase harness in
 [notes-supabase-live-test-harness-plan.md](notes-supabase-live-test-harness-plan.md).
 Slice 6H-3B-3A now adds skipped-by-default harness scaffolding and gating
-tests. It does not add `supabase-py`, create a live client, enable Supabase
-persistence, introduce credentials, add a migration, or execute RLS validation.
+tests. Slice 6H-3B-3B now adds the documentation-only local setup guide in
+[notes-local-supabase-setup-guide.md](notes-local-supabase-setup-guide.md).
+Neither slice adds `supabase-py`, creates a live client, enables Supabase
+persistence, introduces credentials, adds a migration, or executes RLS
+validation.
 
-The next bounded task is **Slice 6H-3B-3B - Local Supabase setup guide**. That
-task should document local-only setup and cleanup expectations with
-placeholder configuration; it must not silently turn on live traffic or
-introduce database artifacts.
+The next bounded task is **Slice 6H-3B-4 - Approved migration/RLS validation
+planning**. Local setup can be prepared safely with placeholder configuration,
+but the harness cannot claim RLS coverage until a reviewed migration/RLS
+artifact exists.
 
 ## 1. Objective
 
@@ -72,6 +75,9 @@ replacement for application scoping.
   placeholder-only environment requirements, default-CI exclusion, synthetic
   data rules, adapter validation, RLS validation expectations, cleanup
   expectations, and migration prerequisites.
+- The local Supabase setup guide documents local-only prerequisites,
+  placeholder variables, synthetic token source expectations, artifact
+  exclusions, troubleshooting, and the RLS/migration blocker.
 - The skipped-by-default harness skeleton defines `supabase_live` and
   `integration` pytest markers, fail-closed gating helpers, synthetic naming
   helpers, service-role rejection, redaction checks, and a placeholder live
@@ -382,16 +388,16 @@ requires explicit approval under
    Skipped-by-default markers, fail-closed configuration guards, synthetic
    naming helpers, and placeholder tests now prove the harness cannot run
    without explicit opt-in.
-5. **Slice 6H-3B-3B - Local Supabase setup guide (recommended next)**
+5. **Slice 6H-3B-3B - Local Supabase setup guide (completed)**
    Document local-only setup and cleanup instructions with placeholder values
    and approved prerequisites.
 6. **Slice 6H-3B-3C - Hosted staging opt-in test plan**
    Document controlled non-production staging validation, secret-store rules,
    CI/manual workflow separation, and redaction requirements.
-7. **Slice 6H-3B-4 - Approved migration/RLS validation**
-   Only after explicit database-artifact approval, introduce/review the minimum
-   migration and validate owner isolation and soft-delete outcomes in an
-   approved environment.
+7. **Slice 6H-3B-4 - Approved migration/RLS validation planning (recommended next)**
+   Plan the explicit database-artifact approval, security review, application
+   and rollback path, and synthetic owner-isolation validation before any
+   executable migration or RLS test is added.
 
 JWKS/live authentication production readiness remains separately gated: an SDK
 adapter alone does not make the current configured RS256 verifier suitable for
@@ -464,3 +470,17 @@ Slice 6H-3B-3A is complete when:
 - The next recommended task is Slice 6H-3B-3B; no live SDK adapter, credential,
   `.env` file, migration, SQL artifact, network execution, or RLS test has been
   introduced.
+
+Slice 6H-3B-3B is complete when:
+
+- A local Supabase setup guide documents safe local-only/non-production
+  preparation, placeholder values, synthetic user/token sources, cleanup,
+  troubleshooting, and security checks.
+- It explicitly prohibits committed `.env` files, credentials, generated
+  Supabase state, database dumps/files, service-role keys, real tokens, SQL,
+  and migrations.
+- It keeps default CI disabled and records migration/RLS approval as the blocker
+  for meaningful local validation.
+- The next recommended task is Slice 6H-3B-4 migration/RLS validation planning;
+  no live SDK adapter, network behavior, credential, `.env` file, migration,
+  SQL artifact, or RLS execution has been introduced.

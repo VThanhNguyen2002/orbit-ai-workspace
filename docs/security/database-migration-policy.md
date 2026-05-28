@@ -12,6 +12,9 @@ approved for commit. Until an explicit policy change is reviewed and approved,
   RLS outcomes as sanitized, non-deployable summaries.
 - Planning work must not add executable migrations, generated database state, or
   environment-specific database artifacts.
+- Local Supabase setup documentation may describe future disposable local
+  preparation with placeholders only; it must not commit generated Supabase
+  state, local database files, credentials, or executable SQL.
 - The repository being private does not make operational database artifacts safe
   to commit casually. Git history is durable and access can change over time.
 
