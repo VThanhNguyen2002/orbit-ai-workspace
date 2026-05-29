@@ -8,8 +8,10 @@ execution dry-run.
 This document is a checklist and evidence plan only. It does not approve,
 execute, apply, or validate the local Markdown artifact in
 [notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md).
-Local execution remains blocked until a later approval record explicitly grants
-local-only dry-run execution.
+Slice 6H-3B-4C-LA later records constrained approval for a future local-only
+dry-run attempt. That approval still does not automatically execute the
+artifact; the next slice must prepare the execution runbook and honor every
+preflight check and stop condition.
 
 The intended future dry-run is limited to a disposable local Supabase target,
 synthetic users, synthetic Notes rows, a public-key plus caller-token request
@@ -35,22 +37,22 @@ This preparation does not:
 
 ## 3. Current Status
 
-- Local RLS execution approval is pending in
+- Local-only RLS dry-run attempt approval is granted under constraints in
   [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md).
 - The local Notes table/RLS artifact is Markdown-only and remains outside
   `supabase/migrations/`.
 - Live/local Notes RLS tests are skipped by default.
 - No executable Notes SQL is committed.
 - No Supabase local run, hosted Supabase connection, or RLS validation has been
-  performed.
+  performed by this preparation or approval slice.
 - No Supabase environment is required by CI.
 - Default CI remains credential-free and must not set live harness opt-in
   values.
 
-## 4. Preconditions Before Local Execution Approval
+## 4. Preconditions For Local Execution Approval
 
-A reviewer may consider local-only dry-run execution approval only after all of
-the following are true:
+These preconditions supported the constrained local-only approval and still
+apply before any approved local dry-run execution:
 
 - The target is a disposable local Supabase project.
 - The target contains no real user data, imported production data, staging data,
@@ -78,8 +80,7 @@ the following are true:
 
 ## 5. Dry-Run Preflight Checklist
 
-Run these checks before local execution approval is granted and repeat them
-immediately before any approved local dry-run:
+Run these checks immediately before any approved local dry-run:
 
 - [ ] Working tree is clean before preparing local-only evidence.
 - [ ] No `.env` or `.env.*` file is staged or tracked.
@@ -201,17 +202,17 @@ failed or partial attempts:
 
 ## 9. Approval Decision Point
 
-After this preparation document is accepted, the next approval slice may either:
+After this preparation document is accepted and the approval record grants the
+future local-only attempt, the next slice should prepare the exact execution
+runbook.
 
-- grant local-only RLS dry-run execution approval; or
-- keep execution blocked.
-
-Recommended next task: **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run
-approval**.
+Recommended next task: **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution
+runbook**.
 
 This recommendation is local-only. It does not imply hosted staging,
 production, default CI, live repository mode, service-role request-path usage,
-or public Notes API behavior approval.
+or public Notes API behavior approval. It also does not mean the dry-run should
+execute automatically after approval.
 
 ## 10. Definition Of Done
 
@@ -223,7 +224,7 @@ Slice 6H-3B-4C-L is complete when:
 - The future evidence format is documented.
 - The rollback/cleanup checklist is documented.
 - Existing approval, validation, harness, policy, and next-action docs point to
-  this preparation and the next approval decision.
+  this preparation and the next runbook task.
 - No SQL file, migration, `.env` file, credential, generated Supabase state,
   local Supabase run, hosted Supabase connection, live RLS validation, runtime
   code, tests, or public Notes API behavior change is introduced.

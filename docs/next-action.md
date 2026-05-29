@@ -2,33 +2,33 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval**.
+Prepare **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution runbook**.
 
-Slice 6H-3B-4C-L adds
-[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
-with the local-only objective, non-goals, current status, preconditions,
-preflight checklist, manual dry-run sequence, evidence format, cleanup
-checklist, and approval decision point.
+Slice 6H-3B-4C-LA records constrained approval for a future local-only RLS
+dry-run attempt in
+[notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md).
+The approval is limited to a disposable local Supabase target, the local-only
+Markdown artifact, opt-in local harness, synthetic users, synthetic Notes rows,
+redacted evidence, and cleanup verification.
 
-The next bounded step is an approval decision only. It may grant local-only
-dry-run execution approval or keep execution blocked. It must not execute the
-artifact automatically.
+The next bounded step is to prepare the careful execution runbook. The dry-run
+must not execute automatically merely because approval has been recorded.
 
 ## Why This Is Next
 
-Local execution approval is still pending, but the previously missing
-preflight, evidence, redaction, and rollback/cleanup expectations are now
-documented for review.
+The local-only approval boundary is now explicit, but execution still needs a
+runbook that walks through preflight checks, stop conditions, evidence capture,
+rollback/cleanup verification, and post-run reporting before any approved local
+attempt begins.
 
-Hosted staging planning remains deferred until local-only execution approval is
-granted or explicitly deferred.
+Hosted staging planning remains deferred until the local-only dry-run is either
+completed with accepted evidence or explicitly deferred.
 
 ## Expected Files To Change
 
-- The local RLS execution approval record, if a reviewer grants approval or
-  records that execution remains blocked.
-- Minimal references from planning docs, if the approval decision changes the
-  recommended next task.
+- A local-only RLS dry-run execution runbook, if created by the next slice.
+- Minimal references from the approval, validation, harness, policy, or
+  next-action docs, if needed.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, hosted staging workflow
@@ -57,11 +57,11 @@ pnpm build
 
 ## Definition Of Done
 
-- The approval decision is recorded explicitly.
-- If granted, approval is limited to a disposable local-only dry-run with
-  synthetic users, synthetic Notes rows, redacted evidence, and cleanup
-  requirements.
-- If not granted, execution remains blocked and the reason is recorded.
+- The runbook is documented without executing the dry-run automatically.
+- The runbook repeats the approved local-only scope and the explicitly not
+  approved items.
+- Pre-execution checks, stop conditions, redacted evidence capture, and cleanup
+  verification are operationally clear.
 - Hosted Supabase, staging, production, default CI, real data, credentials,
   service-role request-path usage, live repository mode, and public Notes API
   behavior remain out of scope.
@@ -71,12 +71,11 @@ pnpm build
 
 ## Risks
 
-- Approval language could be mistaken for hosted or production execution unless
-  it stays explicitly local-only.
-- Cleanup plans remain untested until an approved disposable local dry-run
-  occurs.
+- A runbook could be mistaken for permission to run against hosted or
+  production targets unless the approved local-only scope is repeated clearly.
+- Cleanup remains unproven until the approved disposable local dry-run occurs.
 - Service-role values must remain outside request-path validation.
-- The local-only artifact still does not prove hosted staging readiness.
+- The local-only dry-run still will not prove hosted staging readiness.
 - JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
 
@@ -85,7 +84,7 @@ pnpm build
 Before considering the next slice complete:
 
 1. Render the full final report clearly and structurally.
-2. Include approval scope, non-goals, risks, deferred work, verification
+2. Include runbook scope, non-goals, risks, deferred work, verification
    evidence, CI status, and security observations.
 3. Be explicit about anything scaffold-only, mocked/faked, intentionally
    deferred, or unresolved.

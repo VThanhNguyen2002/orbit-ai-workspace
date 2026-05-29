@@ -17,19 +17,22 @@ Slice 6H-3B-4C now adds skipped-by-default Notes RLS validation case
 scaffolding in `apps/api/tests/integration/test_notes_rls_validation.py`.
 Slice 6H-3B-4C-R records the local execution approval gate in
 [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
-and keeps local RLS execution approval pending. Slice 6H-3B-4C-L adds
+and kept local RLS execution approval pending at that time. Slice 6H-3B-4C-L
+adds
 [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
 with the local preflight checklist, evidence format, and cleanup expectations,
-but it does not execute the artifact or run RLS validation.
+but it does not execute the artifact or run RLS validation. Slice 6H-3B-4C-LA
+records constrained approval for a future local-only RLS dry-run attempt
+without executing it.
 These slices do not add a live Supabase SDK adapter, connect to Supabase,
 introduce credentials, add `.env` files, add migrations or SQL, execute RLS
 tests, or enable live Notes persistence.
 
-The next bounded task is **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run
-approval**. That task may grant local-only dry-run execution approval or keep
-execution blocked. It must still avoid staging, production, hosted Supabase,
-default CI, real-data, credential, service-role request-path, and public Notes
-API behavior approval.
+The next bounded task is **Slice 6H-3B-4C-DR - Local-only RLS dry-run
+execution runbook**. That task should prepare the careful runbook for the
+approved local-only attempt. It must still avoid automatic execution, staging,
+production, hosted Supabase, default CI, real-data, credential, service-role
+request-path, and public Notes API behavior approval.
 
 ## 1. Objective
 
@@ -98,11 +101,11 @@ The harness eventually needs to prove:
   the base live harness is configured because no live client, artifact
   execution approval, or applied RLS target exists in this slice.
 - `docs/notes-local-rls-execution-approval-record.md` records the local
-  execution approval gate and keeps approval pending until explicit reviewer
-  approval is recorded.
+  execution approval gate and now approves a future local-only RLS dry-run
+  attempt under strict constraints.
 - `docs/notes-local-rls-dry-run-preparation.md` records the future local-only
   preflight checklist, manual sequence, evidence format, redaction plan, and
-  cleanup checklist without granting execution approval.
+  cleanup checklist.
 - No executable Notes migration exists. RLS intent is documentation only until
   the database artifact policy approves a specific migration.
 - `docs/notes-local-supabase-setup-guide.md` documents the future local-only
@@ -285,9 +288,9 @@ harness should validate at least:
 - No Notes request performs physical deletion.
 
 Slice 6H-3B-4C defines these cases in pytest without implementing live
-Supabase client logic. The executable assertions remain deferred until an
-explicit local execution approval record exists and the approved artifact is
-applied in the selected local or staging target.
+Supabase client logic. The executable assertions remain deferred until the
+approved local-only runbook is followed and the approved artifact is applied in
+the selected disposable local target.
 
 The harness should distinguish:
 
@@ -388,10 +391,16 @@ exercise.
    boundary, rollback/cleanup procedure, evidence format, redaction checklist,
    and reviewer sign-off format without executing the artifact.
 10. **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval
+    (completed)**
+    Record constrained approval for a future local-only dry-run attempt. Do not
+    execute the dry-run.
+11. **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution runbook
     (recommended next)**
-    Decide whether to grant local-only dry-run execution approval or keep
-    execution blocked.
-11. **Slice 6H-3B-4D - Hosted staging validation plan**
+    Prepare the careful runbook for the approved local-only attempt, including
+    pre-execution checks, stop conditions, redacted evidence capture, and
+    cleanup verification. Do not automatically execute merely because approval
+    is recorded.
+12. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation after local execution
    approval is recorded or explicitly deferred.
 
@@ -478,9 +487,28 @@ Slice 6H-3B-4C-L is complete when:
   objective, non-goals, current status, preconditions, preflight checklist,
   manual sequence, evidence format, cleanup checklist, approval decision point,
   and definition of done.
-- Local execution approval remains pending until a later approval slice grants
-  it explicitly.
-- The next recommended task is Slice 6H-3B-4C-LA.
+- Local execution approval remained pending until Slice 6H-3B-4C-LA granted
+  it explicitly under constraints.
+- That completed slice led to Slice 6H-3B-4C-LA.
+- No live SDK adapter, network behavior, credential, `.env` file, migration,
+  SQL artifact, local Supabase run, hosted Supabase connection, RLS execution,
+  service-role request-path usage, or public Notes API behavior change has
+  been introduced.
+
+Slice 6H-3B-4C-LA is complete when:
+
+- The local RLS execution approval record states that the local-only RLS
+  dry-run attempt is approved under constraints.
+- The approved scope is limited to a disposable local Supabase target, the
+  local-only Markdown artifact, opt-in local harness, synthetic users,
+  synthetic Notes rows, redacted evidence, and cleanup verification.
+- Hosted Supabase, staging, production, default CI, real data, credentials,
+  committed `.env` files, committed `.sql` files, committed
+  `supabase/migrations/*`, generated Supabase state, live repository mode,
+  service-role request-path usage, and public Notes API behavior changes remain
+  not approved.
+- Required pre-execution conditions and dry-run stop conditions are documented.
+- The next recommended task is Slice 6H-3B-4C-DR.
 - No live SDK adapter, network behavior, credential, `.env` file, migration,
   SQL artifact, local Supabase run, hosted Supabase connection, RLS execution,
   service-role request-path usage, or public Notes API behavior change has

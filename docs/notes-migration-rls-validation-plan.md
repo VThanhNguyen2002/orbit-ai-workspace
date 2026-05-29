@@ -18,11 +18,13 @@ Slice 6H-3B-4C adds skipped-by-default Notes RLS validation case scaffolding in
 validation cases and safety gates only; it does not execute the local artifact
 or validate RLS. Slice 6H-3B-4C-R records the local execution approval gate in
 [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
-and keeps local RLS execution approval pending. Slice 6H-3B-4C-L adds the
-local-only dry-run preparation checklist in
+and kept local RLS execution approval pending at that time. Slice 6H-3B-4C-L
+adds the local-only dry-run preparation checklist in
 [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
-without executing the artifact. The next recommended approval slice is
-**Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval**.
+without executing the artifact. Slice 6H-3B-4C-LA records constrained approval
+for a future local-only RLS dry-run attempt without executing it. The next
+recommended slice is **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution
+runbook**.
 
 ## 1. Objective
 
@@ -82,22 +84,25 @@ The plan must make future reviewers able to answer:
   behind the existing opt-in live harness. Default CI verifies case inventory,
   missing-env gating, required synthetic token placeholders, service-role
   rejection, and no-network behavior only.
-- The local execution approval record exists, but local RLS execution approval
-  remains pending until explicit reviewer approval is recorded.
+- The local execution approval record now approves a future local-only RLS
+  dry-run attempt under strict constraints. It does not approve automatic
+  execution, hosted Supabase, staging, production, default CI, committed SQL,
+  migrations, real data, credentials, service-role request-path usage, live
+  repository mode, or public Notes API behavior changes.
 - The local dry-run preparation document records the disposable local target
   assumptions, preflight checklist, manual dry-run sequence, evidence format,
-  redaction expectations, and rollback/cleanup checklist. It does not approve
-  execution.
+  redaction expectations, and rollback/cleanup checklist.
 - No `.sql` Notes migration or auto-applied RLS artifact is approved or
   committed.
 - No RLS behavior has been validated against local or hosted Supabase.
 
-## 4. Why Executable SQL Remains Prohibited For Now
+## 4. Why Committed Executable SQL Remains Prohibited For Now
 
-Executable SQL execution remains prohibited because the repository does not yet
-have an approved non-production execution plan or completed synthetic RLS
-validation plan. The local-only Markdown artifact is approved for review, not
-for execution.
+Committed executable SQL remains prohibited because the repository does not yet
+have an approved migration file, hosted execution path, or completed synthetic
+RLS validation evidence. Slice 6H-3B-4C-LA approves only a future local-only
+dry-run attempt that manually materializes the reviewed Markdown artifact in a
+disposable local target under the documented constraints.
 
 Specific reasons:
 
@@ -114,9 +119,11 @@ Specific reasons:
 - Generated Supabase state, dumps, local database files, and environment-bound
   metadata are not portable review artifacts.
 
-Until execution approval is explicit, `supabase/migrations/*.sql` remains
-ignored, no SQL file should be committed, and fenced SQL-like draft content in
-Markdown must not be executed.
+Until a separate migration-file approval is explicit,
+`supabase/migrations/*.sql` remains ignored and no SQL file should be
+committed. Fenced SQL-like draft content in Markdown may be manually
+materialized only for the approved local-only dry-run attempt, after the
+runbook and pre-execution checks are satisfied.
 
 ## 5. Approval Criteria For Future Migration/RLS Artifacts
 
@@ -321,10 +328,16 @@ RLS tests may be added or enabled only after all prerequisites are true:
    and reviewer sign-off format needed before local execution approval can be
    granted. Do not execute the artifact.
 7. **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval
+   (completed)**
+   Record constrained approval for a future local-only dry-run attempt using
+   the preparation document as the review boundary. Do not execute the dry-run.
+8. **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution runbook
    (recommended next)**
-   Decide whether to grant local-only dry-run execution approval or keep
-   execution blocked, using the preparation document as the review boundary.
-8. **Slice 6H-3B-4D - Hosted staging validation plan**
+   Prepare the careful runbook for the approved local-only attempt, including
+   pre-execution checks, stop conditions, redacted evidence capture, and cleanup
+   verification. Do not automatically execute merely because approval is
+   recorded.
+9. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation, secret-store handling,
    workflow separation, redaction, rollback, and evidence requirements.
 
@@ -401,10 +414,30 @@ Slice 6H-3B-4C-L is complete when:
   non-goals, current status, preconditions, preflight checklist, manual
   dry-run sequence, evidence format, rollback/cleanup checklist, approval
   decision point, and definition of done for a future local-only dry-run.
-- Local execution approval remains pending until a later approval slice grants
-  it explicitly.
-- The next recommended task is Slice 6H-3B-4C-LA.
+- Local execution approval remained pending until Slice 6H-3B-4C-LA granted
+  it explicitly under constraints.
+- That completed slice led to Slice 6H-3B-4C-LA.
 - No runtime code, tests, executable SQL, migrations, `.env` files,
+  credentials, generated Supabase state, local Supabase run, hosted Supabase
+  connection, live RLS validation, live repository mode, service-role
+  request-path usage, frontend/UI, Expo, AI, offline sync, or public Notes API
+  behavior change is introduced.
+
+Slice 6H-3B-4C-LA is complete when:
+
+- `docs/notes-local-rls-execution-approval-record.md` records that the
+  local-only RLS dry-run attempt is approved under constraints.
+- The approved scope is limited to a disposable local Supabase target, the
+  local-only Markdown artifact, opt-in local harness, synthetic users,
+  synthetic Notes rows, redacted evidence, and cleanup verification.
+- Staging, production, hosted Supabase, default CI, real data, credentials,
+  committed `.env` files, committed `.sql` files, committed
+  `supabase/migrations/*`, generated Supabase state, live repository mode,
+  service-role request-path usage, and public Notes API behavior changes remain
+  not approved.
+- Required pre-execution conditions and dry-run stop conditions are documented.
+- The next recommended task is Slice 6H-3B-4C-DR.
+- No runtime code, tests, executable SQL files, migrations, `.env` files,
   credentials, generated Supabase state, local Supabase run, hosted Supabase
   connection, live RLS validation, live repository mode, service-role
   request-path usage, frontend/UI, Expo, AI, offline sync, or public Notes API

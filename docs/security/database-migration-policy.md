@@ -62,18 +62,20 @@ and must not be executed without a separate execution approval record.
 
 The local execution approval gate is recorded in
 [notes-local-rls-execution-approval-record.md](../notes-local-rls-execution-approval-record.md).
-That record keeps local RLS execution approval pending. It does not approve
-executing the artifact, creating SQL files, adding Supabase migrations, running
-local or hosted Supabase, running live RLS tests, committing credentials, using
-service-role credentials in request-path code, or enabling staging/production
-execution.
+That record now approves a future local-only RLS dry-run attempt under strict
+constraints. It does not approve creating or committing SQL files, adding
+Supabase migrations, running hosted Supabase, staging or production execution,
+default CI execution, committing credentials, using service-role credentials in
+request-path code, enabling live repository mode, or changing public Notes API
+behavior.
 
 The local dry-run preparation checklist is recorded in
 [notes-local-rls-dry-run-preparation.md](../notes-local-rls-dry-run-preparation.md).
 It documents the preflight checks, manual local-only sequence, evidence format,
 redaction expectations, and rollback/cleanup checklist for a future approval
-decision. It remains non-executable and does not grant local, hosted, staging,
-production, or CI execution approval.
+decision. It remains non-executable documentation. The later approval remains
+local-only and does not grant hosted, staging, production, or CI execution
+approval.
 
 ## Notes Design Handling
 

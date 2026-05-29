@@ -2,139 +2,181 @@
 
 ## Status
 
-Slice 6H-3B-4C-R records the approval gate for a future local-only Notes RLS
-execution attempt.
-
-Local RLS execution approval is **pending**. Slice 6H-3B-4C-L adds
+Slice 6H-3B-4C-R recorded the approval gate for a future local-only Notes RLS
+execution attempt. Slice 6H-3B-4C-L added
 [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
-to record the disposable local target assumptions, preflight checks,
-rollback/cleanup expectations, evidence format, and manual dry-run sequence.
-That preparation does not grant approval to execute the local artifact or run
-opt-in RLS validation tests. Execution remains blocked until an explicit
-reviewer approval entry is recorded.
+with the disposable local target assumptions, preflight checks,
+rollback/cleanup expectations, evidence format, stop boundaries, and manual
+dry-run sequence.
+
+Slice 6H-3B-4C-LA records the explicit approval decision:
+
+**Local-only RLS dry-run attempt: approved under constraints.**
 
 This is documentation-only. It does not execute SQL, create a migration, run
 Supabase locally, connect to hosted Supabase, run live RLS tests, add
 credentials, enable live repository mode, or change public Notes API behavior.
 
-## Approval Decision
+This approval does not authorize automatic execution after this commit. The
+next slice must prepare the local-only dry-run execution runbook and still stop
+at any pre-execution failure or stop condition documented below.
 
-Local-only execution may be explicitly granted later only if every condition in
-this record is satisfied and a reviewer records that approval before execution.
+## Approval Decision
 
 Current decision:
 
-- Local RLS execution approval: pending.
+- Local-only RLS dry-run attempt: approved under constraints.
 - Production execution approval: not granted.
 - Staging execution approval: not granted.
 - Hosted Supabase execution approval: not granted.
 - Default CI execution: prohibited.
-- Live tests: opt-in only and still skipped by default.
 - Service-role request-path usage: prohibited.
 - Real user data: prohibited.
 - Real production data: prohibited.
+- Live repository mode: not granted.
+- Public Notes API behavior changes: not granted.
 
-## Pending Local-Only Scope
+## Approved Local-Only Scope
 
-If all conditions are later satisfied and approval is recorded, the only
-candidate scope is:
+This approval is limited to:
 
 - Target: disposable local Supabase environment only.
 - Allowed artifact:
   [notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md).
-- Allowed validation: opt-in local harness using
+- Artifact form: local-only Markdown artifact only. This approval does not
+  approve committing a `.sql` file or `supabase/migrations/*` file.
+- Allowed validation: opt-in local harness only, using
   `SYNAPSE_SUPABASE_INTEGRATION_TESTS=1` and
   `SYNAPSE_SUPABASE_TEST_MODE=local`.
-- Allowed data: synthetic users and synthetic Notes rows only.
-- Allowed credentials: local-only synthetic public key/token values supplied
-  from a gitignored local file, local shell, or approved secret store.
-- Required preparation:
-  [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md).
+- Allowed users: synthetic users only.
+- Allowed data: synthetic Notes rows only.
+- Allowed credentials: local-only public key and synthetic caller-token values
+  supplied from a gitignored local file, local shell, or approved secret store.
+- Allowed evidence: redacted evidence collection only.
+- Required cleanup: cleanup verification is required after any attempted
+  local-only dry-run, including failed or partial attempts.
 
-This pending scope does not approve staging, production, hosted Supabase,
-default CI, migration files, `.env` commits, generated Supabase state, real
-data, or service-role request-path behavior.
-
-## Required Conditions Before Approval
-
-All of the following must be true before local execution can be approved:
-
-- The execution target is a disposable local-only Supabase environment.
-- Synthetic users only are used.
-- Synthetic Notes data only is used.
-- No real user data, real emails, real note content, production data, staging
-  data, dumps, backups, snapshots, or generated database files enter git.
-- No real credentials, project identifiers, access tokens, refresh tokens,
-  service-role keys, JWT secrets, passwords, client secrets, connection
-  strings, or `.env` files enter git.
-- Environment values come only from a gitignored local file, a local shell, or
-  an approved secret store.
-- The local artifact is reviewed against
-  [database-migration-policy.md](security/database-migration-policy.md) before
-  execution.
-- The local dry-run preparation document is accepted, including the preflight
-  checklist, manual sequence, evidence format, redaction expectations, and
-  rollback/cleanup checklist.
-- Rollback and cleanup steps are documented for the disposable local target,
-  including how synthetic rows/users are identified and removed without logging
-  note content.
-- Cleanup evidence reports only coarse synthetic counts and run identifiers.
-- The RLS validation matrix is mapped to opt-in tests in
-  `apps/api/tests/integration/test_notes_rls_validation.py`.
-- The request-path harness uses a public key plus synthetic caller access
-  tokens, never a service-role credential.
-- `SUPABASE_SERVICE_ROLE_KEY` remains rejected by the request-path harness.
-- Default CI does not set live Supabase env flags and does not run live RLS
-  validation.
-- Validation evidence redacts keys, tokens, authorization headers, Auth
-  payloads, URLs with secrets, emails, and note content.
-- An explicit reviewer approval entry is recorded before any local artifact
-  execution or opt-in RLS validation run.
+The approved local-only scope is bound by
+[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+and [database-migration-policy.md](security/database-migration-policy.md).
 
 ## Explicitly Not Approved
 
 This record does not approve:
 
-- executing the local Markdown artifact;
-- copying fenced draft content into a runnable SQL file;
-- creating `.sql` files;
-- adding anything under `supabase/migrations/`;
-- running Supabase locally;
-- connecting to hosted Supabase;
-- running live RLS tests;
-- committing `.env` files or credentials;
-- using service-role credentials in request-path code or tests;
-- enabling live Notes repository mode;
-- staging or production execution;
+- staging execution;
+- production execution;
 - hosted Supabase execution;
-- default CI execution; or
-- public Notes API behavior changes.
+- default CI execution;
+- service-role request-path usage;
+- real user data;
+- real production data;
+- committed `.env` files;
+- committed `.sql` files;
+- committed `supabase/migrations/*`;
+- generated Supabase state;
+- live Notes repository mode;
+- public Notes API behavior changes;
+- connecting to hosted Supabase;
+- using real credentials, real emails, real note content, dumps, backups, or
+  snapshots; or
+- broadening the local artifact beyond the reviewed Markdown content without
+  separate approval.
+
+## Required Before Actual Dry-Run Execution
+
+Before any approved local-only dry-run attempt begins, all of the following
+must be true:
+
+- Working tree is clean.
+- No `.env` or `.env.*` file is staged.
+- No `.sql` file is staged.
+- No `supabase/migrations/*` file is staged.
+- No generated Supabase state, dump, backup, snapshot, database file, or local
+  runtime file is staged.
+- Local environment values come only from a gitignored local file or local
+  shell.
+- No credential, project identifier, access token, refresh token, service-role
+  key, JWT secret, password, client secret, connection string, authorization
+  header, Auth payload, or `.env` file enters git.
+- `SUPABASE_SERVICE_ROLE_KEY` is absent from request-path harness
+  configuration.
+- Request-path harness behavior uses a public key plus synthetic caller access
+  tokens, never service role.
+- Synthetic user A and user B access tokens are available locally only through
+  `SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN` and
+  `SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN`.
+- The dry-run evidence template is ready and configured for redaction.
+- The rollback/cleanup checklist is ready for the disposable local target.
+- The RLS validation matrix is understood and mapped to
+  `apps/api/tests/integration/test_notes_rls_validation.py`.
+- The local artifact is reviewed against
+  [database-migration-policy.md](security/database-migration-policy.md) before
+  it is manually materialized in the disposable local target.
+
+## Dry-Run Stop Conditions
+
+Stop immediately and do not continue the local-only dry-run if any of the
+following occur:
+
+- A service-role key is required for request-path behavior.
+- Real data, real users, real emails, real Notes content, production data,
+  staging data, dumps, backups, or snapshots are involved.
+- Cleanup cannot be guaranteed or the disposable local target cannot be reset
+  or disposed.
+- RLS policy behavior allows cross-user visibility.
+- SQL differs from the reviewed Markdown artifact without separate approval.
+- Secrets, tokens, authorization headers, Auth payloads, URLs with secrets,
+  emails, raw user identifiers, or note content would be printed, shared, or
+  committed.
+- Any `.env`, `.sql`, `supabase/migrations/*`, generated Supabase state, dump,
+  backup, snapshot, database file, credential, or sensitive evidence artifact
+  would be staged or committed.
+
+## Evidence And Cleanup Requirements
+
+A future local-only dry-run execution report must use the evidence format in
+[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md).
+It must include:
+
+- environment type: local only;
+- approval record and artifact version or commit;
+- pseudonymized synthetic user A/B identifiers;
+- local RLS validation matrix results;
+- confirmation that no service-role request path was used;
+- redacted failure logs if failures occur; and
+- cleanup verification with coarse synthetic counts only.
+
+Cleanup verification is required even when the dry-run stops early.
 
 ## Next Approval Step
 
-Recommended next task: **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run
-approval**.
+Recommended next task: **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution
+runbook**.
 
-That slice may either grant local-only dry-run execution approval or keep
-execution blocked. It must still not grant staging, production, hosted
-Supabase, default CI, real-data, credential, service-role request-path, or
-public Notes API behavior approval.
+That slice should prepare the careful runbook for the approved local-only
+attempt. It must not automatically execute the dry-run merely because approval
+is recorded here.
 
-Hosted staging planning remains deferred until local-only execution approval is
-granted or explicitly deferred.
+Hosted staging planning remains deferred until the local-only dry-run is either
+completed with accepted evidence or explicitly deferred.
 
 ## Definition Of Done
 
-Slice 6H-3B-4C-R is complete when:
+Slice 6H-3B-4C-LA is complete when:
 
-- This approval record exists and records local RLS execution approval as
-  pending.
-- Production, staging, hosted Supabase, default CI, real data, credentials, and
-  service-role request-path usage remain explicitly not approved.
-- Conditions for a future local-only approval are documented.
-- The local dry-run preparation document is referenced as the required
-  preparation before any approval can be granted.
-- The next recommended task is Slice 6H-3B-4C-LA.
+- This approval record states that the local-only RLS dry-run attempt is
+  approved under constraints.
+- The approved local-only scope is explicit: disposable local Supabase,
+  Markdown artifact only, opt-in local harness only, synthetic users, synthetic
+  Notes rows, redacted evidence, and cleanup verification.
+- Staging, production, hosted Supabase, default CI, real data, credentials,
+  committed `.env` files, committed `.sql` files, committed
+  `supabase/migrations/*`, generated Supabase state, live repository mode,
+  service-role request-path usage, and public Notes API behavior changes remain
+  not approved.
+- Required pre-execution conditions and stop conditions are documented.
+- The next recommended task is Slice 6H-3B-4C-DR.
 - No SQL file, migration, `.env` file, credential, generated Supabase state,
   local Supabase run, hosted Supabase connection, live RLS test, runtime code,
-  or public Notes API behavior change is introduced.
+  test code, or public Notes API behavior change is introduced.
