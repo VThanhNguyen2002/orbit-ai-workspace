@@ -6,9 +6,15 @@ Slice 6H-3B-4A prepares the security review packet for a future Notes
 table/RLS migration. This packet is sanitized, non-executable documentation
 only. It does not approve, add, or apply SQL.
 
+External ChatGPT engineering/security review accepted this packet at commit
+`a8b435aee7f31b4e4f414b4ae8165baa062fb414`. The acceptance record is documented
+in
+[notes-migration-rls-approval-record.md](notes-migration-rls-approval-record.md).
+
 The next implementation slice is **Slice 6H-3B-4B - Approved local-only
-migration artifact**, but that slice must not start until this review packet is
-accepted and the required approvals are recorded.
+migration artifact**. That slice may draft a local-only artifact under the
+recorded constraints, but this packet still does not approve SQL execution,
+production/staging migration, live RLS tests, or service-role request-path use.
 
 ## 1. Objective
 

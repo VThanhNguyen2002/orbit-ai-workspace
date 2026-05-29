@@ -2,27 +2,28 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-4B - Approved local-only migration artifact**, but do not
-start until the Slice 6H-3B-4A draft review packet is accepted and the required
-approvals are recorded.
+Prepare **Slice 6H-3B-4B - Approved local-only migration artifact**. The Slice
+6H-3B-4A draft review packet has been accepted by external ChatGPT
+engineering/security review, and the acceptance is recorded in
+[notes-migration-rls-approval-record.md](notes-migration-rls-approval-record.md).
 
-The next bounded step, after acceptance, is to add the minimal
-environment-independent Notes migration/RLS artifact for local-only validation.
+The next bounded step is to draft the minimal environment-independent Notes
+migration/RLS artifact for local-only validation under the recorded constraints.
 That work must follow
 [database-migration-policy.md](security/database-migration-policy.md),
 [notes-migration-rls-validation-plan.md](notes-migration-rls-validation-plan.md),
-and
+the accepted
 [notes-migration-rls-draft-review-packet.md](notes-migration-rls-draft-review-packet.md).
 
 Security gate: this repository still has no approved executable Supabase
-migration at the time of this handoff. Slice 6H-3B-4B may create an artifact
-only if the review packet has been accepted and the artifact-specific policy
-exception is explicit.
+migration execution approval at the time of this handoff. Slice 6H-3B-4B may
+draft the local-only artifact only under the approval-record constraints and
+must still not execute it by default.
 
 ## Expected Files To Change
 
 - The approved local-only Notes migration/RLS artifact, only after acceptance
-  and recorded approval.
+  and under the approval-record constraints.
 - Minimal documentation updates that identify the artifact as approved for
   local-only validation.
 - A clear note that generated Supabase state, real data, credentials, dumps,
@@ -68,6 +69,8 @@ pnpm build
   tests.
 - Memory persistence remains the default; live repository wiring and RLS tests
   remain deferred.
+- The artifact is not executed by default, and any local execution remains a
+  separate explicit opt-in validation step.
 
 ## Risks
 
