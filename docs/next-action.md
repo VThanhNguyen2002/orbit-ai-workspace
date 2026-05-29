@@ -2,32 +2,33 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-4C-R - Record explicit local RLS execution approval**.
+Prepare **Slice 6H-3B-4C-L - Local-only RLS execution dry-run preparation**.
 
-Slice 6H-3B-4C adds skipped-by-default Notes RLS validation case scaffolding in
-`apps/api/tests/integration/test_notes_rls_validation.py`. The tests define the
-required user A/user B validation matrix and safety gates behind the existing
-opt-in live harness, but they do not execute RLS validation.
+Slice 6H-3B-4C-R records the local execution approval gate in
+[notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md).
+That record keeps local RLS execution approval pending and explicitly does not
+approve running the local artifact or opt-in RLS validation tests.
 
-The local-only Markdown artifact at
-[notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md)
-has still not been executed and is not approved for automatic execution.
+The next bounded step is to prepare the local-only dry-run checklist needed
+before a reviewer can grant execution approval. This should remain
+documentation/preparation only.
 
 ## Why This Is Next
 
-No explicit local RLS execution approval is recorded. Before the local artifact
-or RLS validation cases may be executed, reviewers need a bounded approval
-record that identifies the disposable local target, synthetic user/data rules,
-cleanup expectations, evidence format, redaction requirements, and exact manual
-command boundary.
+Local execution approval is still pending because the repository does not yet
+record the disposable local target assumptions, exact manual command boundary,
+rollback/cleanup procedure, evidence format, redaction checklist, and reviewer
+sign-off format for a future local-only execution attempt.
 
-This remains separate from hosted staging validation. Hosted staging planning
-can follow after local execution approval is recorded or explicitly deferred.
+Hosted staging planning remains deferred until local-only execution approval is
+granted or explicitly deferred.
 
 ## Expected Files To Change
 
-- A local RLS execution approval record or equivalent approval handoff document.
-- Minimal references from the RLS validation plan or approval record, if needed.
+- Local-only dry-run preparation documentation for the disposable local target,
+  command boundary, cleanup/rollback steps, evidence format, and redaction
+  checklist.
+- Minimal references from existing RLS approval or validation docs, if needed.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, hosted staging workflow
@@ -56,21 +57,22 @@ pnpm build
 
 ## Definition Of Done
 
-- Explicit local RLS execution approval is recorded, or the decision to defer it
-  is recorded with rationale.
-- The approval record names the disposable local target type and states that
-  hosted staging and production remain out of scope.
-- Synthetic-only user/data rules, cleanup evidence, redaction requirements, and
-  no-service-role request-path constraints are explicit.
+- The local-only dry-run preparation is documented without executing anything.
+- The preparation identifies the disposable local target assumptions and keeps
+  hosted staging and production out of scope.
+- Cleanup/rollback steps, evidence format, redaction requirements, and reviewer
+  sign-off format are explicit.
+- Local RLS execution approval remains pending unless a separate approval record
+  explicitly grants it.
 - No SQL file, migration, `.env` file, credential, generated Supabase state,
-  hosted resource access, or RLS validation execution is introduced by default.
+  hosted resource access, local Supabase run, or RLS validation execution is
+  introduced by default.
 
 ## Risks
 
-- Approval language could accidentally authorize hosted staging or production
-  execution if the target boundary is vague.
-- Validation could create false confidence if the approved artifact is not
-  actually applied before the RLS cases run.
+- Preparation language could be mistaken for execution approval if the pending
+  approval state is not repeated clearly.
+- Cleanup plans may be incomplete until tested against a disposable local target.
 - Service-role values must remain outside request-path validation.
 - The local-only artifact still does not prove hosted staging readiness.
 - JWKS cache and key-rotation handling remain required before production
@@ -85,5 +87,5 @@ Before considering the slice complete:
    verification evidence, CI status, and security observations.
 3. Be explicit about anything scaffold-only, mocked/faked, intentionally
    deferred, or unresolved.
-4. Do not automatically continue to the next slice after rendering the report.
+4. Do not automatically continue to execution after rendering the report.
 5. Wait for external ChatGPT review feedback before proceeding further.

@@ -83,3 +83,18 @@ does not approve:
 - applying the artifact to local, staging, production, or hosted Supabase;
 - enabling RLS tests; or
 - using service-role credentials in request-path behavior.
+
+## Local Execution Approval Gate
+
+Slice 6H-3B-4C-R records the local execution approval gate in
+[notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md).
+
+That record keeps local RLS execution approval pending. It does not approve
+executing the local artifact, running opt-in RLS validation, creating SQL files,
+adding Supabase migrations, connecting to hosted Supabase, running default CI
+live tests, committing credentials, or using service-role credentials in the
+request path.
+
+The next recommended task is **Slice 6H-3B-4C-L - Local-only RLS execution
+dry-run preparation**. That task must still be documentation/preparation only
+unless a later approval record explicitly grants local execution.

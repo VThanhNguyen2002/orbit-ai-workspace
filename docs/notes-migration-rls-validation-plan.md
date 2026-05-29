@@ -16,9 +16,10 @@ Slice 6H-3B-4B adds the local-only Markdown artifact in
 Slice 6H-3B-4C adds skipped-by-default Notes RLS validation case scaffolding in
 `apps/api/tests/integration/test_notes_rls_validation.py`. It defines the
 validation cases and safety gates only; it does not execute the local artifact
-or validate RLS. The next implementation slice is **Slice 6H-3B-4C-R - Record
-explicit local RLS execution approval** because separate local execution
-approval has not been recorded.
+or validate RLS. Slice 6H-3B-4C-R records the local execution approval gate in
+[notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
+and keeps local RLS execution approval pending. The next implementation slice
+is **Slice 6H-3B-4C-L - Local-only RLS execution dry-run preparation**.
 
 ## 1. Objective
 
@@ -78,6 +79,9 @@ The plan must make future reviewers able to answer:
   behind the existing opt-in live harness. Default CI verifies case inventory,
   missing-env gating, required synthetic token placeholders, service-role
   rejection, and no-network behavior only.
+- The local execution approval record exists, but local RLS execution approval
+  remains pending until a disposable local target, rollback/cleanup procedure,
+  evidence format, and explicit reviewer approval are recorded.
 - No `.sql` Notes migration or auto-applied RLS artifact is approved or
   committed.
 - No RLS behavior has been validated against local or hosted Supabase.
@@ -300,11 +304,17 @@ RLS tests may be added or enabled only after all prerequisites are true:
    synthetic users and explicit local env gates only after separate execution
    approval is recorded.
 5. **Slice 6H-3B-4C-R - Record explicit local RLS execution approval
+   (completed)**
+   Record that local RLS execution approval remains pending, define the local
+   approval conditions, and keep staging, production, hosted Supabase, default
+   CI, real data, credentials, and service-role request-path usage not approved.
+6. **Slice 6H-3B-4C-L - Local-only RLS execution dry-run preparation
    (recommended next)**
-   Record the disposable local target, approval boundary, synthetic user/data
-   requirements, cleanup evidence, and validation command needed before the
-   local artifact or RLS validation cases may be executed.
-6. **Slice 6H-3B-4D - Hosted staging validation plan**
+   Document the disposable local target assumptions, exact manual command
+   boundary, rollback/cleanup procedure, evidence format, redaction checklist,
+   and reviewer sign-off format needed before local execution approval can be
+   granted.
+7. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation, secret-store handling,
    workflow separation, redaction, rollback, and evidence requirements.
 
@@ -362,3 +372,15 @@ Slice 6H-3B-4C is complete when:
   behavior.
 - The next recommended task is Slice 6H-3B-4C-R because explicit local RLS
   execution approval remains absent.
+
+Slice 6H-3B-4C-R is complete when:
+
+- `docs/notes-local-rls-execution-approval-record.md` records local RLS
+  execution approval as pending.
+- The record documents the required conditions for a later local-only approval:
+  disposable local Supabase, synthetic users/data only, no credentials in git,
+  local artifact policy review, rollback/cleanup documentation, RLS test matrix
+  mapping, no service-role request-path usage, and explicit reviewer approval.
+- Staging, production, hosted Supabase, default CI, real data, credentials,
+  SQL files, migrations, and live RLS validation remain not approved.
+- The next recommended task is Slice 6H-3B-4C-L.

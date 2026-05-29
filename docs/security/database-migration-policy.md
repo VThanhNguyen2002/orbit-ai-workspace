@@ -60,6 +60,14 @@ The Slice 6H-3B-4B local artifact is recorded as Markdown at
 It is not a Supabase migration file, is not stored under `supabase/migrations/`,
 and must not be executed without a separate execution approval record.
 
+The local execution approval gate is recorded in
+[notes-local-rls-execution-approval-record.md](../notes-local-rls-execution-approval-record.md).
+That record keeps local RLS execution approval pending. It does not approve
+executing the artifact, creating SQL files, adding Supabase migrations, running
+local or hosted Supabase, running live RLS tests, committing credentials, using
+service-role credentials in request-path code, or enabling staging/production
+execution.
+
 ## Notes Design Handling
 
 The intended Notes ownership and RLS behavior is documented in architecture
