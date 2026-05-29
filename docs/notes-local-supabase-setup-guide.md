@@ -14,7 +14,10 @@ a specific Notes migration/RLS artifact is approved under
 applied in a disposable local or approved non-production environment.
 Slice 6H-3B-4 adds the security-first approval and validation plan in
 [notes-migration-rls-validation-plan.md](notes-migration-rls-validation-plan.md);
-the next step remains a documentation-only review packet, not executable SQL.
+Slice 6H-3B-4A adds the documentation-only draft review packet in
+[notes-migration-rls-draft-review-packet.md](notes-migration-rls-draft-review-packet.md).
+The next step may be an approved local-only migration artifact only after that
+packet is accepted and approvals are recorded.
 
 ## 1. Objective
 
@@ -293,8 +296,8 @@ Slice 6H-3B-3B is complete when:
 - The migration/RLS approval prerequisite is recorded as the blocker for RLS
   claims and meaningful local validation.
 - Related planning docs and the API README point to this guide.
-- The next recommended task is **Slice 6H-3B-4A - Migration/RLS draft review
-  packet**.
+- The guide records that the migration/RLS review-packet path must precede any
+  executable artifact.
 - No runtime code, tests, SDK dependency, frontend/UI, Expo, AI, offline sync,
   SQL, migration, `.env`, generated Supabase state, live repository mode, or
   public Notes API behavior change is introduced.
@@ -305,6 +308,16 @@ Slice 6H-3B-4 is complete when:
   security review checklist, sanitized Notes behavior, RLS validation matrix,
   test harness prerequisites, artifact policy, risks, and review-packet-first
   implementation sequence.
-- The next recommended task is Slice 6H-3B-4A. No executable SQL, migration,
+- Slice 6H-3B-4 led to the review-packet step. No executable SQL, migration,
   RLS test, live Supabase execution, credential, `.env` file, generated
   Supabase state, or live repository wiring has been introduced.
+
+Slice 6H-3B-4A is complete when:
+
+- The draft review packet documents the proposed future Notes table/RLS behavior
+  in sanitized prose, current contract sources, review questions, approval
+  gates, risk analysis, and required evidence.
+- The next recommended task is Slice 6H-3B-4B, but only after the packet is
+  accepted. No executable SQL, migration, RLS test, live Supabase execution,
+  credential, `.env` file, generated Supabase state, or live repository wiring
+  has been introduced.

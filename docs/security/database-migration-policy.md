@@ -47,7 +47,10 @@ For Notes specifically,
 [notes-migration-rls-validation-plan.md](../notes-migration-rls-validation-plan.md)
 defines the review process, security checklist, validation matrix, and future
 review-packet step that must precede any executable Notes migration/RLS
-artifact.
+artifact. The draft review packet is recorded in
+[notes-migration-rls-draft-review-packet.md](../notes-migration-rls-draft-review-packet.md);
+accepting that packet is required before an approved local-only migration
+artifact may be created.
 
 ## Notes Design Handling
 
