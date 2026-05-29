@@ -7,11 +7,15 @@ migration/RLS artifact. This document is security-first planning only. It does
 not add executable SQL, migrations, generated Supabase state, credentials, live
 SDK wiring, local Supabase execution, hosted Supabase access, or RLS tests.
 
-Slice 6H-3B-4A now adds the documentation-only draft review packet in
-[notes-migration-rls-draft-review-packet.md](notes-migration-rls-draft-review-packet.md).
-The next implementation slice is **Slice 6H-3B-4B - Approved local-only
-migration artifact**, but it must not start until the review packet is accepted
-and the required approvals are recorded.
+Slice 6H-3B-4A adds the documentation-only draft review packet in
+[notes-migration-rls-draft-review-packet.md](notes-migration-rls-draft-review-packet.md),
+and Slice 6H-3B-4A-R records acceptance in
+[notes-migration-rls-approval-record.md](notes-migration-rls-approval-record.md).
+Slice 6H-3B-4B adds the local-only Markdown artifact in
+[notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md).
+The next implementation slice is **Slice 6H-3B-4C - RLS validation tests behind
+opt-in harness**, but it must not execute the local artifact until separate
+execution approval is recorded.
 
 ## 1. Objective
 
@@ -64,14 +68,19 @@ The plan must make future reviewers able to answer:
 - The draft review packet describes the proposed future Notes table/RLS design
   in sanitized prose and records review questions, approval gates, and risks
   before any SQL artifact exists.
-- No executable Notes migration or RLS artifact is approved or committed.
+- The local-only artifact is a Markdown review document outside
+  `supabase/migrations/`; it is not a Supabase migration file and has not been
+  executed.
+- No `.sql` Notes migration or auto-applied RLS artifact is approved or
+  committed.
 - No RLS behavior has been validated against local or hosted Supabase.
 
 ## 4. Why Executable SQL Remains Prohibited For Now
 
-Executable SQL remains prohibited because the repository does not yet have an
-approved Notes migration/RLS artifact, a completed review packet, or a validated
-non-production execution plan.
+Executable SQL execution remains prohibited because the repository does not yet
+have an approved non-production execution plan or completed synthetic RLS
+validation plan. The local-only Markdown artifact is approved for review, not
+for execution.
 
 Specific reasons:
 
@@ -88,8 +97,9 @@ Specific reasons:
 - Generated Supabase state, dumps, local database files, and environment-bound
   metadata are not portable review artifacts.
 
-Until approval is explicit, `supabase/migrations/*.sql` remains ignored and no
-SQL file should be committed.
+Until execution approval is explicit, `supabase/migrations/*.sql` remains
+ignored, no SQL file should be committed, and fenced SQL-like draft content in
+Markdown must not be executed.
 
 ## 5. Approval Criteria For Future Migration/RLS Artifacts
 
@@ -235,8 +245,8 @@ RLS tests may be added or enabled only after all prerequisites are true:
 
 ## 11. Artifact Policy
 
-- No SQL is committed until explicit approval is granted for the specific
-  artifact.
+- No `.sql` file or auto-applied migration is committed until explicit approval
+  is granted for that specific executable artifact.
 - The migration file must be minimal, environment-independent, and scoped to the
   reviewed Notes behavior.
 - Generated Supabase state remains ignored and uncommitted.
@@ -244,8 +254,9 @@ RLS tests may be added or enabled only after all prerequisites are true:
   runtime directories remain uncommitted.
 - A future approved migration change must update ignore rules only as part of
   that explicit review, not as a convenience during planning.
-- Review packets may describe intended behavior in prose or non-executable
-  checklists. They must not smuggle executable SQL into Markdown.
+- Review packets and local-only artifacts may describe intended behavior in
+  prose, checklists, or clearly labeled fenced SQL-like drafts. They must state
+  when draft content is not approved for default execution.
 
 ## 12. Security Risks
 
@@ -266,14 +277,17 @@ RLS tests may be added or enabled only after all prerequisites are true:
    Prepare a documentation-only packet with the proposed artifact scope,
    sanitized behavior summary, reviewer checklist, validation evidence plan, and
    rollback/cleanup notes. Do not commit executable SQL.
-2. **Slice 6H-3B-4B - Approved local-only migration artifact (recommended next)**
-   After explicit approval, add the minimal environment-independent migration
-   artifact for local-only validation. Keep generated Supabase state,
-   credentials, and real data out of git.
-3. **Slice 6H-3B-4C - RLS validation tests behind opt-in harness**
+2. **Slice 6H-3B-4A-R - Record Migration/RLS review packet approval (completed)**
+   Record external review acceptance and the remaining non-approval boundaries.
+3. **Slice 6H-3B-4B - Approved local-only migration artifact (completed)**
+   Add the minimal environment-independent Markdown artifact for local-only
+   validation review. Keep it outside `supabase/migrations/`, do not execute it,
+   and keep generated Supabase state, credentials, and real data out of git.
+4. **Slice 6H-3B-4C - RLS validation tests behind opt-in harness (recommended next)**
    Add skipped-by-default tests that validate the approved artifact with
-   synthetic users and explicit local/staging env gates.
-4. **Slice 6H-3B-4D - Hosted staging validation plan**
+   synthetic users and explicit local env gates only after separate execution
+   approval is recorded.
+5. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation, secret-store handling,
    workflow separation, redaction, rollback, and evidence requirements.
 
@@ -305,3 +319,17 @@ Slice 6H-3B-4A is complete when:
   generated Supabase state, live Supabase execution, live SDK adapter, live
   repository mode, service-role request-path usage, frontend/UI, Expo, AI,
   offline sync, or public Notes API behavior change is introduced.
+
+Slice 6H-3B-4B is complete when:
+
+- A local-only Markdown artifact documents the Notes table/RLS draft outside
+  `supabase/migrations/`.
+- The artifact includes status warnings, source references, fenced SQL-like
+  draft content, owner-spoofing notes, soft-delete/version behavior,
+  rollback/cleanup notes, validation checklist, and open questions.
+- The next recommended task is Slice 6H-3B-4C, but only after separate approval
+  exists to execute the local artifact.
+- No runtime code, tests, `.sql` files, Supabase migrations, `.env` files,
+  credentials, generated Supabase state, Supabase execution, live repository
+  mode, service-role request-path usage, frontend/UI, Expo, AI, offline sync,
+  or public Notes API behavior change is introduced.

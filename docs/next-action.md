@@ -2,37 +2,34 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-4B - Approved local-only migration artifact**. The Slice
-6H-3B-4A draft review packet has been accepted by external ChatGPT
-engineering/security review, and the acceptance is recorded in
-[notes-migration-rls-approval-record.md](notes-migration-rls-approval-record.md).
+Prepare **Slice 6H-3B-4C - RLS validation tests behind opt-in harness**. Slice
+6H-3B-4B adds the local-only Markdown artifact in
+[notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md),
+but that artifact has not been executed and is not approved for automatic
+execution.
 
-The next bounded step is to draft the minimal environment-independent Notes
-migration/RLS artifact for local-only validation under the recorded constraints.
-That work must follow
+The next bounded step is to add skipped-by-default RLS validation tests behind
+the existing opt-in harness shape. That work must follow
 [database-migration-policy.md](security/database-migration-policy.md),
 [notes-migration-rls-validation-plan.md](notes-migration-rls-validation-plan.md),
-the accepted
-[notes-migration-rls-draft-review-packet.md](notes-migration-rls-draft-review-packet.md).
+[notes-migration-rls-approval-record.md](notes-migration-rls-approval-record.md),
+and the local artifact.
 
-Security gate: this repository still has no approved executable Supabase
-migration execution approval at the time of this handoff. Slice 6H-3B-4B may
-draft the local-only artifact only under the approval-record constraints and
-must still not execute it by default.
+Security gate: Slice 6H-3B-4C may add tests that remain skipped by default, but
+it must not execute the local artifact or run RLS validation until a separate
+execution approval is recorded.
 
 ## Expected Files To Change
 
-- The approved local-only Notes migration/RLS artifact, only after acceptance
-  and under the approval-record constraints.
-- Minimal documentation updates that identify the artifact as approved for
-  local-only validation.
-- A clear note that generated Supabase state, real data, credentials, dumps,
-  backups, and `.env` files remain prohibited.
+- Skipped-by-default RLS validation test scaffolding behind explicit opt-in
+  harness controls, only after confirming it cannot execute without approval.
+- Minimal documentation updates that identify the test execution gate.
+- No local or hosted Supabase execution.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, hosted staging workflow
 execution, live Notes Supabase repository wiring, service-role request-path
-usage, or RLS test execution.
+usage, generated Supabase state, `.env` files, or RLS test execution.
 
 ## Commands To Run
 
@@ -55,43 +52,41 @@ pnpm build
 
 ## Definition Of Done
 
-- The review packet acceptance and artifact-specific approval are recorded
-  before any executable SQL is added.
-- The migration artifact is minimal, environment-independent, and local-only at
-  this stage.
-- The artifact contains no production data, credentials, project identifiers,
-  service-role keys, broad grants, or unsafe privileged functions.
-- Generated Supabase state, dumps, backups, SQLite/db files, and `.env` files
-  remain untracked.
-- The artifact preserves current Notes API behavior and owner-scoped soft
-  deletion/version semantics.
-- No service-role credential is introduced into the request path or default
-  tests.
-- Memory persistence remains the default; live repository wiring and RLS tests
-  remain deferred.
-- The artifact is not executed by default, and any local execution remains a
-  separate explicit opt-in validation step.
+- RLS validation tests are present only as skipped-by-default or explicitly
+  gated scaffolding.
+- Tests require explicit local execution approval before they can apply or
+  validate the local artifact.
+- Default CI remains credential-free and does not run Supabase.
+- No service-role credential is introduced into request-path code, test inputs,
+  or default tests.
+- No real data, credentials, generated Supabase state, dumps, backups, SQLite/db
+  files, `.env` files, or hosted resources are used.
+- Memory persistence remains the default; live repository wiring remains
+  deferred.
 
 ## Risks
 
-- Adding a migration artifact changes the repository's database artifact
-  posture, so review evidence must be explicit.
-- A faulty RLS artifact could expose cross-user data if later applied.
-- A local-only artifact still does not prove hosted staging readiness.
+- Tests could create false confidence if they run without applying the reviewed
+  artifact in an approved local target.
+- Harness gating mistakes could accidentally attempt live/local Supabase access
+  in default CI.
+- Service-role values must remain rejected from request-path validation.
+- The local-only artifact still does not prove hosted staging readiness.
 - JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
 
 ## Rollback Notes
 
-If Slice 6H-3B-4B work is unsuitable, revert only that work. Keep completed
+If Slice 6H-3B-4C work is unsuitable, revert only that work. Keep completed
 shared contracts, backend skeleton, API client methods, Slice 6E/6G boundaries,
 Slice 6H-1 verifier boundary/tests, Slice 6H-2 descriptor factory/tests, the
 Slice 6H-3 and Slice 6H-3B plans, Slice 6H-3A fake-client repository tests,
 Slice 6H-6 contract drift guard, Slice 6H-3B-1 adapter interface/tests, Slice
 6H-3B-2 fake SDK transport tests, Slice 6H-3B-3 harness plan, Slice 6H-3B-3A
 skipped harness skeleton, Slice 6H-3B-3B local setup guide, Slice 6H-3B-4
-migration/RLS validation plan, Slice 6H-3B-4A draft review packet, and the
-database artifact security policy intact.
+migration/RLS validation plan, Slice 6H-3B-4A draft review packet, Slice
+6H-3B-4A-R approval record, Slice 6H-3B-4B local artifact, and the database
+artifact security policy intact.
 
 ## External Review Gate
 

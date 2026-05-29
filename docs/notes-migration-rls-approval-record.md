@@ -67,3 +67,19 @@ The next slice must remain:
 
 Any later local or hosted execution remains blocked until a separate execution
 plan and approval are recorded.
+
+## Local Artifact Record
+
+Slice 6H-3B-4B creates a non-auto-executable local-only review artifact at
+[notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md).
+The artifact is a Markdown review document, not a Supabase migration file, and
+it is not placed under `supabase/migrations/`.
+
+This record allows the artifact to be reviewed as a local-only draft. It still
+does not approve:
+
+- executing the artifact;
+- copying fenced SQL-like draft content into a runnable `.sql` file;
+- applying the artifact to local, staging, production, or hosted Supabase;
+- enabling RLS tests; or
+- using service-role credentials in request-path behavior.

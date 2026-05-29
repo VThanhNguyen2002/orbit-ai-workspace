@@ -55,11 +55,17 @@ That record allows the next local-only artifact preparation slice under the
 documented constraints, but it does not approve production/staging execution,
 live RLS tests, or service-role request-path usage.
 
+The Slice 6H-3B-4B local artifact is recorded as Markdown at
+[notes-local-migration-rls-artifact.md](../database/notes/notes-local-migration-rls-artifact.md).
+It is not a Supabase migration file, is not stored under `supabase/migrations/`,
+and must not be executed without a separate execution approval record.
+
 ## Notes Design Handling
 
 The intended Notes ownership and RLS behavior is documented in architecture
-plans only. Those summaries are not a migration, have not been executed, and do
-not authorize creation or deployment of database artifacts.
+plans and the local-only Markdown artifact only. Those summaries are not an
+auto-applied migration, have not been executed, and do not authorize staging or
+production deployment.
 
 ## Git History Posture
 
