@@ -13,9 +13,12 @@ and Slice 6H-3B-4A-R records acceptance in
 [notes-migration-rls-approval-record.md](notes-migration-rls-approval-record.md).
 Slice 6H-3B-4B adds the local-only Markdown artifact in
 [notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md).
-The next implementation slice is **Slice 6H-3B-4C - RLS validation tests behind
-opt-in harness**, but it must not execute the local artifact until separate
-execution approval is recorded.
+Slice 6H-3B-4C adds skipped-by-default Notes RLS validation case scaffolding in
+`apps/api/tests/integration/test_notes_rls_validation.py`. It defines the
+validation cases and safety gates only; it does not execute the local artifact
+or validate RLS. The next implementation slice is **Slice 6H-3B-4C-R - Record
+explicit local RLS execution approval** because separate local execution
+approval has not been recorded.
 
 ## 1. Objective
 
@@ -71,6 +74,10 @@ The plan must make future reviewers able to answer:
 - The local-only artifact is a Markdown review document outside
   `supabase/migrations/`; it is not a Supabase migration file and has not been
   executed.
+- The RLS validation test skeleton defines the required user A/user B cases
+  behind the existing opt-in live harness. Default CI verifies case inventory,
+  missing-env gating, required synthetic token placeholders, service-role
+  rejection, and no-network behavior only.
 - No `.sql` Notes migration or auto-applied RLS artifact is approved or
   committed.
 - No RLS behavior has been validated against local or hosted Supabase.
@@ -199,6 +206,11 @@ non-production Supabase.
 | Include deleted remains owner-scoped | User A | User A deleted note and User B deleted note | User A can inspect only own deleted note when an owner-scoped include-deleted path is explicitly tested |
 | No physical delete in CRUD | User A | User A synthetic note | Public Notes delete path performs only soft-delete behavior |
 
+Slice 6H-3B-4C maps this matrix into skipped pytest case functions. Those case
+functions continue to skip after the base live-harness gate because no live
+client, local artifact execution approval, or applied RLS target exists in this
+slice.
+
 Validation evidence must distinguish RLS enforcement from adapter behavior.
 Adapter validation proves request construction and caller-token propagation.
 RLS validation proves database policy behavior after the approved artifact is
@@ -283,11 +295,16 @@ RLS tests may be added or enabled only after all prerequisites are true:
    Add the minimal environment-independent Markdown artifact for local-only
    validation review. Keep it outside `supabase/migrations/`, do not execute it,
    and keep generated Supabase state, credentials, and real data out of git.
-4. **Slice 6H-3B-4C - RLS validation tests behind opt-in harness (recommended next)**
+4. **Slice 6H-3B-4C - RLS validation tests behind opt-in harness (completed)**
    Add skipped-by-default tests that validate the approved artifact with
    synthetic users and explicit local env gates only after separate execution
    approval is recorded.
-5. **Slice 6H-3B-4D - Hosted staging validation plan**
+5. **Slice 6H-3B-4C-R - Record explicit local RLS execution approval
+   (recommended next)**
+   Record the disposable local target, approval boundary, synthetic user/data
+   requirements, cleanup evidence, and validation command needed before the
+   local artifact or RLS validation cases may be executed.
+6. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation, secret-store handling,
    workflow separation, redaction, rollback, and evidence requirements.
 
@@ -333,3 +350,15 @@ Slice 6H-3B-4B is complete when:
   credentials, generated Supabase state, Supabase execution, live repository
   mode, service-role request-path usage, frontend/UI, Expo, AI, offline sync,
   or public Notes API behavior change is introduced.
+
+Slice 6H-3B-4C is complete when:
+
+- `apps/api/tests/integration/test_notes_rls_validation.py` defines the user
+  A/user B RLS validation cases behind the existing opt-in live harness.
+- Default CI verifies only scaffold inventory and safety gates.
+- The tests remain skipped by default and do not import a Supabase client,
+  execute SQL, apply the local artifact, connect to local or hosted Supabase,
+  use service-role request-path credentials, or change public Notes API
+  behavior.
+- The next recommended task is Slice 6H-3B-4C-R because explicit local RLS
+  execution approval remains absent.

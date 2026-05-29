@@ -2,34 +2,38 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-4C - RLS validation tests behind opt-in harness**. Slice
-6H-3B-4B adds the local-only Markdown artifact in
-[notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md),
-but that artifact has not been executed and is not approved for automatic
-execution.
+Prepare **Slice 6H-3B-4C-R - Record explicit local RLS execution approval**.
 
-The next bounded step is to add skipped-by-default RLS validation tests behind
-the existing opt-in harness shape. That work must follow
-[database-migration-policy.md](security/database-migration-policy.md),
-[notes-migration-rls-validation-plan.md](notes-migration-rls-validation-plan.md),
-[notes-migration-rls-approval-record.md](notes-migration-rls-approval-record.md),
-and the local artifact.
+Slice 6H-3B-4C adds skipped-by-default Notes RLS validation case scaffolding in
+`apps/api/tests/integration/test_notes_rls_validation.py`. The tests define the
+required user A/user B validation matrix and safety gates behind the existing
+opt-in live harness, but they do not execute RLS validation.
 
-Security gate: Slice 6H-3B-4C may add tests that remain skipped by default, but
-it must not execute the local artifact or run RLS validation until a separate
-execution approval is recorded.
+The local-only Markdown artifact at
+[notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md)
+has still not been executed and is not approved for automatic execution.
+
+## Why This Is Next
+
+No explicit local RLS execution approval is recorded. Before the local artifact
+or RLS validation cases may be executed, reviewers need a bounded approval
+record that identifies the disposable local target, synthetic user/data rules,
+cleanup expectations, evidence format, redaction requirements, and exact manual
+command boundary.
+
+This remains separate from hosted staging validation. Hosted staging planning
+can follow after local execution approval is recorded or explicitly deferred.
 
 ## Expected Files To Change
 
-- Skipped-by-default RLS validation test scaffolding behind explicit opt-in
-  harness controls, only after confirming it cannot execute without approval.
-- Minimal documentation updates that identify the test execution gate.
-- No local or hosted Supabase execution.
+- A local RLS execution approval record or equivalent approval handoff document.
+- Minimal references from the RLS validation plan or approval record, if needed.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, hosted staging workflow
 execution, live Notes Supabase repository wiring, service-role request-path
-usage, generated Supabase state, `.env` files, or RLS test execution.
+usage, generated Supabase state, `.env` files, SQL files, migrations, or RLS
+test execution.
 
 ## Commands To Run
 
@@ -52,73 +56,34 @@ pnpm build
 
 ## Definition Of Done
 
-- RLS validation tests are present only as skipped-by-default or explicitly
-  gated scaffolding.
-- Tests require explicit local execution approval before they can apply or
-  validate the local artifact.
-- Default CI remains credential-free and does not run Supabase.
-- No service-role credential is introduced into request-path code, test inputs,
-  or default tests.
-- No real data, credentials, generated Supabase state, dumps, backups, SQLite/db
-  files, `.env` files, or hosted resources are used.
-- Memory persistence remains the default; live repository wiring remains
-  deferred.
+- Explicit local RLS execution approval is recorded, or the decision to defer it
+  is recorded with rationale.
+- The approval record names the disposable local target type and states that
+  hosted staging and production remain out of scope.
+- Synthetic-only user/data rules, cleanup evidence, redaction requirements, and
+  no-service-role request-path constraints are explicit.
+- No SQL file, migration, `.env` file, credential, generated Supabase state,
+  hosted resource access, or RLS validation execution is introduced by default.
 
 ## Risks
 
-- Tests could create false confidence if they run without applying the reviewed
-  artifact in an approved local target.
-- Harness gating mistakes could accidentally attempt live/local Supabase access
-  in default CI.
-- Service-role values must remain rejected from request-path validation.
+- Approval language could accidentally authorize hosted staging or production
+  execution if the target boundary is vague.
+- Validation could create false confidence if the approved artifact is not
+  actually applied before the RLS cases run.
+- Service-role values must remain outside request-path validation.
 - The local-only artifact still does not prove hosted staging readiness.
 - JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
-
-## Rollback Notes
-
-If Slice 6H-3B-4C work is unsuitable, revert only that work. Keep completed
-shared contracts, backend skeleton, API client methods, Slice 6E/6G boundaries,
-Slice 6H-1 verifier boundary/tests, Slice 6H-2 descriptor factory/tests, the
-Slice 6H-3 and Slice 6H-3B plans, Slice 6H-3A fake-client repository tests,
-Slice 6H-6 contract drift guard, Slice 6H-3B-1 adapter interface/tests, Slice
-6H-3B-2 fake SDK transport tests, Slice 6H-3B-3 harness plan, Slice 6H-3B-3A
-skipped harness skeleton, Slice 6H-3B-3B local setup guide, Slice 6H-3B-4
-migration/RLS validation plan, Slice 6H-3B-4A draft review packet, Slice
-6H-3B-4A-R approval record, Slice 6H-3B-4B local artifact, and the database
-artifact security policy intact.
 
 ## External Review Gate
 
 Before considering the slice complete:
 
 1. Render the full final report clearly and structurally.
-2. Include:
-   - architectural decisions
-   - tradeoffs
-   - risks
-   - shortcuts/deferred items
-   - verification evidence
-   - CI status
-   - security observations
-3. Assume the rendered output will be reviewed externally by ChatGPT as an
-   extended engineering review gate.
-4. Be explicit about:
-   - anything intentionally deferred
-   - anything scaffold-only
-   - anything mocked/faked
-   - any remaining inconsistencies
-   - any temporary implementations
-5. Do not hide weak points or unresolved risks.
-6. Do not automatically continue to the next slice after rendering the report.
-7. Wait for external ChatGPT review feedback before proceeding further.
-
-The rendered report must be detailed enough for:
-
-- architecture review
-- consistency review
-- security review
-- CI/reliability review
-- implementation-scope review
-
-Treat the final report as a handoff artifact for external engineering audit.
+2. Include architectural decisions, tradeoffs, risks, deferred work,
+   verification evidence, CI status, and security observations.
+3. Be explicit about anything scaffold-only, mocked/faked, intentionally
+   deferred, or unresolved.
+4. Do not automatically continue to the next slice after rendering the report.
+5. Wait for external ChatGPT review feedback before proceeding further.
