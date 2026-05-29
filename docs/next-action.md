@@ -2,33 +2,33 @@
 
 ## Objective
 
-Prepare **Slice 6H-3B-4C-L - Local-only RLS execution dry-run preparation**.
+Prepare **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval**.
 
-Slice 6H-3B-4C-R records the local execution approval gate in
-[notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md).
-That record keeps local RLS execution approval pending and explicitly does not
-approve running the local artifact or opt-in RLS validation tests.
+Slice 6H-3B-4C-L adds
+[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+with the local-only objective, non-goals, current status, preconditions,
+preflight checklist, manual dry-run sequence, evidence format, cleanup
+checklist, and approval decision point.
 
-The next bounded step is to prepare the local-only dry-run checklist needed
-before a reviewer can grant execution approval. This should remain
-documentation/preparation only.
+The next bounded step is an approval decision only. It may grant local-only
+dry-run execution approval or keep execution blocked. It must not execute the
+artifact automatically.
 
 ## Why This Is Next
 
-Local execution approval is still pending because the repository does not yet
-record the disposable local target assumptions, exact manual command boundary,
-rollback/cleanup procedure, evidence format, redaction checklist, and reviewer
-sign-off format for a future local-only execution attempt.
+Local execution approval is still pending, but the previously missing
+preflight, evidence, redaction, and rollback/cleanup expectations are now
+documented for review.
 
 Hosted staging planning remains deferred until local-only execution approval is
 granted or explicitly deferred.
 
 ## Expected Files To Change
 
-- Local-only dry-run preparation documentation for the disposable local target,
-  command boundary, cleanup/rollback steps, evidence format, and redaction
-  checklist.
-- Minimal references from existing RLS approval or validation docs, if needed.
+- The local RLS execution approval record, if a reviewer grants approval or
+  records that execution remains blocked.
+- Minimal references from planning docs, if the approval decision changes the
+  recommended next task.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, hosted staging workflow
@@ -57,22 +57,24 @@ pnpm build
 
 ## Definition Of Done
 
-- The local-only dry-run preparation is documented without executing anything.
-- The preparation identifies the disposable local target assumptions and keeps
-  hosted staging and production out of scope.
-- Cleanup/rollback steps, evidence format, redaction requirements, and reviewer
-  sign-off format are explicit.
-- Local RLS execution approval remains pending unless a separate approval record
-  explicitly grants it.
+- The approval decision is recorded explicitly.
+- If granted, approval is limited to a disposable local-only dry-run with
+  synthetic users, synthetic Notes rows, redacted evidence, and cleanup
+  requirements.
+- If not granted, execution remains blocked and the reason is recorded.
+- Hosted Supabase, staging, production, default CI, real data, credentials,
+  service-role request-path usage, live repository mode, and public Notes API
+  behavior remain out of scope.
 - No SQL file, migration, `.env` file, credential, generated Supabase state,
   hosted resource access, local Supabase run, or RLS validation execution is
-  introduced by default.
+  introduced automatically.
 
 ## Risks
 
-- Preparation language could be mistaken for execution approval if the pending
-  approval state is not repeated clearly.
-- Cleanup plans may be incomplete until tested against a disposable local target.
+- Approval language could be mistaken for hosted or production execution unless
+  it stays explicitly local-only.
+- Cleanup plans remain untested until an approved disposable local dry-run
+  occurs.
 - Service-role values must remain outside request-path validation.
 - The local-only artifact still does not prove hosted staging readiness.
 - JWKS cache and key-rotation handling remain required before production
@@ -80,11 +82,11 @@ pnpm build
 
 ## External Review Gate
 
-Before considering the slice complete:
+Before considering the next slice complete:
 
 1. Render the full final report clearly and structurally.
-2. Include architectural decisions, tradeoffs, risks, deferred work,
-   verification evidence, CI status, and security observations.
+2. Include approval scope, non-goals, risks, deferred work, verification
+   evidence, CI status, and security observations.
 3. Be explicit about anything scaffold-only, mocked/faked, intentionally
    deferred, or unresolved.
 4. Do not automatically continue to execution after rendering the report.

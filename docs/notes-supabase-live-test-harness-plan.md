@@ -17,14 +17,19 @@ Slice 6H-3B-4C now adds skipped-by-default Notes RLS validation case
 scaffolding in `apps/api/tests/integration/test_notes_rls_validation.py`.
 Slice 6H-3B-4C-R records the local execution approval gate in
 [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
-and keeps local RLS execution approval pending.
+and keeps local RLS execution approval pending. Slice 6H-3B-4C-L adds
+[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+with the local preflight checklist, evidence format, and cleanup expectations,
+but it does not execute the artifact or run RLS validation.
 These slices do not add a live Supabase SDK adapter, connect to Supabase,
 introduce credentials, add `.env` files, add migrations or SQL, execute RLS
 tests, or enable live Notes persistence.
 
-The next bounded task is **Slice 6H-3B-4C-L - Local-only RLS execution dry-run
-preparation**. That task must still avoid executing the local artifact or RLS
-tests unless a later approval record explicitly grants local execution.
+The next bounded task is **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run
+approval**. That task may grant local-only dry-run execution approval or keep
+execution blocked. It must still avoid staging, production, hosted Supabase,
+default CI, real-data, credential, service-role request-path, and public Notes
+API behavior approval.
 
 ## 1. Objective
 
@@ -93,9 +98,11 @@ The harness eventually needs to prove:
   the base live harness is configured because no live client, artifact
   execution approval, or applied RLS target exists in this slice.
 - `docs/notes-local-rls-execution-approval-record.md` records the local
-  execution approval gate and keeps approval pending until the disposable local
-  target, exact cleanup/rollback procedure, evidence format, and explicit
-  reviewer approval are recorded.
+  execution approval gate and keeps approval pending until explicit reviewer
+  approval is recorded.
+- `docs/notes-local-rls-dry-run-preparation.md` records the future local-only
+  preflight checklist, manual sequence, evidence format, redaction plan, and
+  cleanup checklist without granting execution approval.
 - No executable Notes migration exists. RLS intent is documentation only until
   the database artifact policy approves a specific migration.
 - `docs/notes-local-supabase-setup-guide.md` documents the future local-only
@@ -376,11 +383,15 @@ exercise.
    before approval can be granted, and keep hosted/staging/production/default CI
    execution not approved.
 9. **Slice 6H-3B-4C-L - Local-only RLS execution dry-run preparation
-   (recommended next)**
+   (completed)**
    Document the disposable local target assumptions, exact manual command
    boundary, rollback/cleanup procedure, evidence format, redaction checklist,
    and reviewer sign-off format without executing the artifact.
-10. **Slice 6H-3B-4D - Hosted staging validation plan**
+10. **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval
+    (recommended next)**
+    Decide whether to grant local-only dry-run execution approval or keep
+    execution blocked.
+11. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation after local execution
    approval is recorded or explicitly deferred.
 
@@ -459,4 +470,18 @@ Slice 6H-3B-4C-R is complete when:
   real data, credentials, and service-role request-path usage.
 - The record defines the local-only conditions required before any future
   execution approval can be granted.
-- The next recommended task is Slice 6H-3B-4C-L.
+- That completed slice led to Slice 6H-3B-4C-L.
+
+Slice 6H-3B-4C-L is complete when:
+
+- `docs/notes-local-rls-dry-run-preparation.md` documents the local-only
+  objective, non-goals, current status, preconditions, preflight checklist,
+  manual sequence, evidence format, cleanup checklist, approval decision point,
+  and definition of done.
+- Local execution approval remains pending until a later approval slice grants
+  it explicitly.
+- The next recommended task is Slice 6H-3B-4C-LA.
+- No live SDK adapter, network behavior, credential, `.env` file, migration,
+  SQL artifact, local Supabase run, hosted Supabase connection, RLS execution,
+  service-role request-path usage, or public Notes API behavior change has
+  been introduced.

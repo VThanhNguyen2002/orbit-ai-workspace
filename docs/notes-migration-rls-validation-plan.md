@@ -18,8 +18,11 @@ Slice 6H-3B-4C adds skipped-by-default Notes RLS validation case scaffolding in
 validation cases and safety gates only; it does not execute the local artifact
 or validate RLS. Slice 6H-3B-4C-R records the local execution approval gate in
 [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
-and keeps local RLS execution approval pending. The next implementation slice
-is **Slice 6H-3B-4C-L - Local-only RLS execution dry-run preparation**.
+and keeps local RLS execution approval pending. Slice 6H-3B-4C-L adds the
+local-only dry-run preparation checklist in
+[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+without executing the artifact. The next recommended approval slice is
+**Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval**.
 
 ## 1. Objective
 
@@ -80,8 +83,11 @@ The plan must make future reviewers able to answer:
   missing-env gating, required synthetic token placeholders, service-role
   rejection, and no-network behavior only.
 - The local execution approval record exists, but local RLS execution approval
-  remains pending until a disposable local target, rollback/cleanup procedure,
-  evidence format, and explicit reviewer approval are recorded.
+  remains pending until explicit reviewer approval is recorded.
+- The local dry-run preparation document records the disposable local target
+  assumptions, preflight checklist, manual dry-run sequence, evidence format,
+  redaction expectations, and rollback/cleanup checklist. It does not approve
+  execution.
 - No `.sql` Notes migration or auto-applied RLS artifact is approved or
   committed.
 - No RLS behavior has been validated against local or hosted Supabase.
@@ -309,12 +315,16 @@ RLS tests may be added or enabled only after all prerequisites are true:
    approval conditions, and keep staging, production, hosted Supabase, default
    CI, real data, credentials, and service-role request-path usage not approved.
 6. **Slice 6H-3B-4C-L - Local-only RLS execution dry-run preparation
-   (recommended next)**
+   (completed)**
    Document the disposable local target assumptions, exact manual command
    boundary, rollback/cleanup procedure, evidence format, redaction checklist,
    and reviewer sign-off format needed before local execution approval can be
-   granted.
-7. **Slice 6H-3B-4D - Hosted staging validation plan**
+   granted. Do not execute the artifact.
+7. **Slice 6H-3B-4C-LA - Grant local-only RLS dry-run approval
+   (recommended next)**
+   Decide whether to grant local-only dry-run execution approval or keep
+   execution blocked, using the preparation document as the review boundary.
+8. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation, secret-store handling,
    workflow separation, redaction, rollback, and evidence requirements.
 
@@ -383,4 +393,19 @@ Slice 6H-3B-4C-R is complete when:
   mapping, no service-role request-path usage, and explicit reviewer approval.
 - Staging, production, hosted Supabase, default CI, real data, credentials,
   SQL files, migrations, and live RLS validation remain not approved.
-- The next recommended task is Slice 6H-3B-4C-L.
+- That completed slice led to Slice 6H-3B-4C-L.
+
+Slice 6H-3B-4C-L is complete when:
+
+- `docs/notes-local-rls-dry-run-preparation.md` documents the objective,
+  non-goals, current status, preconditions, preflight checklist, manual
+  dry-run sequence, evidence format, rollback/cleanup checklist, approval
+  decision point, and definition of done for a future local-only dry-run.
+- Local execution approval remains pending until a later approval slice grants
+  it explicitly.
+- The next recommended task is Slice 6H-3B-4C-LA.
+- No runtime code, tests, executable SQL, migrations, `.env` files,
+  credentials, generated Supabase state, local Supabase run, hosted Supabase
+  connection, live RLS validation, live repository mode, service-role
+  request-path usage, frontend/UI, Expo, AI, offline sync, or public Notes API
+  behavior change is introduced.

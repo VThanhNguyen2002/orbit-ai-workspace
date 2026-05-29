@@ -68,6 +68,13 @@ local or hosted Supabase, running live RLS tests, committing credentials, using
 service-role credentials in request-path code, or enabling staging/production
 execution.
 
+The local dry-run preparation checklist is recorded in
+[notes-local-rls-dry-run-preparation.md](../notes-local-rls-dry-run-preparation.md).
+It documents the preflight checks, manual local-only sequence, evidence format,
+redaction expectations, and rollback/cleanup checklist for a future approval
+decision. It remains non-executable and does not grant local, hosted, staging,
+production, or CI execution approval.
+
 ## Notes Design Handling
 
 The intended Notes ownership and RLS behavior is documented in architecture
