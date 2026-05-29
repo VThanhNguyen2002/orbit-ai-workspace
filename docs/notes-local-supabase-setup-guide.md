@@ -12,6 +12,9 @@ The local harness can be prepared safely, but it cannot claim RLS coverage until
 a specific Notes migration/RLS artifact is approved under
 [database-migration-policy.md](security/database-migration-policy.md) and
 applied in a disposable local or approved non-production environment.
+Slice 6H-3B-4 adds the security-first approval and validation plan in
+[notes-migration-rls-validation-plan.md](notes-migration-rls-validation-plan.md);
+the next step remains a documentation-only review packet, not executable SQL.
 
 ## 1. Objective
 
@@ -290,8 +293,18 @@ Slice 6H-3B-3B is complete when:
 - The migration/RLS approval prerequisite is recorded as the blocker for RLS
   claims and meaningful local validation.
 - Related planning docs and the API README point to this guide.
-- The next recommended task is **Slice 6H-3B-4 - Approved migration/RLS
-  validation planning**.
+- The next recommended task is **Slice 6H-3B-4A - Migration/RLS draft review
+  packet**.
 - No runtime code, tests, SDK dependency, frontend/UI, Expo, AI, offline sync,
   SQL, migration, `.env`, generated Supabase state, live repository mode, or
   public Notes API behavior change is introduced.
+
+Slice 6H-3B-4 is complete when:
+
+- The migration/RLS validation plan defines the future artifact approval gate,
+  security review checklist, sanitized Notes behavior, RLS validation matrix,
+  test harness prerequisites, artifact policy, risks, and review-packet-first
+  implementation sequence.
+- The next recommended task is Slice 6H-3B-4A. No executable SQL, migration,
+  RLS test, live Supabase execution, credential, `.env` file, generated
+  Supabase state, or live repository wiring has been introduced.

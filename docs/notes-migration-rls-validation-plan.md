@@ -1,0 +1,291 @@
+# Notes Migration/RLS Validation Plan
+
+## Status
+
+Slice 6H-3B-4 defines the approval and validation plan for a future Notes
+migration/RLS artifact. This document is security-first planning only. It does
+not add executable SQL, migrations, generated Supabase state, credentials, live
+SDK wiring, local Supabase execution, hosted Supabase access, or RLS tests.
+
+The next task remains documentation/review-packet work:
+**Slice 6H-3B-4A - Migration/RLS draft review packet**. That packet should
+prepare the evidence needed for approval before any executable migration is
+committed.
+
+## 1. Objective
+
+Define the review process, approval criteria, artifact policy, and validation
+matrix required before a future Notes migration/RLS artifact may be committed
+or tested against Supabase.
+
+The plan must make future reviewers able to answer:
+
+- whether the proposed Notes table behavior matches the existing public Notes
+  API and repository contract;
+- whether RLS enforces owner isolation independently of application-level
+  `user_id` predicates;
+- whether the migration artifact is minimal, environment-independent, and free
+  of secrets or real data;
+- whether validation uses only synthetic users and data in local or approved
+  non-production targets; and
+- whether default CI remains credential-free and disabled for live/local
+  Supabase tests.
+
+## 2. Non-Goals
+
+- Do not add executable SQL, migrations, policies, seeds, database dumps, or
+  generated Supabase state.
+- Do not run Supabase locally or connect to hosted Supabase.
+- Do not add real project URLs, public keys, service-role keys, JWT secrets,
+  access tokens, refresh tokens, passwords, `.env` files, or other credentials.
+- Do not execute RLS validation tests.
+- Do not add a live Supabase SDK adapter or enable live Notes repository mode.
+- Do not add service-role use to the Notes request path.
+- Do not change public Notes API behavior, shared contracts, frontend/UI, Expo,
+  AI, or offline sync behavior.
+- Do not treat this plan as approval to commit a migration.
+
+## 3. Current Baseline
+
+- Memory Notes persistence is the default for normal local, test, and CI runs.
+- `SupabaseNotesRepository` is scaffolded behind an injected user-scoped client
+  protocol and is not wired into request handling.
+- Fake repository and fake SDK transport tests prove query shape, owner
+  predicates, caller-token propagation assumptions, redaction, no-network
+  behavior, and service-role exclusion without importing the Supabase SDK.
+- The live/local harness skeleton is skipped by default and requires explicit
+  opt-in, explicit `local` or `staging` mode, required placeholder environment
+  names, synthetic user token placeholders, and absence of
+  `SUPABASE_SERVICE_ROLE_KEY`.
+- The local Supabase setup guide documents placeholder-only preparation and
+  reiterates that RLS coverage is blocked until an approved migration/RLS
+  artifact exists.
+- No executable Notes migration or RLS artifact is approved or committed.
+- No RLS behavior has been validated against local or hosted Supabase.
+
+## 4. Why Executable SQL Remains Prohibited For Now
+
+Executable SQL remains prohibited because the repository does not yet have an
+approved Notes migration/RLS artifact, a completed review packet, or a validated
+non-production execution plan.
+
+Specific reasons:
+
+- Git history is durable. A private repository can later become broader in
+  access or public, so operational database artifacts need review before they
+  enter history.
+- A migration can change privilege boundaries, grants, ownership behavior,
+  timestamps, soft-delete semantics, and RLS outcomes. Those effects must be
+  reviewed before commit.
+- Service-role/admin execution and request-path validation have different
+  security properties. Planning must keep those boundaries separate before any
+  artifact is introduced.
+- A migration without an RLS validation matrix can create false confidence.
+- Generated Supabase state, dumps, local database files, and environment-bound
+  metadata are not portable review artifacts.
+
+Until approval is explicit, `supabase/migrations/*.sql` remains ignored and no
+SQL file should be committed.
+
+## 5. Approval Criteria For Future Migration/RLS Artifacts
+
+A future artifact may be proposed only after a review packet shows all of the
+following:
+
+- The artifact is minimal and limited to the Notes table/RLS behavior under
+  review.
+- It is environment-independent and contains no project identifiers, connection
+  strings, credentials, tokens, real user identifiers, real emails, or real note
+  content.
+- It preserves the current Notes public API behavior: owner-scoped CRUD,
+  optimistic version checks, soft deletion, non-disclosing not-found behavior,
+  and no request-path physical delete.
+- It enables or requires RLS for Notes before live request-path persistence is
+  considered.
+- It binds read, insert, update, and soft-delete behavior to the authenticated
+  caller identity.
+- It avoids broad grants and avoids widening access for anonymous, public,
+  service-role, or cross-user paths.
+- It does not introduce unsafe privileged functions. Any privileged function
+  requires explicit justification, narrowed scope, and separate review.
+- It includes rollback and cleanup considerations for non-production trials.
+- It includes a synthetic validation matrix and expected evidence format.
+- It passes secret/data scanning before commit.
+
+Approval must be specific to the artifact being committed. Approval for this
+plan, a future review packet, or local setup instructions is not approval to
+commit arbitrary SQL.
+
+## 6. Required Security Review Checklist
+
+Reviewers must confirm:
+
+- The artifact contains no production data, seed data, dumps, backups,
+  credentials, tokens, connection strings, project identifiers, or real user
+  content.
+- RLS is enabled for every Notes user-data path before live Notes persistence is
+  enabled.
+- Read behavior returns only rows owned by the authenticated caller.
+- Insert behavior prevents the caller from creating a row for another owner.
+- Update and soft-delete behavior are limited to owned rows.
+- Physical delete is not part of public Notes CRUD.
+- Application-level `user_id` predicates remain required after RLS exists.
+- Service-role credentials are absent from request-path code, harness inputs,
+  logs, tests, and docs examples.
+- Grants are narrow and do not provide broad table access beyond the intended
+  public-key plus caller-JWT request path.
+- Any trigger, default, generated value, or helper function is minimal and does
+  not bypass owner checks.
+- Any privileged function is absent, or explicitly justified and reviewed for
+  search path, caller influence, write scope, and data exposure.
+- Rollback and non-production cleanup are documented.
+- Validation evidence uses synthetic users/data only and redacts keys, tokens,
+  Auth payloads, URLs with secrets, and note content.
+
+## 7. Proposed Notes Table/RLS Behavior
+
+This section is sanitized prose only. It is not a migration and must not be
+copied into an executable SQL file.
+
+The future Notes persistence target is a user-owned table with a stable note
+identifier, an authenticated owner identifier, editable title/content fields,
+content type, archive state, soft-delete state, creation/update timestamps,
+optional deletion timestamp, and monotonically increasing version.
+
+Expected behavior:
+
+- Each Notes row belongs to exactly one authenticated user.
+- Normal reads return only rows owned by the authenticated caller.
+- Default reads hide soft-deleted rows through application predicates; RLS still
+  limits any include-deleted path to the owner.
+- Inserts must create rows for the authenticated caller only.
+- Updates must affect only rows owned by the authenticated caller.
+- The public Notes delete operation remains a soft-delete update owned by the
+  caller.
+- Physical deletion is reserved for separately approved administrative cleanup,
+  not request-path CRUD.
+- RLS and application-level owner predicates are complementary; neither replaces
+  the other.
+
+## 8. RLS Validation Matrix
+
+The future opt-in harness must validate RLS with synthetic user A and synthetic
+user B after the approved artifact is applied in local or approved
+non-production Supabase.
+
+| Case | Actor | Target data | Expected outcome |
+|---|---|---|---|
+| Select own notes | User A | User A synthetic notes | User A can select visible own notes |
+| Block cross-user select | User A | User B synthetic notes | User A cannot select or infer User B notes |
+| Block cross-user update | User A | User B synthetic note | Update is rejected or returns the same non-disclosing not-found outcome as the API contract |
+| Block cross-user soft delete | User A | User B synthetic note | Soft-delete update is rejected or returns the same non-disclosing not-found outcome as the API contract |
+| Bind insert owner | User A | Insert payload attempting User B ownership | Insert is rejected; no User B-owned row is created by User A |
+| Allow own insert | User A | Insert payload for User A ownership | Insert succeeds only for User A ownership |
+| Owner-scoped soft delete | User A | User A synthetic note | Soft delete succeeds as an owner-scoped update and hides the note from default reads |
+| Include deleted remains owner-scoped | User A | User A deleted note and User B deleted note | User A can inspect only own deleted note when an owner-scoped include-deleted path is explicitly tested |
+| No physical delete in CRUD | User A | User A synthetic note | Public Notes delete path performs only soft-delete behavior |
+
+Validation evidence must distinguish RLS enforcement from adapter behavior.
+Adapter validation proves request construction and caller-token propagation.
+RLS validation proves database policy behavior after the approved artifact is
+applied.
+
+## 9. Migration Review Checklist
+
+Before any migration file is approved for commit, reviewers must verify:
+
+- No production data, production schema dump, backup, snapshot, or seed with
+  real data is included.
+- No credentials, passwords, JWT secrets, service-role keys, access tokens,
+  refresh tokens, private keys, connection strings, or project identifiers are
+  included.
+- No service-role key is required for request-path Notes behavior or harness
+  validation.
+- No broad grants are introduced.
+- No unsafe privileged function is introduced. Any privileged function must be
+  explicitly justified, narrowly scoped, and reviewed before commit.
+- Rollback and cleanup considerations are documented, including how to remove
+  synthetic rows from local or approved non-production environments.
+- The artifact is minimal and environment-independent.
+- Secret/data scans pass before commit.
+- The artifact remains uncommitted until approval is recorded.
+
+## 10. Test Harness Prerequisites
+
+RLS tests may be added or enabled only after all prerequisites are true:
+
+- A specific Notes migration/RLS artifact has been approved.
+- The approved artifact has been applied in a disposable local project or an
+  approved non-production staging project.
+- The target contains only synthetic users and synthetic Notes data for the
+  harness.
+- The harness uses explicit opt-in configuration, including
+  `SYNAPSE_SUPABASE_INTEGRATION_TESTS=1`.
+- `SYNAPSE_SUPABASE_TEST_MODE` is explicitly set to `local` or `staging`.
+- The harness uses `SUPABASE_PUBLISHABLE_KEY`, or a reviewed legacy
+  `SUPABASE_ANON_KEY`, plus synthetic user access-token sources.
+- `SUPABASE_SERVICE_ROLE_KEY` is absent from request-path harness inputs.
+- Default CI remains disabled for live/local Supabase tests.
+- Logs and failures redact keys, tokens, authorization headers, Auth payloads,
+  URLs with secrets, user emails, and note content.
+
+## 11. Artifact Policy
+
+- No SQL is committed until explicit approval is granted for the specific
+  artifact.
+- The migration file must be minimal, environment-independent, and scoped to the
+  reviewed Notes behavior.
+- Generated Supabase state remains ignored and uncommitted.
+- `.env` files, dumps, backups, SQLite/db files, local metadata, and generated
+  runtime directories remain uncommitted.
+- A future approved migration change must update ignore rules only as part of
+  that explicit review, not as a convenience during planning.
+- Review packets may describe intended behavior in prose or non-executable
+  checklists. They must not smuggle executable SQL into Markdown.
+
+## 12. Security Risks
+
+| Risk | Required control |
+|---|---|
+| RLS bypass | Require public-key plus caller-JWT request path, approved RLS, and user A/B validation before live enablement |
+| Cross-user leakage | Keep application `user_id` predicates and validate RLS blocks cross-user select, update, and soft-delete attempts |
+| Service-role misuse | Keep service-role credentials out of request-path code, adapter construction, harness inputs, and validation evidence |
+| Token leakage | Use short-lived synthetic access tokens and redact tokens, authorization headers, Auth payloads, and env values |
+| Cleanup failure | Use deterministic synthetic prefixes, owner-scoped cleanup, and coarse cleanup reports without note content |
+| Accidental live CI execution | Keep default CI unset for live flags; require explicit env opt-in, mode, markers, and reviewed manual workflow separation |
+| False RLS confidence | Do not infer database enforcement from fake tests, adapter tests, or setup docs |
+| Unsafe migration scope | Require artifact-specific review for grants, functions, rollback, and environment independence |
+
+## 13. Future Implementation Slices
+
+1. **Slice 6H-3B-4A - Migration/RLS draft review packet**
+   Prepare a documentation-only packet with the proposed artifact scope,
+   sanitized behavior summary, reviewer checklist, validation evidence plan, and
+   rollback/cleanup notes. Do not commit executable SQL.
+2. **Slice 6H-3B-4B - Approved local-only migration artifact**
+   After explicit approval, add the minimal environment-independent migration
+   artifact for local-only validation. Keep generated Supabase state,
+   credentials, and real data out of git.
+3. **Slice 6H-3B-4C - RLS validation tests behind opt-in harness**
+   Add skipped-by-default tests that validate the approved artifact with
+   synthetic users and explicit local/staging env gates.
+4. **Slice 6H-3B-4D - Hosted staging validation plan**
+   Document controlled hosted non-production validation, secret-store handling,
+   workflow separation, redaction, rollback, and evidence requirements.
+
+## 14. Definition Of Done
+
+Slice 6H-3B-4 is complete when:
+
+- This plan defines the migration/RLS approval process, security checklist,
+  sanitized Notes behavior, validation matrix, artifact policy, risks, and
+  future implementation slices.
+- The plan explains why executable SQL remains prohibited until explicit
+  approval.
+- Related Supabase planning docs point to this plan.
+- The next recommended task is **Slice 6H-3B-4A - Migration/RLS draft review
+  packet**.
+- No runtime code, tests, executable SQL, migrations, `.env` files, credentials,
+  generated Supabase state, live Supabase execution, live SDK adapter, live
+  repository mode, service-role request-path usage, frontend/UI, Expo, AI,
+  offline sync, or public Notes API behavior change is introduced.

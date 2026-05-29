@@ -9,13 +9,15 @@ fake SDK transport tests, and Supabase-shaped Notes repository coverage. Slice
 `apps/api/tests/integration/`. Slice 6H-3B-3B now adds the documentation-only
 local setup guide in
 [notes-local-supabase-setup-guide.md](notes-local-supabase-setup-guide.md).
-Neither slice adds a live Supabase SDK adapter, connects to Supabase,
-introduces credentials, adds `.env` files, adds migrations or SQL, executes RLS
-tests, or enables live Notes persistence.
+Slice 6H-3B-4 now adds the security-first migration/RLS validation plan in
+[notes-migration-rls-validation-plan.md](notes-migration-rls-validation-plan.md).
+These slices do not add a live Supabase SDK adapter, connect to Supabase,
+introduce credentials, add `.env` files, add migrations or SQL, execute RLS
+tests, or enable live Notes persistence.
 
-The next bounded task is **Slice 6H-3B-4 - Approved migration/RLS validation
-planning**. Local setup can be prepared safely with placeholders, but RLS
-validation remains blocked until a migration/RLS artifact is approved.
+The next bounded task is **Slice 6H-3B-4A - Migration/RLS draft review
+packet**. That task remains documentation/review-packet work and must not add
+executable SQL.
 
 ## 1. Objective
 
@@ -82,6 +84,9 @@ The harness eventually needs to prove:
 - `docs/notes-local-supabase-setup-guide.md` documents the future local-only
   setup posture, placeholder variables, synthetic data rules, cleanup
   expectations, troubleshooting, and artifact/credential restrictions.
+- `docs/notes-migration-rls-validation-plan.md` documents the future
+  migration/RLS approval criteria, security review checklist, RLS validation
+  matrix, artifact policy, and review-packet-first implementation sequence.
 
 ## 4. Default CI Must Remain Credential-Free
 
@@ -325,10 +330,13 @@ exercise.
    Document the controlled staging workflow, secret-store expectations,
    CI/manual workflow separation, redaction requirements, and rollback
    expectations for non-production hosted validation.
-4. **Slice 6H-3B-4 - Approved migration/RLS validation planning (recommended next)**
+4. **Slice 6H-3B-4 - Approved migration/RLS validation planning (completed)**
    Plan the explicit database-artifact approval, security review, non-production
    application path, and synthetic owner-isolation validation before any
    executable migration or RLS test is added.
+5. **Slice 6H-3B-4A - Migration/RLS draft review packet (recommended next)**
+   Prepare the documentation-only review packet for a future artifact. Do not
+   add executable SQL.
 
 ## 14. Definition Of Done
 
@@ -372,4 +380,15 @@ Slice 6H-3B-3B is complete when:
 - The guide keeps the future harness env-gated and default CI disabled.
 - The next recommended task is Slice 6H-3B-4 migration/RLS validation planning;
   no live SDK adapter, network behavior, credential, `.env` file, migration,
+  SQL artifact, or RLS execution has been introduced.
+
+Slice 6H-3B-4 is complete when:
+
+- A migration/RLS validation plan defines artifact approval criteria, security
+  review requirements, sanitized Notes behavior, a synthetic user A/B RLS
+  validation matrix, migration review checklist, harness prerequisites,
+  artifact policy, risks, and future implementation slices.
+- It keeps executable SQL prohibited until explicit approval and sets the next
+  recommended task to Slice 6H-3B-4A review-packet documentation.
+- No live SDK adapter, network behavior, credential, `.env` file, migration,
   SQL artifact, or RLS execution has been introduced.

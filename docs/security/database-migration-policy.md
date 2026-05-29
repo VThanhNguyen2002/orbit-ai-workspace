@@ -43,6 +43,12 @@ specific database change. Before commit, it must:
 4. Change the ignore rule only as part of the explicitly approved migration
    review, not as a convenience during planning.
 
+For Notes specifically,
+[notes-migration-rls-validation-plan.md](../notes-migration-rls-validation-plan.md)
+defines the review process, security checklist, validation matrix, and future
+review-packet step that must precede any executable Notes migration/RLS
+artifact.
+
 ## Notes Design Handling
 
 The intended Notes ownership and RLS behavior is documented in architecture

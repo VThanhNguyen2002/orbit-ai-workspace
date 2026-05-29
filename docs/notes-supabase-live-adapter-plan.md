@@ -14,14 +14,14 @@ live/local Supabase harness in
 Slice 6H-3B-3A now adds skipped-by-default harness scaffolding and gating
 tests. Slice 6H-3B-3B now adds the documentation-only local setup guide in
 [notes-local-supabase-setup-guide.md](notes-local-supabase-setup-guide.md).
-Neither slice adds `supabase-py`, creates a live client, enables Supabase
-persistence, introduces credentials, adds a migration, or executes RLS
-validation.
+Slice 6H-3B-4 now adds the security-first migration/RLS validation plan in
+[notes-migration-rls-validation-plan.md](notes-migration-rls-validation-plan.md).
+These slices do not add `supabase-py`, create a live client, enable Supabase
+persistence, introduce credentials, add a migration, or execute RLS validation.
 
-The next bounded task is **Slice 6H-3B-4 - Approved migration/RLS validation
-planning**. Local setup can be prepared safely with placeholder configuration,
-but the harness cannot claim RLS coverage until a reviewed migration/RLS
-artifact exists.
+The next bounded task is **Slice 6H-3B-4A - Migration/RLS draft review
+packet**. It remains documentation/review-packet work and must not add
+executable SQL.
 
 ## 1. Objective
 
@@ -78,6 +78,9 @@ replacement for application scoping.
 - The local Supabase setup guide documents local-only prerequisites,
   placeholder variables, synthetic token source expectations, artifact
   exclusions, troubleshooting, and the RLS/migration blocker.
+- The migration/RLS validation plan documents artifact approval criteria,
+  security review requirements, sanitized Notes behavior, the synthetic user
+  A/B validation matrix, artifact policy, and review-packet-first sequencing.
 - The skipped-by-default harness skeleton defines `supabase_live` and
   `integration` pytest markers, fail-closed gating helpers, synthetic naming
   helpers, service-role rejection, redaction checks, and a placeholder live
@@ -394,10 +397,13 @@ requires explicit approval under
 6. **Slice 6H-3B-3C - Hosted staging opt-in test plan**
    Document controlled non-production staging validation, secret-store rules,
    CI/manual workflow separation, and redaction requirements.
-7. **Slice 6H-3B-4 - Approved migration/RLS validation planning (recommended next)**
+7. **Slice 6H-3B-4 - Approved migration/RLS validation planning (completed)**
    Plan the explicit database-artifact approval, security review, application
    and rollback path, and synthetic owner-isolation validation before any
    executable migration or RLS test is added.
+8. **Slice 6H-3B-4A - Migration/RLS draft review packet (recommended next)**
+   Prepare the documentation-only review packet for a future artifact. Do not
+   add executable SQL.
 
 JWKS/live authentication production readiness remains separately gated: an SDK
 adapter alone does not make the current configured RS256 verifier suitable for
@@ -483,4 +489,15 @@ Slice 6H-3B-3B is complete when:
   for meaningful local validation.
 - The next recommended task is Slice 6H-3B-4 migration/RLS validation planning;
   no live SDK adapter, network behavior, credential, `.env` file, migration,
+  SQL artifact, or RLS execution has been introduced.
+
+Slice 6H-3B-4 is complete when:
+
+- A migration/RLS validation plan defines artifact approval criteria, security
+  review requirements, sanitized Notes behavior, a synthetic user A/B RLS
+  validation matrix, migration review checklist, harness prerequisites,
+  artifact policy, risks, and future implementation slices.
+- It keeps executable SQL prohibited until explicit approval and sets the next
+  recommended task to Slice 6H-3B-4A review-packet documentation.
+- No live SDK adapter, network behavior, credential, `.env` file, migration,
   SQL artifact, or RLS execution has been introduced.
