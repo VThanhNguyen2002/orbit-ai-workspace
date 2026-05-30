@@ -33,14 +33,17 @@ and stop at any failed preflight or stop condition.
 - All required env vars still absent (depends on running local stack).
 - Synthetic users still absent (depends on running local stack).
 
-### From E3 / B3 (New Blocker — Current)
+### From E3 / B3 (Partially Addressed By B4)
 
-- `npx supabase start` **failed during Docker image pull/inspect** from
-  `public.ecr.aws`. The local Supabase stack did not start.
-- `SUPABASE_URL` still unknown (project never started successfully).
-- All required env vars remain absent as a result.
-- No synthetic users or Notes data could be created.
-- No RLS execution was possible.
+- ~~`supabase start` Docker image pull failed~~ — images now pull successfully.
+- Container startup: **failed due to disk full (ENOSPC)**.
+- Root cause: Supabase images (~4.9 GB total) consumed all remaining free disk
+  space on `/` during pull and container layer writes.
+- `supabase stop --no-backup` also failed with ENOSPC during the B4 attempt.
+- Cleanup: all Supabase images removed via `docker rmi` (~4.9 GB reclaimed).
+- Disk after cleanup: ~3.9 GB free (86% used) — still insufficient for a
+  successful `supabase start` (requires ~8–10 GB free headroom).
+- All env vars, synthetic users, and tokens still absent.
 
 Repository safety checks all passed (clean working tree, no tracked `.env`,
 `.sql`, `supabase/migrations/*`; `SUPABASE_SERVICE_ROLE_KEY` absent; no
@@ -377,8 +380,46 @@ df -h
 docker system df
 ```
 
-Supabase images require multiple gigabytes. Free sufficient disk space before
-retrying. Run `docker system prune` to reclaim unused layers if needed.
+Supabase images total approximately 4.9 GB. The full local stack (images plus
+container layer writes) requires ample free space. **Minimum recommended free
+space before retrying: 8–10 GB on `/`**.
+
+**B4 confirmed root cause: ENOSPC.** Images pulled successfully but container
+startup wrote layers that exhausted the disk. All Supabase images were
+removed post-B4 to recover ~4.9 GB.
+
+#### Free Disk Space Before Retrying
+
+Check what is consuming space:
+
+```text
+du -sh /var/log/* /tmp/* /home/vietthanh/.npm /home/vietthanh/.cache 2>/dev/null | sort -rh | head -20
+```
+
+Then free space using one or more of:
+
+```text
+# Remove npm cache (safe, will be rebuilt):
+npm cache clean --force
+
+# Remove apt caches:
+sudo apt-get clean
+
+# Remove Docker build cache and unused images (confirm none are needed):
+docker system prune -f
+docker image prune -a -f
+
+# Remove large unneded files in /tmp:
+rm -rf /tmp/synapse-supabase-dryrun
+mkdir /tmp/synapse-supabase-dryrun
+cd /tmp/synapse-supabase-dryrun && npx supabase init
+```
+
+Verify at least 8 GB free before retrying:
+
+```text
+df -h /
+```
 
 ### Check Registry / Network Access
 
@@ -420,3 +461,25 @@ Once `supabase start` succeeds:
    (create synthetic users).
 3. Do not commit the URL or key.
 4. Do not paste the full `supabase status` output anywhere.
+
+## 14. B4 Troubleshooting Summary
+
+Date: 2026-05-30
+
+| Check | Result |
+|---|---|
+| Docker daemon | Running (v29.1.3, 7.7 GiB RAM, overlayfs) |
+| Registry `public.ecr.aws` | Reachable (HTTP 401 — normal) |
+| Disk before retry | 87% full, ~3.8 GB free |
+| Image pull | **Succeeded** (all images downloaded) |
+| Container startup | **Failed** — `error running container: exit 1` |
+| `supabase stop` | **Failed** — `ENOSPC: no space left on device` |
+| Disk after retry | **100% full**, 0 bytes free |
+| Root cause | **Disk exhausted** during image pull + container layer writes |
+| Supabase images size | ~4.9 GB total |
+| Cleanup (images removed) | ~4.9 GB reclaimed via `docker rmi` |
+| Disk after cleanup | ~3.9 GB free (86% used) |
+| No Supabase containers remain | Confirmed |
+| No raw secrets pasted | Confirmed |
+
+Required before next attempt: free 8–10 GB on `/` (see section 13).

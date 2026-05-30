@@ -2,23 +2,26 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-B4 — Troubleshoot local Supabase
-Docker startup**.
+Recommended next task: **Slice 6H-3B-4C-B4-R — Resolve Docker disk space
+blocker manually**.
 
-Slice 6H-3B-4C-B3 records a new blocker: `npx supabase start` failed during
-Docker image pull/inspect from `public.ecr.aws` in `/tmp/synapse-supabase-dryrun`.
-The local Supabase stack did not start. Cleanup was performed
-(`supabase stop --no-backup`). No Supabase containers remain. No SQL was
-executed. No repo artifacts were created.
+Slice 6H-3B-4C-B4 identified the root cause of the `supabase start` failure:
+**disk exhausted (ENOSPC)**. Supabase images (~4.9 GB) were pulled successfully
+but container layer writes consumed all remaining space on `/`. The startup
+failed with `error running container: exit 1` and `supabase stop` also failed
+with `ENOSPC`.
 
-Slice 6H-3B-4C-B2 updated the blocker-resolution checklist in
+Cleanup: all Supabase images removed via `docker rmi` (~4.9 GB reclaimed).
+Disk is now ~3.9 GB free (86% used) — still insufficient. At least 8–10 GB
+free is needed before retrying.
+
+See section 13 of
 [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
-with a detailed manual setup sequence. Section 13 of that document now covers
-Docker troubleshooting steps.
+for exact disk cleanup steps.
 
 Do not run Slice 6H-3B-4C-E3 until `supabase start` succeeds locally and the
-full blocker-resolution checklist (section 11) is satisfied. Do not execute
-automatically because docs exist.
+full blocker-resolution checklist (section 11) is satisfied.
+
 
 
 ## Why This Is Next
