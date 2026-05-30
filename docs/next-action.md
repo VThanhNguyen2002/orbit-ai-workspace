@@ -2,18 +2,23 @@
 
 ## Objective
 
-Recommended next task: **Slice 7B — AI summarization shared contracts**.
+Recommended next task: **Slice 7C — Backend fake-provider summarization route skeleton**.
 
-Slice 7A (AI summarization planning) is complete. The implementation plan is
-at [docs/ai-summarization-implementation-plan.md](ai-summarization-implementation-plan.md).
+Slice 7B is complete. `GetSummaryResponseSchema` and `get_summary_response`
+registry entry added to `packages/shared/src/ai/index.ts` and
+`schema-registry.ts`. 4 new contract tests added. 31 shared tests pass.
 
-Gap analysis: all core AI wire contracts already exist in
-`packages/shared/src/ai/index.ts` and `domain/index.ts`. Slice 7B should:
+Slice 7C should implement, in `apps/api`:
 
-- Register a `get_summary_response` entry in `schema-registry.ts` using the
-  existing `SummarySchema` wrapped in `createApiSuccessEnvelopeSchema`.
-- Add typed API client summarization methods (SSE event parser, `summarizeNote()`).
-- No provider SDK, no credentials, no `.env`, no Supabase work.
+- `POST /v1/ai/notes/{note_id}/summarize` router (SSE response).
+- `FakeProvider` — deterministic, no network, canned output.
+- `SummarizationService` — auth + ownership check + size check + call provider.
+- Settings additions: `llm_provider`, `summarize_max_content_len`, `summarize_enabled`.
+- No OpenAI SDK. No credentials. No `.env`. No Supabase live wiring.
+
+Local Supabase / RLS validation remains paused (disk capacity). Resume
+conditions in [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+
 
 Local Supabase / RLS validation remains paused (disk capacity). Resume
 conditions in [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
