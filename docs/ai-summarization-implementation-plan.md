@@ -1,0 +1,331 @@
+# AI Summarization Implementation Plan
+
+## Slice 7A — Docs-First Planning
+
+Date: 2026-05-30
+
+---
+
+## 1. Objective
+
+Plan the end-to-end AI summarization feature for Synapse Notes without
+implementing any provider runtime code, adding credentials, calling APIs, or
+changing public Notes behavior. This document is the source of truth for all
+downstream AI summarization implementation slices (7B through 7G).
+
+---
+
+## 2. Non-Goals (This Plan)
+
+This plan explicitly excludes:
+
+- Real OpenAI / Groq / Gemini API calls.
+- Provider SDK integration or credential wiring.
+- `OPENAI_API_KEY`, `.env` files, or any credentials in the repo.
+- Vector embeddings and semantic search integration.
+- Frontend / Expo UI screens.
+- Supabase / RLS work (paused — see
+  [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md)).
+- Production deployment.
+- Background / automatic summarization without explicit user action.
+- Fine-tuned models.
+
+---
+
+## 3. Current Baseline
+
+### Shared AI Contracts (`packages/shared/src/ai/index.ts`)
+
+All core wire contracts already exist and are registered in the schema registry:
+
+| Schema | Status | Notes |
+|---|---|---|
+| `SummarizeRequestSchema` | ✅ Exists | `source_id`, `source_type`, `content` (max 50k), `max_sentences` |
+| `SummarizeResponseSchema` | ✅ Exists | `summary`, `action_items[]` |
+| `AiUsageSchema` | ✅ Exists | `provider`, `model`, `input_tokens`, `output_tokens`, `estimated_cost_usd`, `operation` |
+| `AiStreamTokenEventSchema` | ✅ Exists | SSE `token` event |
+| `AiStreamActionItemsEventSchema` | ✅ Exists | SSE `action_items` event |
+| `AiStreamDoneEventSchema` | ✅ Exists | SSE `done` event with optional `summary_id` and `usage` |
+| `AiStreamErrorEventSchema` | ✅ Exists | SSE `error` event with `code`, `message`, `retryable` |
+| `AiStreamEventSchema` | ✅ Exists | discriminated union of all SSE events |
+| `SemanticSearchRequestSchema` | ✅ Exists | (deferred — semantic search is out of scope) |
+
+### Domain Types (`packages/shared/src/domain/index.ts`)
+
+| Type | Status |
+|---|---|
+| `SummarySchema` | ✅ Exists — `id`, `user_id`, `source_id`, `source_type`, `content`, `action_items[]`, `provider`, `model`, `created_at` |
+| `SummaryActionItemSchema` | ✅ Exists — `text`, `priority` |
+| `SummarySourceTypeSchema` | ✅ Exists — `"note" \| "transcript"` |
+
+### Architecture (`docs/architecture/ai-integration.md`)
+
+- AI is a **backend-only concern** — client never calls providers directly.
+- `LLMProvider` abstract base class defined (Python).
+- Provider selection is config-driven (`llm_provider` setting).
+- Summarization flow: fetch note → stream LLM → extract action items → SSE to client.
+- System prompt format defined (summary + `---ACTION_ITEMS---` + JSON array).
+- Streaming: SSE token events → `action_items` event → `done` event.
+- Token chunking strategy defined for long content.
+- Cost tracking via `AIUsage` dataclass.
+
+### Backend Status
+
+- Memory-only `NotesRepository` is current default.
+- Supabase live wiring deferred.
+- Auth: RS256 JWT verifier implemented; JWKS not yet wired for live Supabase.
+- No AI routes implemented yet.
+
+### API Client Status
+
+- Notes CRUD client methods exist.
+- No AI summarization client methods yet.
+
+---
+
+## 4. User-Facing Feature Concept
+
+When an operator enables AI summarization (opt-in, user-initiated only):
+
+1. **Summarize one note** — user taps "Summarize" on a note; receives streamed
+   summary and extracted action items. Original note content is never modified.
+2. **Summary stored** — result persists as a `Summary` entity linked to the
+   source note. Subsequent calls for unchanged notes may return the cached summary
+   (Phase 2 caching, not in scope now).
+3. **User-owned isolation** — only the authenticated owner of a note may
+   request its summarization. No cross-user access.
+4. **Action items** — optional list of concrete, prioritized tasks extracted from
+   the note. User may choose to promote them to `Task` entities later.
+5. **Streaming** — summary text appears token-by-token for immediate feedback.
+
+Explicitly not in scope: auto-summarize on save, batch background summarization,
+cross-note summarization, summarization in offline mode.
+
+---
+
+## 5. API Contract Plan
+
+### Endpoints (Planning Only — Not Implemented)
+
+```
+POST /v1/ai/notes/{note_id}/summarize
+```
+
+Request body: matches `SummarizeRequestSchema` with `source_type = "note"`.
+Alternatively: body may be omitted for the note-level route (API fetches content).
+
+```
+POST /v1/ai/notes/summarize-batch        (deferred — Phase 2)
+```
+
+Response: **Server-Sent Events (SSE)** stream using `AiStreamEventSchema`.
+
+### SSE Event Sequence
+
+```
+data: {"event": "token", "data": {"text": "This note discusses..."}}
+data: {"event": "token", "data": {"text": " Q3 planning goals."}}
+data: {"event": "action_items", "data": {"items": [{"text": "...", "priority": "high"}]}}
+data: {"event": "done", "data": {"summary_id": "uuid", "usage": {...}}}
+```
+
+Error path:
+
+```
+data: {"event": "error", "data": {"code": "provider_unavailable", "message": "...", "retryable": true}}
+```
+
+### HTTP Conventions
+
+- Method: `POST` (summarization is a write + compute operation).
+- Content-Type response: `text/event-stream`.
+- Auth: `Authorization: Bearer <user-jwt>` required.
+- 404 if `note_id` does not belong to authenticated user (no 403 — prevent enumeration).
+- 400 if content exceeds `max_content_length` policy.
+- 503 if provider unavailable.
+- 429 if rate limit exceeded.
+
+---
+
+## 6. Shared Contract Gap Analysis
+
+All wire contracts for summarization already exist (section 3). Gap contracts
+needed for the API-level HTTP envelope:
+
+| Contract | Status | Action |
+|---|---|---|
+| `SummarizeNoteResponseEnvelope` | Deferred for streaming — SSE bypasses envelope | No new schema needed |
+| `SummarizeErrorResponse` | Covered by existing `ApiErrorEnvelopeSchema` | No new schema needed |
+| `SummarizeBatchRequest` | Not scoped (Phase 2) | Skip |
+| `GetSummaryRequest` / `GetSummaryResponse` | Not yet in registry | Add in Slice 7B |
+
+Slice 7B should register `get_summary_response` entry using the existing
+`SummarySchema` wrapped in `createApiSuccessEnvelopeSchema`.
+
+---
+
+## 7. Backend Architecture Plan
+
+```
+apps/api/app/
+├── routers/
+│   └── ai.py                    # POST /v1/ai/notes/{note_id}/summarize
+├── services/
+│   └── ai/
+│       ├── base.py              # LLMProvider ABC (already in architecture doc)
+│       ├── fake_provider.py     # Deterministic fake — returns canned text, no network
+│       ├── openai_provider.py   # Deferred (Slice 7F)
+│       ├── summarization_service.py  # Orchestrates: auth → fetch → build prompt → stream
+│       └── prompt_builder.py    # Builds system prompt; unit testable with synthetic content
+└── core/
+    └── config.py               # Add: llm_provider, llm_model, summarize_max_content_len
+```
+
+Layer boundaries:
+
+| Layer | Responsibility | Must Not |
+|---|---|---|
+| Router | parse path params, auth context, stream response | touch provider |
+| Service | orchestrate note fetch, ownership check, size check, call provider | log content |
+| Prompt builder | construct system prompt + user content | include user identity in prompt |
+| Provider interface | `LLMProvider` ABC — `complete()` / `stream()` | depend on HTTP session |
+| Fake provider | return deterministic canned output | make network calls |
+| OpenAI provider | call OpenAI API (deferred) | run in CI without explicit flag |
+
+Redaction boundary: logs may record `note_id`, `user_id` (UUID only), `provider`,
+`model`, `input_tokens`, `output_tokens`. Logs must never record note content,
+prompt text, token values, API keys, or bearer tokens.
+
+---
+
+## 8. Provider / Auth Strategy
+
+### Phase-by-Phase Provider Plan
+
+| Phase | Provider | Credential | When |
+|---|---|---|---|
+| Now (Slice 7C) | `FakeProvider` | None | Default for dev/CI |
+| Slice 7F | OpenAI | Workload Identity Federation (preferred for CI/cloud) | When live test needed |
+| Slice 7F fallback | OpenAI | `OPENAI_API_KEY` env var (gitignored, local only) | When WIF not available |
+| Phase 3+ | Groq / Gemini | Config-driven, same pattern | When cost optimisation needed |
+
+### Credential Rules
+
+- `OPENAI_API_KEY` (and any provider key) must never be committed.
+- `.env` files must be gitignored and `gitleaks` clean.
+- CI must not require any live provider key. All CI tests use `FakeProvider`.
+- Workload Identity Federation (WIF) is the preferred credential method for
+  GCP/cloud deployments because it eliminates long-lived keys.
+- Service-role key is never used on the summarization request path.
+
+### Settings Additions (Planned for Slice 7C)
+
+```python
+# apps/api/app/core/config.py additions
+llm_provider: Literal["fake", "openai", "groq", "gemini"] = "fake"
+llm_model: str = "gpt-4o-mini"
+summarize_max_content_len: int = 50_000  # matches SummarizeRequestSchema
+summarize_enabled: bool = False          # opt-in flag; default off
+```
+
+---
+
+## 9. Privacy / Security Rules
+
+These rules apply to every AI summarization implementation slice:
+
+| Rule | Requirement |
+|---|---|
+| Content logging | Never log note content, prompt text, or AI response text |
+| Token / key logging | Never log bearer tokens, API keys, or auth headers |
+| User identity in prompts | Never include email or display name in prompts |
+| Ownership check | Verify `note.user_id == auth_context.user_id` before any AI call |
+| Service-role path | Never use service-role credential on the summarization request path |
+| Request size limit | Reject if content > `summarize_max_content_len` (default 50k chars) |
+| Output validation | Validate AI response structure before sending to client |
+| Rate limiting | Plan per-user rate limit (Slice 7E or 7F); enforce before provider call |
+| Abuse / cost guardrails | Hard budget ceiling per user per day (Phase 2); log usage always |
+| Diagnostic redaction | Error responses include only error code and coarse message; no content |
+| No background processing | Summarization is always user-initiated; no auto-summarize on save |
+
+Inherited from `docs/security/privacy-and-data-handling.md`:
+
+- No PII in prompts.
+- Only use providers with data-retention opt-out.
+- AI calls logged with timestamp, model, token count — not content.
+- Auth token not logged in any path.
+
+---
+
+## 10. Cost / Token Strategy
+
+| Concern | Plan |
+|---|---|
+| Input size limit | `summarize_max_content_len = 50_000` chars (≈ 12,500 tokens) |
+| Truncation | If content > limit: reject with 400 (Phase 1); chunking in Phase 2 |
+| Token counting | Estimate using word count × 1.3 (same as embedding strategy) |
+| Usage tracking | Record `AiUsage` after every provider call (provider, model, in/out tokens, cost_usd) |
+| Cost visibility | Usage logged to structured log; Phase 2 stores aggregate to DB |
+| Budget guardrail | Hard daily per-user limit (Phase 2); Phase 1 relies on rate limiting |
+| Caching | Phase 2 — skip re-summarize if content hash unchanged and model unchanged |
+| No hidden cost | Summarization requires explicit user action every time in Phase 1 |
+
+---
+
+## 11. Testing Strategy
+
+All tests are network-free by default. Live provider tests require explicit
+opt-in environment variable and never run in default CI.
+
+| Test Layer | What | How |
+|---|---|---|
+| Shared contract tests | Schema shape, parse/serialize, round-trip | `contracts:check` Zod parse tests |
+| Prompt builder unit tests | System prompt format, synthetic content only | pytest, no network |
+| Fake provider tests | Canned output, streaming events, action item extraction | pytest, no network |
+| Router / service tests | Auth enforcement, ownership check, size check, SSE event sequence | pytest with fake provider |
+| API client tests | Client serializes request, deserializes SSE events | jest/vitest, no network |
+| Security tests | Missing auth → 401, wrong user → 404, content too long → 400, key not logged | pytest |
+| Log redaction tests | Assert content / tokens do not appear in structured log output | pytest |
+| Live provider tests | Real OpenAI call | Opt-in via env var, not in default CI |
+
+---
+
+## 12. Failure Modes
+
+| Failure | Detection | Response |
+|---|---|---|
+| Provider unavailable | `ConnectionError` / non-2xx from provider | SSE `error` event: `provider_unavailable`, `retryable: true`; 503 fallback |
+| Provider timeout (30 s) | `asyncio.TimeoutError` | Retry once; then SSE `error`: `provider_timeout`, `retryable: true` |
+| Malformed AI response | Parse failure after stream completes | SSE `error`: `invalid_response`, `retryable: false` |
+| Over-limit input | `len(content) > max_content_len` | 400 before any provider call |
+| Unauthorized / wrong user | `note.user_id != auth.user_id` | 404 (do not leak existence) |
+| Missing auth | No / invalid bearer token | 401 |
+| Rate limit | Provider 429 | SSE `error`: `rate_limit`, `retryable: true`; respect `Retry-After` |
+| Budget exceeded | Per-user daily limit hit | 429 with `Retry-After` header |
+| Unsafe output | Content policy violation from provider | SSE `error`: `content_policy`, `retryable: false` |
+
+---
+
+## 13. Future Slices
+
+| Slice | Goal |
+|---|---|
+| **7B** | AI summarization shared contracts — register `get_summary_response` in schema registry; add API client summarization types |
+| **7C** | Backend fake-provider summarization route skeleton — `POST /v1/ai/notes/{id}/summarize`, `FakeProvider`, SSE streaming, auth + ownership + size checks |
+| **7D** | API client summarization methods — `summarizeNote()`, SSE event parser, typed events |
+| **7E** | Prompt builder and redaction tests — `prompt_builder.py`, log-redaction assertions, security tests |
+| **7F** | OpenAI provider integration planning — `OpenAIProvider`, WIF strategy, opt-in CI gate, cost tracking |
+| **7G** | OpenAI Workload Identity Federation planning — GCP service account, keyless auth, CI integration docs |
+
+---
+
+## 14. Definition Of Done (This Slice)
+
+- [x] `docs/ai-summarization-implementation-plan.md` written and committed.
+- [x] `docs/next-action.md` updated to Slice 7B.
+- [x] All existing contract checks pass (`contracts:check`).
+- [x] `ruff check` passes (no Python changed).
+- [x] `pnpm lint / typecheck / test / build` pass (no runtime code changed).
+- [x] `gitleaks detect --redact` clean.
+- [x] No `.env`, SQL, migrations, credentials, or Supabase state changed.
+- [x] No provider SDK, no network call, no `OPENAI_API_KEY` added.

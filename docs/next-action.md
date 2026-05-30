@@ -2,21 +2,22 @@
 
 ## Objective
 
-Recommended next task: **Slice 7A — AI summarization planning**.
+Recommended next task: **Slice 7B — AI summarization shared contracts**.
 
-Slice 6H-3B-4C-P records an intentional pause of local Supabase validation.
-All practical disk cleanup steps were completed (Supabase images ~4.9 GB,
-snap cache ~3.7 GB removed). Disk is ~7.2–7.3 GB free — still below the
-safe retry threshold of ≥8 GB (prefer ≥10 GB). VM disk expansion is required
-before any future retry.
+Slice 7A (AI summarization planning) is complete. The implementation plan is
+at [docs/ai-summarization-implementation-plan.md](ai-summarization-implementation-plan.md).
 
-The Supabase / RLS validation branch is **explicitly paused**. It is not
-abandoned. Resume conditions are recorded in
-[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md)
-and [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
+Gap analysis: all core AI wire contracts already exist in
+`packages/shared/src/ai/index.ts` and `domain/index.ts`. Slice 7B should:
 
-AI summarization planning (Slice 7A) can proceed docs-first without secrets,
-credentials, runtime provider integration, or Supabase dependencies.
+- Register a `get_summary_response` entry in `schema-registry.ts` using the
+  existing `SummarySchema` wrapped in `createApiSuccessEnvelopeSchema`.
+- Add typed API client summarization methods (SSE event parser, `summarizeNote()`).
+- No provider SDK, no credentials, no `.env`, no Supabase work.
+
+Local Supabase / RLS validation remains paused (disk capacity). Resume
+conditions in [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+
 
 
 
