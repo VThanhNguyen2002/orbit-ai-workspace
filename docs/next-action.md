@@ -2,8 +2,14 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-E2 - Re-attempt local-only RLS
-dry-run**.
+Recommended next task: **Slice 6H-3B-4C-B2 — Resolve remaining local RLS
+dry-run blockers**.
+
+Slice 6H-3B-4C-E2 re-attempted preflight on 2026-05-30 and was blocked for
+a second consecutive time. Blockers are identical to the prior attempt:
+no disposable local Supabase target, no Supabase CLI on PATH, and all
+required environment variables are absent. See updated
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
 
 Slice 6H-3B-4C-LA records constrained approval for a future local-only RLS
 dry-run attempt in
