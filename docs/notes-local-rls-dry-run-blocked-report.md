@@ -20,6 +20,8 @@ synthetic users or Notes rows were created, mutated, or cleaned up.
   [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
 - Preparation checklist:
   [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+- Blocker-resolution checklist:
+  [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
 - Local-only Markdown artifact:
   [notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md)
 - Database artifact policy:
@@ -113,9 +115,11 @@ staged by the blocked preflight.
 
 ## Next Recommended Task
 
-Recommended next task: **Slice 6H-3B-4C-B - Resolve local RLS dry-run
-blockers**.
+The blocker-resolution checklist is now recorded in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
 
-That slice should prepare the missing local-only prerequisites outside git,
-then rerun Slice 6H-3B-4C-E from the runbook preflight. It must not proceed to
-hosted staging planning.
+Recommended next task: **Slice 6H-3B-4C-E2 - Re-attempt local-only RLS
+dry-run**.
+
+Only re-attempt after the blocker-resolution checklist is satisfied locally.
+Do not execute automatically, and do not proceed to hosted staging planning.

@@ -24,6 +24,9 @@ Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
 required disposable local target configuration and synthetic user token inputs
 were absent. See
 [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+Slice 6H-3B-4C-B records the exact blocker-resolution checklist and readiness
+evidence required before any re-attempt in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
 
 ## 2. Source-Of-Truth References
 
@@ -31,6 +34,8 @@ were absent. See
   [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
 - Dry-run preparation:
   [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+- Blocker-resolution checklist:
+  [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
 - Local-only Markdown artifact:
   [notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md)
 - Database artifact policy:
@@ -97,6 +102,10 @@ emails, user ids, note ids, or note content.
 ## 5. Pre-Execution Checks
 
 Run these checks immediately before any local-only dry-run attempt.
+
+Before re-attempting after the blocked preflight, first satisfy the
+blocker-resolution definition of ready in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
 
 ### Approval And Target
 

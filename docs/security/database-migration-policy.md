@@ -86,6 +86,15 @@ files, Supabase migrations, hosted Supabase, staging, production, default CI,
 credentials in git, service-role request-path usage, or public Notes API
 behavior changes.
 
+The local dry-run blocker-resolution checklist is recorded in
+[notes-local-rls-dry-run-blocker-resolution.md](../notes-local-rls-dry-run-blocker-resolution.md).
+It documents the missing local-only prerequisites, placeholder-only environment
+rules, disposable target requirements, synthetic data requirements, cleanup
+proof expectations, stop conditions, and definition of ready before another
+dry-run attempt. It does not execute SQL, create SQL files, add migrations, run
+Supabase locally, connect to hosted Supabase, run RLS validation, or authorize
+staging/production execution.
+
 ## Notes Design Handling
 
 The intended Notes ownership and RLS behavior is documented in architecture

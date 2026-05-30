@@ -160,16 +160,18 @@ Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
 local-only target configuration and synthetic user token inputs were absent.
 The blocked result is recorded in
 [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+The blocker-resolution checklist is recorded in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
 
 ## Next Approval Step
 
-Slice 6H-3B-4C-DR now prepares the careful runbook for the approved local-only
-attempt. The runbook must not be treated as automatic execution merely because
+Slice 6H-3B-4C-B now records the local-only blocker-resolution checklist. The
+runbook and checklist must not be treated as automatic execution merely because
 approval is recorded here.
 
-Recommended next action: follow the runbook only for an approved disposable
-local attempt and produce redacted evidence, or explicitly defer local
-execution before hosted staging planning.
+Recommended next action: **Slice 6H-3B-4C-E2 - Re-attempt local-only RLS
+dry-run**, only after the blocker-resolution checklist is satisfied locally.
+If the checklist cannot be satisfied, keep execution explicitly blocked.
 
 Hosted staging planning remains deferred until the local-only dry-run is either
 completed with accepted evidence or explicitly deferred.

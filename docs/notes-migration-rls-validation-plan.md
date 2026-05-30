@@ -34,6 +34,8 @@ Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
 required disposable local target configuration and synthetic user token inputs
 were absent. The blocked result is recorded in
 [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+Slice 6H-3B-4C-B records the local-only blocker-resolution checklist in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
 
 ## 1. Objective
 
@@ -352,11 +354,14 @@ RLS tests may be added or enabled only after all prerequisites are true:
    pre-execution checks, stop conditions, redacted evidence capture, and cleanup
    verification. Do not automatically execute merely because approval is
    recorded.
-9. **Future approved local-only dry-run execution report**
-   Follow the runbook only in a disposable local target, record redacted
-   evidence, verify cleanup, and avoid claiming RLS enforcement from
-   scaffold-only skips.
-10. **Slice 6H-3B-4D - Hosted staging validation plan**
+9. **Slice 6H-3B-4C-B - Resolve local RLS dry-run blockers (completed)**
+   Record the exact local-only setup checklist, cleanup proof expectations,
+   stop conditions, and definition of ready before any re-attempt. Do not
+   execute the dry-run.
+10. **Slice 6H-3B-4C-E2 - Re-attempt local-only RLS dry-run**
+   Re-attempt only after the blocker-resolution checklist is satisfied locally.
+   Do not execute automatically.
+11. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation, secret-store handling,
    workflow separation, redaction, rollback, and evidence requirements after
    local-only evidence is accepted or local execution is explicitly deferred.
@@ -473,6 +478,20 @@ Slice 6H-3B-4C-DR is complete when:
   the runbook.
 - The runbook states that current scaffold-only skips are safety-gate evidence
   only and not RLS enforcement evidence.
+- No runtime code, tests, executable SQL files, migrations, `.env` files,
+  credentials, generated Supabase state, local Supabase run, hosted Supabase
+  connection, live RLS validation, live repository mode, service-role
+  request-path usage, frontend/UI, Expo, AI, offline sync, or public Notes API
+  behavior change is introduced.
+
+Slice 6H-3B-4C-B is complete when:
+
+- `docs/notes-local-rls-dry-run-blocker-resolution.md` records the current
+  blocked reasons, local-only target requirements, placeholder-only env rules,
+  synthetic user/data requirements, cleanup proof expectations, preflight
+  checklist, stop conditions, and definition of ready.
+- The next recommended task is Slice 6H-3B-4C-E2, but only after the
+  blocker-resolution checklist is satisfied locally.
 - No runtime code, tests, executable SQL files, migrations, `.env` files,
   credentials, generated Supabase state, local Supabase run, hosted Supabase
   connection, live RLS validation, live repository mode, service-role

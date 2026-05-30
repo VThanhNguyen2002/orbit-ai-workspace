@@ -2,8 +2,8 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-B - Resolve local RLS dry-run
-blockers**.
+Recommended next task: **Slice 6H-3B-4C-E2 - Re-attempt local-only RLS
+dry-run**.
 
 Slice 6H-3B-4C-LA records constrained approval for a future local-only RLS
 dry-run attempt in
@@ -21,28 +21,33 @@ required disposable local target configuration and synthetic user token inputs
 were absent. The blocked result is recorded in
 [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
 
-The next bounded step is to resolve those local-only blockers outside git.
-Execution must not happen automatically merely because approval has been
-recorded, the runbook exists, or a blocked report exists. The operator must
-re-check every precondition immediately before retrying the dry-run.
+Slice 6H-3B-4C-B records the blocker-resolution checklist in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
+
+The next bounded step is to re-attempt the local-only dry-run only after those
+blockers are resolved outside git. Execution must not happen automatically
+merely because approval has been recorded, the runbook exists, a blocked report
+exists, or the blocker-resolution checklist exists. The operator must re-check
+every precondition immediately before retrying the dry-run.
 
 ## Why This Is Next
 
-The local-only approval boundary and runbook are explicit, but RLS behavior has
-not been validated. The first execution preflight confirmed that required local
-configuration is missing. The next step is to prepare the missing disposable
+The local-only approval boundary, runbook, blocked report, and
+blocker-resolution checklist are explicit, but RLS behavior has not been
+validated. The next step is to retry Slice 6H-3B-4C-E only after the disposable
 local target, synthetic users, public-key value, synthetic caller tokens, and
-cleanup plan outside git before retrying Slice 6H-3B-4C-E.
+cleanup plan are prepared outside git and verified without printing raw values.
 
 Hosted staging planning remains deferred until the local-only dry-run is either
 completed with accepted evidence or explicitly deferred.
 
 ## Expected Files To Change
 
-- Local-only setup notes may be updated only if they remain placeholder-only
-  and contain no credentials or environment-specific values.
-- Minimal references from the runbook, approval, validation, harness, policy,
-  or next-action docs, if needed.
+- A redacted local-only dry-run execution report, if the checklist is satisfied
+  and the runbook is followed.
+- A refreshed blocked report, if the checklist is still not satisfied.
+- Minimal references from planning docs, if the re-attempt outcome changes
+  status.
 
 Do not add provider secrets, frontend screens, Expo initialization, API client
 methods, sync engine implementation, AI behavior, hosted staging workflow
@@ -52,10 +57,11 @@ test execution outside the approved manual local-only runbook flow.
 
 ## Commands To Run
 
-Re-check the runbook preconditions before retrying manual local-only execution.
-The dry-run must use only a disposable local target, synthetic users, synthetic
-Notes rows, local-only public key plus caller-token inputs, and redacted
-evidence. Stop if any runbook stop condition applies.
+Re-check the blocker-resolution checklist and runbook preconditions before
+retrying manual local-only execution. The dry-run must use only a disposable
+local target, synthetic users, synthetic Notes rows, local-only public key plus
+caller-token inputs, and redacted evidence. Stop if any checklist or runbook
+stop condition applies.
 
 ```bash
 pnpm --filter @synapse/shared contracts:export
@@ -76,8 +82,8 @@ pnpm build
 
 ## Definition Of Done
 
-- Missing local-only prerequisites are prepared outside git, or execution
-  remains explicitly blocked.
+- Missing local-only prerequisites are prepared outside git before execution,
+  or execution remains explicitly blocked.
 - No real URL, key, token, user identifier, note identifier, or note content is
   committed.
 - The operator can prove that cleanup is actionable before retrying the dry-run.
