@@ -3,6 +3,7 @@ import {
   ApiSuccessEnvelopeSchema,
   CreateNoteRequestSchema,
   DeleteNoteRequestSchema,
+  SummarySchema,
   UpdateNoteRequestSchema,
   type ApiErrorCode,
   type ApiErrorEnvelope,
@@ -16,6 +17,7 @@ import {
   type Note,
   type NoteContentType,
   type PaginationMeta,
+  type Summary,
   type SyncMetadata,
   type UpdateNoteRequest,
 } from "@synapse/shared";
@@ -52,6 +54,14 @@ export type NotesApi = {
     note_id: string,
     payload: DeleteNoteRequest,
   ) => Promise<ApiSuccessResponse<Note>>;
+};
+
+/** AI feature namespace on {@link SynapseApiClient}.
+ *
+ * NOTE: SSE streaming is deferred to Slice 7E.
+ */
+export type AiApi = {
+  summarizeNote: (note_id: string) => Promise<ApiSuccessResponse<Summary>>;
 };
 
 export type QueryValue =
@@ -139,6 +149,7 @@ export class ApiInvalidResponseError extends Error {
 
 export class SynapseApiClient {
   readonly notes: NotesApi;
+  readonly ai: AiApi;
 
   private readonly baseUrl: string;
   private readonly fetcher: FetchLike;
@@ -154,6 +165,9 @@ export class SynapseApiClient {
       get: (note_id) => this.getNote(note_id),
       update: (note_id, payload) => this.updateNote(note_id, payload),
       delete: (note_id, payload) => this.deleteNote(note_id, payload),
+    };
+    this.ai = {
+      summarizeNote: (note_id) => this.doSummarizeNote(note_id),
     };
   }
 
@@ -254,6 +268,15 @@ export class SynapseApiClient {
       body: DeleteNoteRequestSchema.parse(payload) as JsonValue,
       method: "DELETE",
       parseData: parseNoteData,
+    });
+  }
+
+  private doSummarizeNote(
+    note_id: string,
+  ): Promise<ApiSuccessResponse<Summary>> {
+    return this.request(`/ai/notes/${encodeURIComponent(note_id)}/summarize`, {
+      method: "POST",
+      parseData: parseSummaryData,
     });
   }
 
@@ -623,4 +646,26 @@ function notesListQuery(query: ListNotesQuery): Record<string, QueryValue> {
     is_archived: query.is_archived,
     include_deleted: query.include_deleted,
   };
+}
+
+/**
+ * Validates the `data` field of a summarize-note success response using the
+ * shared {@link GetSummaryResponseSchema}.
+ *
+ * Uses Zod schema validation directly — no `any`, no manual field checks.
+ * ZodErrors are surfaced as {@link ApiInvalidResponseError} to match the
+ * existing error-handling contract.
+ */
+function parseSummaryData(data: unknown): Summary {
+  const result = SummarySchema.safeParse(data);
+
+  if (!result.success) {
+    throw new ApiInvalidResponseError(
+      200,
+      data,
+      `Summary response data did not match contract: ${result.error.message}`,
+    );
+  }
+
+  return result.data;
 }

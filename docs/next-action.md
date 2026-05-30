@@ -2,26 +2,26 @@
 
 ## Objective
 
-Recommended next task: **Slice 7D — API client summarization methods**.
+Recommended next task: **Slice 7E — Prompt builder and redaction tests**.
 
-Slice 7C is complete. Backend fake-provider summarization route added:
+Slice 7D is complete. API client `summarizeNote` method added:
 
-- `POST /v1/ai/notes/{note_id}/summarize` — auth-gated, owner-scoped, non-streaming.
-- `FakeSummarizationProvider` — deterministic, network-free.
-- `SummarizationService` — ownership check, size guard, disabled-by-default flag.
-- 10 new backend tests; 122 pytest tests pass.
-- Enabled via `SYNAPSE_AI_SUMMARIZATION_ENABLED=true`.
+- `client.ai.summarizeNote(note_id)` → `Promise<ApiSuccessResponse<Summary>>`
+- Route: `POST /v1/ai/notes/{note_id}/summarize`
+- Response validated with `SummarySchema.safeParse` (no `any`, no unsafe casts).
+- Auth header injected via existing `getAuthToken` mechanism.
+- 11 new api-client tests; 25 total api-client tests pass.
 - **SSE streaming deferred to a future slice (7E or 7F).**
 
-Slice 7D should add to the API client (`packages/api-client` or equivalent):
+Slice 7E should add:
 
-- Typed `summarizeNote(noteId)` method.
-- SSE event parser for `AiStreamEventSchema`.
-- No provider SDK, no credentials, no new backend routes.
+- Prompt builder: assembles summarization prompt from note title + content.
+- Redaction tests: verify no note content, prompt text, tokens, or API keys are
+  logged at any layer (backend service, provider boundary, router).
+- No provider SDK, no OpenAI integration, no new API routes.
 
 Local Supabase / RLS validation remains paused (disk capacity). Resume
 conditions in [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
-
 
 Local Supabase / RLS validation remains paused (disk capacity). Resume
 conditions in [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
