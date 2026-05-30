@@ -6,6 +6,7 @@ from typing import Literal, cast
 AuthMode = Literal["dev", "jwt"]
 ConfiguredAuthMode = AuthMode | str
 NotesRepositoryMode = Literal["memory", "supabase"]
+AiProvider = Literal["fake"]
 SUPPORTED_AUTH_MODES: tuple[AuthMode, ...] = ("dev", "jwt")
 
 
@@ -27,6 +28,10 @@ class Settings:
     supabase_anon_key: str | None = None
     supabase_jwt_secret: str | None = None
     supabase_service_role_key: str | None = None
+    # AI summarization settings (no provider secrets — fake only)
+    ai_summarization_enabled: bool = False
+    ai_provider: AiProvider = "fake"
+    ai_max_input_chars: int = 50_000
 
 
 @lru_cache
@@ -46,6 +51,9 @@ def get_settings() -> Settings:
         supabase_anon_key=os.getenv("SUPABASE_ANON_KEY"),
         supabase_jwt_secret=os.getenv("SUPABASE_JWT_SECRET"),
         supabase_service_role_key=os.getenv("SUPABASE_SERVICE_ROLE_KEY"),
+        ai_summarization_enabled=os.getenv(
+            "SYNAPSE_AI_SUMMARIZATION_ENABLED", ""
+        ).lower() in ("1", "true", "yes"),
     )
 
 
