@@ -462,9 +462,11 @@ Once `supabase start` succeeds:
 3. Do not commit the URL or key.
 4. Do not paste the full `supabase status` output anywhere.
 
-## 14. B4 Troubleshooting Summary
+## 14. B4 / B4-D Troubleshooting Summary
 
 Date: 2026-05-30
+
+### B4 — Docker Startup Attempt
 
 | Check | Result |
 |---|---|
@@ -476,10 +478,18 @@ Date: 2026-05-30
 | `supabase stop` | **Failed** — `ENOSPC: no space left on device` |
 | Disk after retry | **100% full**, 0 bytes free |
 | Root cause | **Disk exhausted** during image pull + container layer writes |
-| Supabase images size | ~4.9 GB total |
-| Cleanup (images removed) | ~4.9 GB reclaimed via `docker rmi` |
-| Disk after cleanup | ~3.9 GB free (86% used) |
+
+### B4-D — Post-Cleanup State
+
+| Cleanup Action | Result |
+|---|---|
+| Supabase images removed (`docker rmi`) | ~4.9 GB reclaimed |
+| Snap cache cleared (`/var/lib/snapd/cache`) | 3.7 GB → 4 KB reclaimed |
+| Disk after all cleanup | ~7.2–7.3 GB free (74% used) |
+| Safe retry threshold | ≥10 GB free (minimum 8 GB) |
+| Retry blocked | **Yes** — below threshold |
 | No Supabase containers remain | Confirmed |
 | No raw secrets pasted | Confirmed |
 
-Required before next attempt: free 8–10 GB on `/` (see section 13).
+Next recommended task: **Slice 6H-3B-4C-P** — pause local Supabase validation
+until disk is expanded or sufficient space is freed.

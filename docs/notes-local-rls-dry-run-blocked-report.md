@@ -4,12 +4,11 @@
 
 Slice 6H-3B-4C-E3 local RLS dry-run remains **blocked before execution**.
 
-Most recent troubleshooting: 2026-05-30 (Slice 6H-3B-4C-B4).
+Most recent update: 2026-05-30 (Slice 6H-3B-4C-B4-D).
 
 No SQL was executed. No RLS validation ran. No hosted, staging, or production
 Supabase was contacted. The reviewed Markdown artifact was not materialized.
-The opt-in local RLS harness was not run. No synthetic users or Notes rows
-were created, mutated, or cleaned up.
+The opt-in local RLS harness was not run.
 
 ## Source References
 
@@ -17,18 +16,12 @@ were created, mutated, or cleaned up.
   [notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md)
 - Approval record:
   [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md)
-- Preparation checklist:
-  [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
 - Blocker-resolution checklist:
   [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
-- Local-only Markdown artifact:
-  [notes-local-migration-rls-artifact.md](database/notes/notes-local-migration-rls-artifact.md)
-- Database artifact policy:
-  [database-migration-policy.md](security/database-migration-policy.md)
 
 Recorded source state:
 
-- Source commit: `b8e78f4`
+- Source commit: `b039eeb`
 - Artifact blob: `8376735329234cf4838d6344b5a0757fdeeb8828`
 - Runbook blob: `fb84e00af93bf5b42aee2189efa9d6f73be8bf9d`
 
@@ -46,68 +39,75 @@ Missing: Supabase CLI not on PATH, no local project, all env vars absent.
 ### Slice 6H-3B-4C-E3 / B3
 
 CLI available (npx 2.102.0). `supabase init` succeeded. `supabase start`
-failed during image pull/inspect. Stop ran. No containers remained.
+failed during image pull. Stop ran. No containers remained.
 
-### Slice 6H-3B-4C-B4 (Current — Docker Troubleshooting)
+### Slice 6H-3B-4C-B4
 
-Environment checks:
+Root cause identified: **disk exhausted (ENOSPC)**. Images pulled (~4.9 GB)
+but container layer writes consumed all remaining space. Disk hit 100%.
+Supabase images removed via `docker rmi` → ~4.9 GB reclaimed.
 
-- Docker daemon: running (v29.1.3, overlayfs, Ubuntu 22.04, 7.7 GiB RAM).
-- Registry `public.ecr.aws`: reachable (HTTP 401 — normal auth challenge).
-- Disk before retry: 87% full (~3.8 GB free).
+### Slice 6H-3B-4C-B4-D (Current — Post-Cleanup State)
 
-`supabase start` retry result:
+Cleanup actions completed since B4:
 
-- Docker image layers: **downloaded successfully** (all Supabase images
-  pulled from `public.ecr.aws`).
-- Container startup: **failed** — `error running container: exit 1`.
-- `supabase stop --no-backup` after retry: **failed** —
-  `ENOSPC: no space left on device`.
-- Disk after retry: **100% full** (29 GB used, 0 free).
+- Supabase Docker images removed (~4.9 GB).
+- Snap cache cleared (`/var/lib/snapd/cache` reduced from 3.7 GB to 4 KB).
 
-Root cause: **disk space exhausted**. Supabase images consumed the remaining
-~3.8 GB during image pull and container layer writes, leaving no space for
-container startup to complete.
+Disk state after all cleanup:
 
-Cleanup performed (B4):
+- Available: ~7.2–7.3 GB free (74% used on 29 GB volume).
+- This is **below the safe retry threshold** of 8 GB minimum (10 GB preferred).
 
-- Removed all pulled Supabase images via `docker rmi` (~4.9 GB reclaimed).
-- Pruned stopped containers (0 bytes additional).
-- Disk after cleanup: ~3.9 GB free (86% used).
-- `docker ps` filter confirms no Supabase containers running.
-- No raw `supabase status` output was pasted.
+Why 7.3 GB is still insufficient:
 
-## What Was Not Executed (Complete List)
+- Supabase full image set: ~4.9 GB.
+- Container layer overhead during startup: additional headroom needed.
+- No buffer for ongoing system operations.
+- Risk of hitting ENOSPC again during `supabase start`.
 
-- No SQL execution.
+## Decision Point
+
+Three options remain:
+
+**Option A — Free more disk manually** (target ≥ 8 GB, prefer ≥ 10 GB):
+- Remove unused apt packages: `sudo apt-get autoremove --purge`
+- Remove apt caches: `sudo apt-get clean`
+- Remove npm cache: `npm cache clean --force`
+- Remove unused snap revisions: `snap list --all | awk '/disabled/{print $1, $3}' | while read snapname revision; do sudo snap remove "$snapname" --revision="$revision"; done`
+- Check home dir for large files: `du -sh ~/Downloads ~/Videos ~/Music ~/.cache 2>/dev/null | sort -rh | head -10`
+- See section 13 of the blocker-resolution doc for the full disk cleanup guide.
+
+**Option B — Expand VM disk**:
+- If running in a VM, increase the virtual disk allocation from outside the VM.
+- Resize the partition and filesystem: `sudo growpart /dev/sda 3 && sudo resize2fs /dev/sda3`.
+- This is the most reliable path and avoids repeated cleanup cycles.
+
+**Option C — Pause local Supabase validation**:
+- Defer local RLS dry-run until disk is expanded or a machine with sufficient
+  space is available.
+- Record the deferral in docs and continue with other project work.
+- This is the current recommended path (see next-action.md).
+
+## What Was Not Executed
+
+- No `supabase start` retry after B4.
+- No SQL execution at any point.
 - No RLS harness execution.
 - No hosted, staging, or production Supabase access.
-- No materialization of the Markdown artifact.
-- No service-role request-path behavior.
-- No creation, mutation, deletion, or cleanup of users or Notes rows.
-- No repo artifacts, `.env`, `.sql`, migrations, or generated state created.
-
-## Required Manual Resolution
-
-Before retrying Slice 6H-3B-4C-E3, an operator must free significantly more
-disk space. The full Supabase local stack images total approximately 4.9 GB,
-and container startup requires additional headroom. A minimum of 8–10 GB free
-space on `/` is recommended before retrying.
-
-See [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
-section 13 for disk troubleshooting steps.
+- No repo artifacts, `.env`, `.sql`, migrations, or generated state created or staged.
 
 ## Safety Confirmation
 
-This report contains no real Supabase URL, key, token, user identifier,
-email, note identifier, or note content. No `supabase status` output was pasted.
+No real Supabase URL, key, token, user identifier, email, note identifier, or
+note content in this report. No `supabase status` output was pasted.
 
-No `.env`, `.sql`, `supabase/migrations/*`, generated Supabase state,
-credential, or sensitive evidence artifact was created or staged.
+No `.env`, `.sql`, `supabase/migrations/*`, generated Supabase state, or
+credential was created or staged.
 
 ## Next Recommended Task
 
-**Slice 6H-3B-4C-B4-R — Resolve Docker disk space blocker manually**.
+**Slice 6H-3B-4C-P — Pause local Supabase validation until disk is expanded**.
 
-Free at least 8–10 GB on `/`, then retry `supabase start` in
-`/tmp/synapse-supabase-dryrun`. Do not execute automatically.
+Do not retry `supabase start` until at least 8 GB (prefer ≥ 10 GB) free on
+`/`. Do not execute automatically.

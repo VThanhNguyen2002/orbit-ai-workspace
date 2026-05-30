@@ -2,25 +2,28 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-B4-R — Resolve Docker disk space
-blocker manually**.
+Recommended next task: **Slice 6H-3B-4C-P — Pause local Supabase validation
+until disk capacity is expanded**.
 
-Slice 6H-3B-4C-B4 identified the root cause of the `supabase start` failure:
-**disk exhausted (ENOSPC)**. Supabase images (~4.9 GB) were pulled successfully
-but container layer writes consumed all remaining space on `/`. The startup
-failed with `error running container: exit 1` and `supabase stop` also failed
-with `ENOSPC`.
+Slice 6H-3B-4C-B4-D records the post-cleanup disk state. Supabase images
+(~4.9 GB) and snap cache (3.7 GB) were cleared. Disk is now ~7.2–7.3 GB free
+(74% on a 29 GB volume) — still below the safe retry threshold of ≥8 GB
+(prefer ≥10 GB). No retry of `supabase start` was attempted.
 
-Cleanup: all Supabase images removed via `docker rmi` (~4.9 GB reclaimed).
-Disk is now ~3.9 GB free (86% used) — still insufficient. At least 8–10 GB
-free is needed before retrying.
+Available options before any future retry:
 
-See section 13 of
+**A.** Free more disk manually (apt autoremove, npm cache, snap revisions,
+large files in `~/Downloads` or `~/.cache`) — see
 [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
-for exact disk cleanup steps.
+section 13.
 
-Do not run Slice 6H-3B-4C-E3 until `supabase start` succeeds locally and the
-full blocker-resolution checklist (section 11) is satisfied.
+**B.** Expand VM disk allocation from outside the VM, then
+`sudo growpart /dev/sda 3 && sudo resize2fs /dev/sda3`.
+
+**C.** Pause local Supabase validation (current recommendation).
+
+Do not run Slice 6H-3B-4C-E3 until at least 8 GB (prefer ≥10 GB) is free.
+
 
 
 
