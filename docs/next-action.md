@@ -2,27 +2,22 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-P — Pause local Supabase validation
-until disk capacity is expanded**.
+Recommended next task: **Slice 7A — AI summarization planning**.
 
-Slice 6H-3B-4C-B4-D records the post-cleanup disk state. Supabase images
-(~4.9 GB) and snap cache (3.7 GB) were cleared. Disk is now ~7.2–7.3 GB free
-(74% on a 29 GB volume) — still below the safe retry threshold of ≥8 GB
-(prefer ≥10 GB). No retry of `supabase start` was attempted.
+Slice 6H-3B-4C-P records an intentional pause of local Supabase validation.
+All practical disk cleanup steps were completed (Supabase images ~4.9 GB,
+snap cache ~3.7 GB removed). Disk is ~7.2–7.3 GB free — still below the
+safe retry threshold of ≥8 GB (prefer ≥10 GB). VM disk expansion is required
+before any future retry.
 
-Available options before any future retry:
+The Supabase / RLS validation branch is **explicitly paused**. It is not
+abandoned. Resume conditions are recorded in
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md)
+and [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
 
-**A.** Free more disk manually (apt autoremove, npm cache, snap revisions,
-large files in `~/Downloads` or `~/.cache`) — see
-[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
-section 13.
+AI summarization planning (Slice 7A) can proceed docs-first without secrets,
+credentials, runtime provider integration, or Supabase dependencies.
 
-**B.** Expand VM disk allocation from outside the VM, then
-`sudo growpart /dev/sda 3 && sudo resize2fs /dev/sda3`.
-
-**C.** Pause local Supabase validation (current recommendation).
-
-Do not run Slice 6H-3B-4C-E3 until at least 8 GB (prefer ≥10 GB) is free.
 
 
 

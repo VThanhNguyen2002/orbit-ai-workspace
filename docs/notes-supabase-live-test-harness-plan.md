@@ -45,6 +45,14 @@ Slice 6H-3B-4C-B records the exact local-only setup checklist and
 blocker-resolution evidence required before another attempt in
 [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
 
+Slice 6H-3B-4C-P records an **intentional pause** of local Supabase
+validation. All practical disk cleanup was performed (Supabase images ~4.9 GB,
+snap cache ~3.7 GB removed). Disk remains ~7.2–7.3 GB free, below the safe
+retry threshold of ≥8 GB (prefer ≥10 GB). VM disk expansion is required before
+resuming. Resume conditions are documented in
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+Local Supabase validation is paused; it is not abandoned.
+
 ## 1. Objective
 
 Define the future harness that can validate the Notes Supabase adapter, RLS

@@ -2,13 +2,12 @@
 
 ## 1. Objective
 
-Slice 6H-3B-4C-B3 records a new blocker encountered during the B2 manual
-setup attempt: `npx supabase start` failed during Docker image pull/inspect
-from `public.ecr.aws`. The local Supabase stack did not start. Cleanup was
-performed (`supabase stop --no-backup`). No SQL was executed.
+Slice 6H-3B-4C-P records an intentional pause of local Supabase validation
+due to VM disk capacity being insufficient after all practical cleanup steps.
+Disk is ~7.2–7.3 GB free; the safe retry threshold is ≥8 GB (prefer ≥10 GB).
 
-This document now covers all known blockers from E, E2, and E3/B3 attempts.
-The Docker startup failure must be fixed before any future dry-run can proceed.
+This document covers all known blockers from E through B4-D. Validation is
+explicitly paused. Resume requires VM disk expansion or equivalent free space.
 
 This document defines the exact manual setup a human operator must complete
 outside git before any future dry-run attempt. It does not execute SQL, create
@@ -49,8 +48,18 @@ Repository safety checks all passed (clean working tree, no tracked `.env`,
 `.sql`, `supabase/migrations/*`; `SUPABASE_SERVICE_ROLE_KEY` absent; no
 `node-actionlint` in manifests; `.codegraph/` already gitignored).
 
-No operator should retry the dry-run until the Docker startup failure is fixed
-and each missing item is resolved outside git.
+### From B4-D / P (Intentional Pause — Current)
+
+- ~~Container startup ENOSPC~~ — addressed: Supabase images removed (~4.9 GB).
+- ~~Snap cache 3.7 GB~~ — cleared: `/var/lib/snapd/cache` is now 4 KB.
+- Disk after all cleanup: ~7.2–7.3 GB free (74% used).
+- This is **still below the safe retry threshold** of ≥8 GB (≥10 GB preferred).
+- Local Supabase validation is **intentionally paused**.
+- Resume requires: VM disk expansion to ≥8 GB free, or equivalent free space
+  obtained by other means.
+
+Do not retry the dry-run until disk is confirmed sufficient and all checklist
+items in section 11 are re-verified.
 
 ## 3. Local-Only Target Requirements
 
