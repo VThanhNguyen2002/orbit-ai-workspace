@@ -2,47 +2,36 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-B2 — Resolve remaining local RLS
-dry-run blockers**.
+Recommended next task: **Slice 6H-3B-4C-E3 — Re-attempt local-only RLS
+dry-run after local setup**.
+
+Slice 6H-3B-4C-B2 updated the blocker-resolution checklist in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
+with a detailed manual setup sequence (Supabase CLI install, local project
+init, synthetic user creation, env var export, cleanup proof, tooling notes).
+That document is now the definitive setup guide for the next attempt.
 
 Slice 6H-3B-4C-E2 re-attempted preflight on 2026-05-30 and was blocked for
-a second consecutive time. Blockers are identical to the prior attempt:
-no disposable local Supabase target, no Supabase CLI on PATH, and all
-required environment variables are absent. See updated
+a second consecutive time. Blocked result:
 [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
 
-Slice 6H-3B-4C-LA records constrained approval for a future local-only RLS
-dry-run attempt in
+Slice 6H-3B-4C-LA records constrained approval in
 [notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md).
-The approval is limited to a disposable local Supabase target, the local-only
-Markdown artifact, opt-in local harness, synthetic users, synthetic Notes rows,
-redacted evidence, and cleanup verification.
+Slice 6H-3B-4C-DR added the runbook in
+[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md).
 
-Slice 6H-3B-4C-DR added the local-only execution runbook in
-[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md)
-without executing the artifact, running Supabase locally, or validating RLS.
-
-Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
-required disposable local target configuration and synthetic user token inputs
-were absent. The blocked result is recorded in
-[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
-
-Slice 6H-3B-4C-B records the blocker-resolution checklist in
-[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md).
-
-The next bounded step is to re-attempt the local-only dry-run only after those
-blockers are resolved outside git. Execution must not happen automatically
-merely because approval has been recorded, the runbook exists, a blocked report
-exists, or the blocker-resolution checklist exists. The operator must re-check
-every precondition immediately before retrying the dry-run.
+Do not run Slice 6H-3B-4C-E3 until the blocker-resolution checklist in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
+section 11 is fully satisfied manually. Execution must not happen automatically
+because docs exist. The operator must re-check every precondition immediately
+before retrying the dry-run.
 
 ## Why This Is Next
 
-The local-only approval boundary, runbook, blocked report, and
-blocker-resolution checklist are explicit, but RLS behavior has not been
-validated. The next step is to retry Slice 6H-3B-4C-E only after the disposable
-local target, synthetic users, public-key value, synthetic caller tokens, and
-cleanup plan are prepared outside git and verified without printing raw values.
+RLS behavior has not been validated. B2 is complete. The only remaining blocker
+is a human operator running the manual setup sequence in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
+sections 3–8. Until that setup is done outside git, E3 must not be attempted.
 
 Hosted staging planning remains deferred until the local-only dry-run is either
 completed with accepted evidence or explicitly deferred.
@@ -63,27 +52,19 @@ test execution outside the approved manual local-only runbook flow.
 
 ## Commands To Run
 
-Re-check the blocker-resolution checklist and runbook preconditions before
-retrying manual local-only execution. The dry-run must use only a disposable
-local target, synthetic users, synthetic Notes rows, local-only public key plus
-caller-token inputs, and redacted evidence. Stop if any checklist or runbook
-stop condition applies.
+Before attempting E3, complete the manual setup sequence in
+[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
+sections 3–8 outside git. Then satisfy the preflight checklist in section 11
+before running any harness command.
+
+Fast verification for docs-only slices:
 
 ```bash
-pnpm --filter @synapse/shared contracts:export
-pnpm --filter @synapse/shared contracts:check
-
-cd apps/api
-python3 -m ruff check .
-python3 -m pytest
-cd ../..
-
-pnpm --filter @synapse/shared test
-pnpm --filter @synapse/api-client test
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+git diff --check
+python3 -m ruff check apps/api
+python3 -m pytest apps/api/tests/integration/test_notes_rls_validation.py -q
+pnpm dlx node-actionlint .github/workflows/ci.yml
+gitleaks detect --source=. --redact
 ```
 
 ## Definition Of Done

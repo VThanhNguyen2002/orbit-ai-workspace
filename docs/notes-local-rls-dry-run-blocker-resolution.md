@@ -2,188 +2,335 @@
 
 ## 1. Objective
 
-Slice 6H-3B-4C-B resolves the missing setup preconditions that blocked the
-first local-only Notes RLS dry-run attempt at planning and documentation level.
+Slice 6H-3B-4C-B2 updates the local-only blocker-resolution checklist after
+Slice 6H-3B-4C-E2 was blocked for a second consecutive time. The cause is
+identical to the first blocked attempt: no disposable local Supabase target,
+no Supabase CLI on PATH, and all required environment variables are absent.
 
-This document defines the exact local-only checklist and the evidence that must
-exist before another dry-run attempt. It does not execute SQL, create SQL
-files, add migrations, start Supabase locally, connect to hosted Supabase, run
-RLS validation, add credentials, use service-role request-path behavior, enable
-live Notes persistence, or change public Notes API behavior.
+This document defines the exact manual setup a human operator must complete
+outside git before any future dry-run attempt. It does not execute SQL, create
+SQL files, add migrations, start Supabase locally, connect to hosted Supabase,
+run RLS validation, add credentials, use service-role request-path behavior,
+enable live Notes persistence, change public Notes API behavior, or add any
+runtime, package, or dependency.
 
-The blocked attempt is recorded in
+The blocked attempts are recorded in
 [notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
-The next attempt must still follow
+Any future attempt must follow
 [notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md)
 and stop at any failed preflight or stop condition.
 
-## 2. Current Blocked Reasons
+## 2. Current Blocked Reasons (From E2 Re-Attempt)
 
-The first dry-run attempt stopped before execution because all of the following
-preconditions were missing or unproven:
+Slice 6H-3B-4C-E2 ran preflight on 2026-05-30 and stopped before execution
+because every execution precondition was missing:
 
-- missing `SYNAPSE_SUPABASE_INTEGRATION_TESTS`;
-- missing `SYNAPSE_SUPABASE_TEST_MODE`;
-- missing `SUPABASE_URL`;
-- missing public key source through `SUPABASE_PUBLISHABLE_KEY` or reviewed
-  legacy `SUPABASE_ANON_KEY`;
-- missing synthetic user A and user B token sources through
-  `SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN` and
-  `SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN`;
-- missing confirmed disposable local target;
-- missing synthetic users and synthetic Notes data; and
-- missing actionable cleanup proof.
+- Supabase CLI not found on PATH (`supabase` command not available).
+- No disposable local Supabase project running or initialized.
+- `SYNAPSE_SUPABASE_INTEGRATION_TESTS=1` not present in shell.
+- `SYNAPSE_SUPABASE_TEST_MODE=local` not present in shell.
+- `SUPABASE_URL` not present; local target URL unknown.
+- Neither `SUPABASE_PUBLISHABLE_KEY` nor `SUPABASE_ANON_KEY` present.
+- `SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN` not present.
+- `SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN` not present.
+- Synthetic user A and user B not confirmed.
+- Synthetic Notes data not confirmed.
+- Target-locality, absence of real data, and cleanup actionability cannot be
+  verified without an actual disposable local target.
 
-No operator should retry the dry-run until each item has been resolved outside
-git and can be verified without printing raw values.
+Repository safety checks all passed (clean working tree, no tracked `.env`,
+`.sql`, `supabase/migrations/*`; `SUPABASE_SERVICE_ROLE_KEY` absent; no
+`node-actionlint` in manifests; `.codegraph/` already gitignored).
+
+No operator should retry the dry-run until each missing item has been resolved
+outside git and can be verified without printing raw values.
 
 ## 3. Local-Only Target Requirements
 
 An acceptable target must satisfy every requirement below:
 
-- The target is a disposable local Supabase project only.
-- The target is not hosted, staging, production, shared QA, or any other
-  persistent remote Supabase project.
+- The target is a disposable local Supabase project only. It must not be
+  hosted, staging, production, shared QA, or any other persistent remote
+  Supabase project.
 - The target contains no real users, real emails, real Notes rows, imported
   production data, staging data, dumps, backups, snapshots, or realistic
   personal content.
 - The target uses only synthetic users and synthetic Notes rows prepared for
   the dry-run.
 - Request-path validation does not require or use service-role credentials.
-- Cleanup or full disposal/reset is possible before execution starts.
+- Cleanup or full disposal/reset is possible before, during, and after
+  execution.
 
-If locality, data safety, request-path credential boundaries, or cleanup cannot
-be proven, the target is not ready.
+If locality, data safety, request-path credential boundaries, or cleanup
+cannot be proven, the target is not ready.
 
-## 4. Local Env Setup Rules
+## 4. Manual Setup Sequence (Operator Only, Outside Git)
 
-The next attempt may use these placeholder-only environment names:
+Complete the following steps in a local shell. Do not commit any file produced
+by this setup.
+
+### Step 1 — Install Supabase CLI
+
+Install the Supabase CLI using your platform package manager or npm:
 
 ```text
-SYNAPSE_SUPABASE_INTEGRATION_TESTS=1
-SYNAPSE_SUPABASE_TEST_MODE=local
-SUPABASE_URL=<disposable-local-supabase-url>
-SUPABASE_PUBLISHABLE_KEY=<local-public-publishable-key>
-SUPABASE_ANON_KEY=<reviewed-legacy-public-anon-key-fallback>
-SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN=<synthetic-user-a-token>
-SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN=<synthetic-user-b-token>
+npm install -g supabase
+# or: brew install supabase/tap/supabase  (macOS)
+# or: see https://supabase.com/docs/guides/cli
 ```
 
-Use either `SUPABASE_PUBLISHABLE_KEY` or the deliberately reviewed legacy
-`SUPABASE_ANON_KEY` fallback. Do not require both.
+Confirm installation:
 
-Rules:
+```text
+supabase --version
+```
 
-- Real values belong only in an ignored local environment file, local shell, or
-  approved secret store.
-- Never commit `.env` files or copied shell transcripts containing real values.
-- Never print raw URLs, keys, access tokens, authorization headers, Auth
-  payloads, user identifiers, note identifiers, emails, or note content.
-- Never include token values in evidence.
-- Never set `SUPABASE_SERVICE_ROLE_KEY` for request-path harness validation.
-- Clear temporary local shell values or scrub temporary ignored local files
-  after the attempt.
+### Step 2 — Initialize And Start A Disposable Local Project
 
-## 5. Synthetic User/Data Requirements
+In a temporary directory outside this git repository:
 
-The dry-run may use only synthetic user A and synthetic user B.
+```text
+mkdir /tmp/synapse-rls-local && cd /tmp/synapse-rls-local
+supabase init
+supabase start
+```
+
+Record the output anon/publishable key and API URL. Do not commit them.
+Confirm the project is local-only (URL matches `http://127.0.0.1:<port>`).
+
+### Step 3 — Confirm No Real Data
+
+The freshly started local project contains no real users or Notes rows by
+design. Confirm this is a fresh local instance, not a project restored from a
+dump, backup, snapshot, or production data export.
+
+### Step 4 — Create Synthetic Users A And B
+
+Use the Supabase Dashboard UI at `http://127.0.0.1:<studio-port>` or the
+local CLI to create two disposable synthetic users:
+
+- Synthetic user A: use a placeholder email such as
+  `synapse-test-user-a@local.invalid`.
+- Synthetic user B: use a placeholder email such as
+  `synapse-test-user-b@local.invalid`.
+
+Obtain short-lived access tokens for each user by exchanging credentials
+against the local Auth endpoint. Keep tokens in the shell only. Do not
+commit them.
+
+### Step 5 — Set Required Environment Variables (Local Shell Only)
+
+Export values into the shell that will run the harness. Do not write these
+to any committed file:
+
+```text
+export SYNAPSE_SUPABASE_INTEGRATION_TESTS=1
+export SYNAPSE_SUPABASE_TEST_MODE=local
+export SUPABASE_URL='<local-api-url-from-step-2>'
+export SUPABASE_PUBLISHABLE_KEY='<local-anon-key-from-step-2>'
+export SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN='<user-a-token>'
+export SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN='<user-b-token>'
+unset SUPABASE_SERVICE_ROLE_KEY
+```
+
+Acceptable alternatives:
+
+- Write to a gitignored local file (e.g. `apps/api/.env.local`) and source it.
+  Confirm the file path is covered by `.gitignore` before writing.
+- Use an approved local secret store.
+
+Do not write values to any tracked file. Do not print raw values to logs,
+screenshots, evidence docs, or terminal sessions that persist.
+
+### Step 6 — Verify Presence Without Printing Values
+
+Run this check to confirm all required names are set:
+
+```text
+python3 - <<'PY'
+import os
+required = (
+    "SYNAPSE_SUPABASE_INTEGRATION_TESTS",
+    "SYNAPSE_SUPABASE_TEST_MODE",
+    "SUPABASE_URL",
+    "SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN",
+    "SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN",
+)
+public_key_names = ("SUPABASE_PUBLISHABLE_KEY", "SUPABASE_ANON_KEY")
+for name in required:
+    print(f"{name}: {'set' if os.getenv(name) else 'missing'}")
+print("public key:", "set" if any(os.getenv(n) for n in public_key_names) else "missing")
+print("SUPABASE_SERVICE_ROLE_KEY:", "set - STOP" if os.getenv("SUPABASE_SERVICE_ROLE_KEY") else "absent")
+PY
+```
+
+Expected output: all required names show `set`, public key shows `set`,
+SERVICE_ROLE_KEY shows `absent`. No raw values are printed.
+
+### Step 7 — Prepare Cleanup Plan
+
+Before running the dry-run, confirm you can clean up:
+
+- Synthetic Notes rows: delete via owner-scoped API, deterministic synthetic
+  prefix predicates, or full local project disposal (`supabase stop --no-backup`
+  in the project directory).
+- Synthetic Auth users: remove via Dashboard UI or CLI, or dispose the
+  entire local project.
+- Local shell values: `unset` all exported env vars after the run.
+- Gitignored local env file: delete or scrub after the run.
+
+If cleanup cannot be guaranteed before execution starts, do not proceed.
+
+### Step 8 — Confirm Redacted Evidence Location
+
+Choose a location to capture evidence that is either gitignored or outside
+the git repository. The location must not accept raw keys, tokens, Auth
+payloads, emails, user identifiers, note identifiers, or note content.
+Acceptable content: coarse pass/fail/skip, synthetic user labels
+(e.g. `user-a`, `user-b`), synthetic prefixes, coarse cleanup counts,
+run date.
+
+## 5. Required Env Shape (Names Only)
+
+| Env Var Name | Required | Source |
+|---|---|---|
+| `SYNAPSE_SUPABASE_INTEGRATION_TESTS` | yes, must be `1` | local shell / gitignored file |
+| `SYNAPSE_SUPABASE_TEST_MODE` | yes, must be `local` | local shell / gitignored file |
+| `SUPABASE_URL` | yes | local shell / gitignored file |
+| `SUPABASE_PUBLISHABLE_KEY` | one of these two | local shell / gitignored file |
+| `SUPABASE_ANON_KEY` | one of these two | local shell / gitignored file |
+| `SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN` | yes | local shell / gitignored file |
+| `SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN` | yes | local shell / gitignored file |
+| `SUPABASE_SERVICE_ROLE_KEY` | **must be absent** | must not be set |
+
+## 6. Synthetic User And Data Requirements
 
 Synthetic user requirements:
 
-- Use disposable local-only accounts or local-only aliases.
+- Use disposable local-only accounts or local-only placeholder aliases.
 - Do not use real emails unless they are disposable aliases created solely for
   the local target.
 - Do not include raw emails, user ids, Auth payloads, refresh tokens, or access
   tokens in evidence.
+- Use pseudonyms (`user-a`, `user-b`) throughout evidence and logs.
 
 Synthetic Notes requirements:
 
 - Use synthetic Notes rows only.
 - Use a deterministic test prefix such as
   `synapse-live-harness-<user-label>-<run-id>`.
-- Keep the run id non-sensitive and compatible with the harness safe-component
-  rules.
+- Keep the run id non-sensitive and compatible with the harness `_SAFE_COMPONENT_RE`
+  pattern (`^[a-z0-9][a-z0-9_-]{0,63}$`).
 - Do not print note content in logs, evidence, screenshots, or docs.
 - Ensure all rows can be cleaned by owner-scoped predicates, deterministic
-  synthetic prefixes, or full local project disposal/reset.
+  synthetic prefixes, or full local project disposal.
 
-## 6. Cleanup Proof Requirements
+## 7. Cleanup Proof Requirements
 
-Before execution, the operator must be able to prove each cleanup path without
-revealing secrets or real data:
+Cleanup must be provable before execution starts:
 
-- the synthetic note cleanup path, using owner-scoped cleanup, deterministic
-  synthetic prefixes, or local project disposal/reset;
-- the synthetic Auth user cleanup path, or a full disposable local project
-  disposal/reset path;
-- the local environment cleanup path for shell values, ignored local env files,
-  temporary logs, and evidence captures;
-- the post-run git hygiene path proving no `.env`, `.sql`,
+- Synthetic Notes rows: owner-scoped cleanup, synthetic prefix predicates, or
+  local project disposal (`supabase stop --no-backup`).
+- Synthetic Auth users: Dashboard/CLI removal or local project disposal.
+- Local env values: `unset` all exported vars or delete the gitignored local
+  env file.
+- Temporary logs and evidence captures: stored only in gitignored or
+  out-of-repo locations.
+- Post-run git hygiene: `git status --short` confirms no `.env`, `.sql`,
   `supabase/migrations/*`, generated Supabase state, credential, or sensitive
-  evidence artifact is staged; and
-- the redacted evidence output location, with an explicit rule that it contains
-  only coarse pass/fail/skip results, pseudonyms, synthetic prefixes, and
-  coarse cleanup counts.
+  evidence artifact is staged.
 
-If cleanup proof depends on an unreviewed admin or service-role request path,
-the dry-run must stop until that setup path is separately reviewed and kept
-outside request-path validation.
+## 8. Redacted Evidence Requirements
 
-## 7. Preflight Checklist For Next Attempt
+After the dry-run (if executed), create or update
+`docs/notes-local-rls-dry-run-evidence.md` using the template in the runbook.
+The evidence must include only:
 
-Before retrying Slice 6H-3B-4C-E, confirm all of the following:
+- run date;
+- local-only environment confirmation;
+- artifact path and commit/blob SHA;
+- harness mode (`local`);
+- synthetic user aliases only, no raw IDs, emails, or tokens;
+- RLS matrix results (pass/fail/skip, no raw response bodies);
+- cleanup result (coarse counts only);
+- redaction confirmation;
+- no service-role request-path confirmation; and
+- no staged artifact confirmation.
 
-- [ ] Working tree is clean.
+## 9. Local Tooling Notes
+
+These tools are local-only. None should be added as a repo dependency.
+
+| Tool | Correct Usage | Do Not |
+|---|---|---|
+| `supabase` CLI | Install globally or via platform package; use outside this git repo for dry-run setup | Add to `package.json` / `pnpm-lock.yaml` |
+| `node-actionlint` | Run via `pnpm dlx node-actionlint .github/workflows/ci.yml` | Add as a repo dependency |
+| `gitleaks` | Run as local binary: `gitleaks detect --source=. --redact` | Add to `package.json` |
+| `CodeGraph` | Local-only code discovery; `.codegraph/` is already gitignored | Commit `.codegraph/` contents |
+| `MarkItDown` | Local-only trusted doc conversion | Add to server/runtime dependencies |
+
+## 10. Stop Conditions
+
+Stop immediately and do not execute the dry-run if any of these occur:
+
+- Hosted, staging, production, shared QA, or any non-disposable target is
+  detected.
+- Real data, real users, real emails, real Notes content, production data,
+  staging data, imports, dumps, backups, snapshots, or realistic personal
+  content are detected.
+- Service-role credentials are required for request-path behavior.
+- Cleanup cannot be guaranteed before execution starts.
+- Secrets, tokens, authorization headers, Auth payloads, URLs with secrets,
+  emails, raw user identifiers, note identifiers, note content, or local env
+  values would be printed, shared, captured, or committed.
+- SQL differs from the reviewed Markdown artifact without separate approval.
+- Any `.env`, `.sql`, `supabase/migrations/*`, generated Supabase state, dump,
+  backup, snapshot, database file, credential, or sensitive evidence artifact
+  would be staged or committed.
+- Default CI would need to set live/local Supabase harness values.
+
+## 11. Preflight Checklist For Next Attempt (Slice 6H-3B-4C-E3)
+
+Before retrying, confirm all items below:
+
+- [ ] Working tree is clean (`git status --short` prints nothing).
 - [ ] No `.env` or `.env.*` file is staged or tracked.
-- [ ] No `.sql` file is staged.
-- [ ] No `supabase/migrations/*` file is staged.
-- [ ] No generated Supabase state, dump, backup, snapshot, database file, or
-      local runtime artifact is staged.
+- [ ] No `.sql` file is staged or tracked.
+- [ ] No `supabase/migrations/*` file is staged or tracked.
+- [ ] No generated Supabase state, dump, backup, snapshot, or database file is
+      staged.
+- [ ] `node-actionlint` is absent from `package.json` and `pnpm-lock.yaml`.
+- [ ] Supabase CLI is installed and confirms a running local project
+      (`supabase status` returns a local URL, not hosted/staging/production).
 - [ ] The target is confirmed as disposable local Supabase only.
 - [ ] The target contains no real users, real data, staging data, production
       data, imports, dumps, backups, snapshots, or realistic personal content.
 - [ ] `SYNAPSE_SUPABASE_INTEGRATION_TESTS=1` is present locally only.
 - [ ] `SYNAPSE_SUPABASE_TEST_MODE=local` is present locally only.
 - [ ] `SUPABASE_URL` is present locally only and points to the disposable local
-      target.
+      target (URL begins with `http://127.0.0.1`).
 - [ ] `SUPABASE_PUBLISHABLE_KEY` or reviewed legacy `SUPABASE_ANON_KEY` is
       present locally only.
 - [ ] `SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN` is present locally only.
 - [ ] `SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN` is present locally only.
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` is absent from request-path harness
-      configuration.
-- [ ] Synthetic user A, synthetic user B, and synthetic Notes data are ready.
-- [ ] Cleanup is actionable for Notes rows, Auth users, local env values, and
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` is absent.
+- [ ] Synthetic user A and synthetic user B are ready.
+- [ ] Synthetic Notes data can be created and cleaned up.
+- [ ] Cleanup is actionable: Notes rows, Auth users, local env values, and
       generated local state.
-- [ ] Redacted evidence capture is ready and will not include raw values.
-- [ ] The reviewed Markdown artifact identity is unchanged, or separate review
-      has approved any change before execution.
+- [ ] Redacted evidence capture destination is ready and will not include raw
+      values.
+- [ ] The reviewed Markdown artifact identity is unchanged from the recorded
+      blob SHA `8376735329234cf4838d6344b5a0757fdeeb8828`.
 
-## 8. Stop Conditions
+## 12. Definition Of Ready
 
-Stop immediately and do not execute the dry-run if any of these occur:
+Slice 6H-3B-4C-E3 may be attempted only when:
 
-- hosted, staging, production, shared QA, or any non-disposable target is
-  detected;
-- real data, real users, real emails, real Notes content, production data,
-  staging data, imports, dumps, backups, snapshots, or realistic personal
-  content are detected;
-- service-role credentials are required for request-path behavior;
-- cleanup cannot be guaranteed before execution starts;
-- secrets, tokens, authorization headers, Auth payloads, URLs with secrets,
-  emails, raw user identifiers, note identifiers, note content, or local env
-  values would be printed, shared, captured, or committed;
-- SQL differs from the reviewed Markdown artifact without separate approval;
-- any `.env`, `.sql`, `supabase/migrations/*`, generated Supabase state, dump,
-  backup, snapshot, database file, credential, or sensitive evidence artifact
-  would be staged or committed; or
-- default CI would need to set live/local Supabase harness values.
-
-## 9. Definition Of Ready
-
-Slice 6H-3B-4C-E may be re-attempted only when:
-
-- every blocked reason in this document is resolved locally outside git;
+- every blocked reason in section 2 is resolved locally outside git;
+- the manual setup sequence in section 4 is fully completed;
+- the preflight checklist in section 11 is confirmed without printing raw
+  values;
 - the disposable local target is confirmed and contains only synthetic users
   and synthetic Notes data;
 - all required local env names are present without printing or committing raw
@@ -196,7 +343,7 @@ Slice 6H-3B-4C-E may be re-attempted only when:
 - redacted evidence capture is ready; and
 - final preflight git hygiene confirms no prohibited artifact is staged.
 
-Recommended next task: **Slice 6H-3B-4C-E2 - Re-attempt local-only RLS
+Recommended next task: **Slice 6H-3B-4C-E3 — Re-attempt local-only RLS
 dry-run**.
 
 Only re-attempt after this blocker-resolution checklist is satisfied locally.
