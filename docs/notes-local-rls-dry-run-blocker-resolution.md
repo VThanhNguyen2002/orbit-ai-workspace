@@ -2,10 +2,13 @@
 
 ## 1. Objective
 
-Slice 6H-3B-4C-B2 updates the local-only blocker-resolution checklist after
-Slice 6H-3B-4C-E2 was blocked for a second consecutive time. The cause is
-identical to the first blocked attempt: no disposable local Supabase target,
-no Supabase CLI on PATH, and all required environment variables are absent.
+Slice 6H-3B-4C-B3 records a new blocker encountered during the B2 manual
+setup attempt: `npx supabase start` failed during Docker image pull/inspect
+from `public.ecr.aws`. The local Supabase stack did not start. Cleanup was
+performed (`supabase stop --no-backup`). No SQL was executed.
+
+This document now covers all known blockers from E, E2, and E3/B3 attempts.
+The Docker startup failure must be fixed before any future dry-run can proceed.
 
 This document defines the exact manual setup a human operator must complete
 outside git before any future dry-run attempt. It does not execute SQL, create
@@ -20,30 +23,31 @@ Any future attempt must follow
 [notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md)
 and stop at any failed preflight or stop condition.
 
-## 2. Current Blocked Reasons (From E2 Re-Attempt)
+## 2. Blocked Reasons Summary
 
-Slice 6H-3B-4C-E2 ran preflight on 2026-05-30 and stopped before execution
-because every execution precondition was missing:
+### From E / E2 (Resolved In Part By B2 Manual Setup)
 
-- Supabase CLI not found on PATH (`supabase` command not available).
-- No disposable local Supabase project running or initialized.
-- `SYNAPSE_SUPABASE_INTEGRATION_TESTS=1` not present in shell.
-- `SYNAPSE_SUPABASE_TEST_MODE=local` not present in shell.
-- `SUPABASE_URL` not present; local target URL unknown.
-- Neither `SUPABASE_PUBLISHABLE_KEY` nor `SUPABASE_ANON_KEY` present.
-- `SYNAPSE_SUPABASE_TEST_USER_A_ACCESS_TOKEN` not present.
-- `SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN` not present.
-- Synthetic user A and user B not confirmed.
-- Synthetic Notes data not confirmed.
-- Target-locality, absence of real data, and cleanup actionability cannot be
-  verified without an actual disposable local target.
+- ~~Supabase CLI not on PATH~~ — resolved: `npx supabase` 2.102.0 available.
+- ~~`supabase init` not run~~ — resolved: `init` succeeded in
+  `/tmp/synapse-supabase-dryrun`.
+- All required env vars still absent (depends on running local stack).
+- Synthetic users still absent (depends on running local stack).
+
+### From E3 / B3 (New Blocker — Current)
+
+- `npx supabase start` **failed during Docker image pull/inspect** from
+  `public.ecr.aws`. The local Supabase stack did not start.
+- `SUPABASE_URL` still unknown (project never started successfully).
+- All required env vars remain absent as a result.
+- No synthetic users or Notes data could be created.
+- No RLS execution was possible.
 
 Repository safety checks all passed (clean working tree, no tracked `.env`,
 `.sql`, `supabase/migrations/*`; `SUPABASE_SERVICE_ROLE_KEY` absent; no
 `node-actionlint` in manifests; `.codegraph/` already gitignored).
 
-No operator should retry the dry-run until each missing item has been resolved
-outside git and can be verified without printing raw values.
+No operator should retry the dry-run until the Docker startup failure is fixed
+and each missing item is resolved outside git.
 
 ## 3. Local-Only Target Requirements
 
@@ -343,9 +347,76 @@ Slice 6H-3B-4C-E3 may be attempted only when:
 - redacted evidence capture is ready; and
 - final preflight git hygiene confirms no prohibited artifact is staged.
 
-Recommended next task: **Slice 6H-3B-4C-E3 — Re-attempt local-only RLS
-dry-run**.
+Recommended next task: **Slice 6H-3B-4C-B4 — Troubleshoot local Supabase
+Docker startup**.
 
-Only re-attempt after this blocker-resolution checklist is satisfied locally.
-Do not execute automatically because this document exists, the approval record
-exists, or the runbook exists.
+Only re-attempt the dry-run after the Docker startup blocker in section 13 is
+resolved and this full checklist is satisfied locally. Do not execute
+automatically because this document exists, the approval record exists, or the
+runbook exists.
+
+## 13. Docker / Supabase Local Start Troubleshooting
+
+`supabase start` pulls images from `public.ecr.aws`. If that step fails, the
+local stack cannot start and no API URL or keys can be obtained. All of the
+following must be confirmed outside git before retrying `supabase start`.
+
+### Check Docker Daemon
+
+```text
+docker info
+```
+
+Expected: docker daemon running, no error. If not running, start Docker Desktop
+or the Docker daemon for your platform.
+
+### Check Disk Space
+
+```text
+df -h
+docker system df
+```
+
+Supabase images require multiple gigabytes. Free sufficient disk space before
+retrying. Run `docker system prune` to reclaim unused layers if needed.
+
+### Check Registry / Network Access
+
+```text
+curl -I https://public.ecr.aws/v2/
+```
+
+Expected: HTTP 200 or 401 (registry reachable). If connection fails or times
+out, troubleshoot DNS, firewall, proxy, or VPN settings. Do not paste the full
+output of `supabase status` into docs or evidence if it contains API keys or
+JWT secrets.
+
+### Retry Outside Repo
+
+Retry only in `/tmp/synapse-supabase-dryrun` or another temporary directory
+outside this git repository:
+
+```text
+cd /tmp/synapse-supabase-dryrun
+npx supabase start
+```
+
+Confirm the local URL begins with `http://127.0.0.1`. Do not commit any file
+produced by this step.
+
+### Redaction Rule
+
+Never paste raw `supabase status` output into committed docs, evidence files,
+screenshots, or pull-request comments. That output contains the `anon` key,
+`service_role` key, and other secrets. Record only the presence/absence of a
+local URL and truncated port number.
+
+### After Successful Start
+
+Once `supabase start` succeeds:
+
+1. Note the local API URL and anon key in your local shell only.
+2. Continue with the manual setup sequence in section 4, starting at step 4
+   (create synthetic users).
+3. Do not commit the URL or key.
+4. Do not paste the full `supabase status` output anywhere.

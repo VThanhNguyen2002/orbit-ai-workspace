@@ -2,29 +2,24 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-E3 — Re-attempt local-only RLS
-dry-run after local setup**.
+Recommended next task: **Slice 6H-3B-4C-B4 — Troubleshoot local Supabase
+Docker startup**.
+
+Slice 6H-3B-4C-B3 records a new blocker: `npx supabase start` failed during
+Docker image pull/inspect from `public.ecr.aws` in `/tmp/synapse-supabase-dryrun`.
+The local Supabase stack did not start. Cleanup was performed
+(`supabase stop --no-backup`). No Supabase containers remain. No SQL was
+executed. No repo artifacts were created.
 
 Slice 6H-3B-4C-B2 updated the blocker-resolution checklist in
 [notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
-with a detailed manual setup sequence (Supabase CLI install, local project
-init, synthetic user creation, env var export, cleanup proof, tooling notes).
-That document is now the definitive setup guide for the next attempt.
+with a detailed manual setup sequence. Section 13 of that document now covers
+Docker troubleshooting steps.
 
-Slice 6H-3B-4C-E2 re-attempted preflight on 2026-05-30 and was blocked for
-a second consecutive time. Blocked result:
-[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+Do not run Slice 6H-3B-4C-E3 until `supabase start` succeeds locally and the
+full blocker-resolution checklist (section 11) is satisfied. Do not execute
+automatically because docs exist.
 
-Slice 6H-3B-4C-LA records constrained approval in
-[notes-local-rls-execution-approval-record.md](notes-local-rls-execution-approval-record.md).
-Slice 6H-3B-4C-DR added the runbook in
-[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md).
-
-Do not run Slice 6H-3B-4C-E3 until the blocker-resolution checklist in
-[notes-local-rls-dry-run-blocker-resolution.md](notes-local-rls-dry-run-blocker-resolution.md)
-section 11 is fully satisfied manually. Execution must not happen automatically
-because docs exist. The operator must re-check every precondition immediately
-before retrying the dry-run.
 
 ## Why This Is Next
 
