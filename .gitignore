@@ -58,3 +58,4 @@ venv/
 .agents/
 .codex/
 .git/
+.codegraph/
