@@ -20,6 +20,11 @@ Current repository note: the pytest RLS case functions remain scaffolded and
 skip after the base harness gate. A scaffold-only skip run can verify this
 runbook's local safety gates, but it is not RLS enforcement evidence.
 
+Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
+required disposable local target configuration and synthetic user token inputs
+were absent. See
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+
 ## 2. Source-Of-Truth References
 
 - Approval record:

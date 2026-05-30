@@ -2,7 +2,8 @@
 
 ## Objective
 
-Recommended next task: **Slice 6H-3B-4C-E - Execute local-only RLS dry-run**.
+Recommended next task: **Slice 6H-3B-4C-B - Resolve local RLS dry-run
+blockers**.
 
 Slice 6H-3B-4C-LA records constrained approval for a future local-only RLS
 dry-run attempt in
@@ -11,29 +12,35 @@ The approval is limited to a disposable local Supabase target, the local-only
 Markdown artifact, opt-in local harness, synthetic users, synthetic Notes rows,
 redacted evidence, and cleanup verification.
 
-Slice 6H-3B-4C-DR adds the local-only execution runbook in
+Slice 6H-3B-4C-DR added the local-only execution runbook in
 [notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md)
 without executing the artifact, running Supabase locally, or validating RLS.
 
-The next bounded step is to execute the local-only dry-run manually by
-following that runbook in a disposable local target. Execution must not happen
-automatically merely because approval has been recorded or the runbook exists.
-The operator must re-check every precondition immediately before the attempt.
+Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
+required disposable local target configuration and synthetic user token inputs
+were absent. The blocked result is recorded in
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+
+The next bounded step is to resolve those local-only blockers outside git.
+Execution must not happen automatically merely because approval has been
+recorded, the runbook exists, or a blocked report exists. The operator must
+re-check every precondition immediately before retrying the dry-run.
 
 ## Why This Is Next
 
-The local-only approval boundary and runbook are now explicit, but RLS behavior
-has not been validated. The next step is a deliberate local-only attempt that
-walks through the runbook's preflight checks, stop conditions, evidence
-capture, rollback/cleanup verification, and post-run reporting.
+The local-only approval boundary and runbook are explicit, but RLS behavior has
+not been validated. The first execution preflight confirmed that required local
+configuration is missing. The next step is to prepare the missing disposable
+local target, synthetic users, public-key value, synthetic caller tokens, and
+cleanup plan outside git before retrying Slice 6H-3B-4C-E.
 
 Hosted staging planning remains deferred until the local-only dry-run is either
 completed with accepted evidence or explicitly deferred.
 
 ## Expected Files To Change
 
-- A redacted local-only dry-run execution report, if the manual attempt is
-  performed and evidence is accepted for commit.
+- Local-only setup notes may be updated only if they remain placeholder-only
+  and contain no credentials or environment-specific values.
 - Minimal references from the runbook, approval, validation, harness, policy,
   or next-action docs, if needed.
 
@@ -45,8 +52,8 @@ test execution outside the approved manual local-only runbook flow.
 
 ## Commands To Run
 
-Re-check the runbook preconditions before any manual local-only execution. The
-dry-run must use only a disposable local target, synthetic users, synthetic
+Re-check the runbook preconditions before retrying manual local-only execution.
+The dry-run must use only a disposable local target, synthetic users, synthetic
 Notes rows, local-only public key plus caller-token inputs, and redacted
 evidence. Stop if any runbook stop condition applies.
 
@@ -69,11 +76,11 @@ pnpm build
 
 ## Definition Of Done
 
-- The dry-run is executed manually only after re-checking the runbook
-  preconditions, or local execution is explicitly deferred.
-- Any execution report uses redacted evidence and labels scaffold-only skips as
-  non-RLS-enforcement evidence.
-- Cleanup verification is recorded for the disposable local target.
+- Missing local-only prerequisites are prepared outside git, or execution
+  remains explicitly blocked.
+- No real URL, key, token, user identifier, note identifier, or note content is
+  committed.
+- The operator can prove that cleanup is actionable before retrying the dry-run.
 - Hosted Supabase, staging, production, default CI, real data, credentials,
   service-role request-path usage, live repository mode, and public Notes API
   behavior remain out of scope.
@@ -82,11 +89,14 @@ pnpm build
 
 ## Risks
 
-- A manual run could be mistaken for hosted or production permission unless the
+- A retry could be mistaken for hosted or production permission unless the
   approved local-only scope is re-checked immediately before execution.
-- Cleanup remains unproven until the approved disposable local dry-run occurs.
+- Cleanup remains unproven until an actual disposable local target exists.
 - Service-role values must remain outside request-path validation.
-- The local-only dry-run still will not prove hosted staging readiness.
+- The local-only dry-run remains blocked until local target and synthetic token
+  inputs exist.
+- A future successful local-only dry-run still will not prove hosted staging
+  readiness.
 - JWKS cache and key-rotation handling remain required before production
   Supabase authentication is enabled.
 

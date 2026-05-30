@@ -60,7 +60,7 @@ This approval is limited to:
   local-only dry-run, including failed or partial attempts.
 
 The approved local-only scope is bound by
-[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+[notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md),
 [notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md),
 and [database-migration-policy.md](security/database-migration-policy.md).
 
@@ -155,6 +155,11 @@ It must include:
 - cleanup verification with coarse synthetic counts only.
 
 Cleanup verification is required even when the dry-run stops early.
+
+Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
+local-only target configuration and synthetic user token inputs were absent.
+The blocked result is recorded in
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
 
 ## Next Approval Step
 

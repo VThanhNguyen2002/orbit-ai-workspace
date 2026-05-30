@@ -37,6 +37,11 @@ local execution before hosted staging planning. That still avoids automatic
 execution, staging, production, hosted Supabase, default CI, real data,
 credential, service-role request-path, and public Notes API behavior approval.
 
+Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
+required disposable local target configuration and synthetic user token inputs
+were absent. The blocked result is recorded in
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+
 ## 1. Objective
 
 Define the future harness that can validate the Notes Supabase adapter, RLS
@@ -112,6 +117,10 @@ The harness eventually needs to prove:
 - `docs/notes-local-rls-dry-run-execution-runbook.md` records the local-only
   pre-execution checks, stop conditions, opt-in harness command boundary,
   redacted evidence template, cleanup sequence, and acceptance criteria.
+- `docs/notes-local-rls-dry-run-blocked-report.md` records that the first
+  local-only execution preflight was blocked before execution because no
+  disposable local target configuration or synthetic user token inputs were
+  available.
 - No executable Notes migration exists. RLS intent is documentation only until
   the database artifact policy approves a specific migration.
 - `docs/notes-local-supabase-setup-guide.md` documents the future local-only

@@ -30,6 +30,11 @@ The next recommended action is to follow that runbook only for an approved
 disposable local attempt and produce redacted evidence, or explicitly defer
 local execution before hosted staging planning.
 
+Slice 6H-3B-4C-E attempted preflight and stopped before execution because the
+required disposable local target configuration and synthetic user token inputs
+were absent. The blocked result is recorded in
+[notes-local-rls-dry-run-blocked-report.md](notes-local-rls-dry-run-blocked-report.md).
+
 ## 1. Objective
 
 Define the review process, approval criteria, artifact policy, and validation
@@ -99,6 +104,9 @@ The plan must make future reviewers able to answer:
 - The local dry-run execution runbook records the exact local-only preflight
   commands, stop conditions, opt-in harness command boundary, redacted evidence
   template, cleanup sequence, and acceptance criteria.
+- The first local dry-run execution preflight was blocked before execution
+  because no disposable local target configuration or synthetic user token
+  inputs were available.
 - No `.sql` Notes migration or auto-applied RLS artifact is approved or
   committed.
 - No RLS behavior has been validated against local or hosted Supabase.
