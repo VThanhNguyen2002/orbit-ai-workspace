@@ -29,6 +29,9 @@ export const SummarizeResponseSchema = z.strictObject({
   action_items: z.array(SummaryActionItemSchema),
 });
 
+export const GetSummaryResponseSchema =
+  createApiSuccessEnvelopeSchema(SummarySchema);
+
 export const SemanticSearchSourceTypeSchema = z.enum(["note", "transcript"]);
 
 export const SemanticSearchRequestSchema = z.strictObject({
@@ -125,6 +128,7 @@ export type AiProvider = z.infer<typeof AiProviderSchema>;
 export type AiModel = z.infer<typeof AiModelSchema>;
 export type SummarizeRequest = z.infer<typeof SummarizeRequestSchema>;
 export type SummarizeResponse = z.infer<typeof SummarizeResponseSchema>;
+export type GetSummaryResponse = z.infer<typeof GetSummaryResponseSchema>;
 export type SemanticSearchSourceType = z.infer<
   typeof SemanticSearchSourceTypeSchema
 >;

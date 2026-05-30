@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   AiStreamDoneEventSchema,
   AiStreamEventSchema,
+  GetSummaryResponseSchema,
   SemanticSearchRequestSchema,
   SemanticSearchResponseSchema,
 } from "./index";
-import { note_id, request_id, timestamp } from "./__fixtures__/contracts";
+import { note_id, request_id, timestamp, user_id } from "./__fixtures__/contracts";
 
 describe("AI contract schemas", () => {
   it("parses a snake_case semantic search contract", () => {
@@ -128,5 +129,75 @@ describe("AI contract schemas", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  describe("GetSummaryResponse contract", () => {
+    const validSummary = {
+      id: note_id,
+      user_id,
+      source_id: note_id,
+      source_type: "note",
+      content: "This note discusses Q3 planning priorities and next steps.",
+      action_items: [
+        { text: "Send follow-up email to team", priority: "high" },
+        { text: "Update project timeline", priority: "medium" },
+      ],
+      provider: "fake",
+      model: "fake-model-v1",
+      created_at: timestamp,
+    };
+
+    it("parses a valid GetSummaryResponse snake_case envelope", () => {
+      const input = {
+        data: validSummary,
+        meta: { request_id },
+      };
+
+      expect(GetSummaryResponseSchema.parse(input)).toEqual(input);
+    });
+
+    it("parses action_items with all valid priority levels", () => {
+      const input = {
+        data: {
+          ...validSummary,
+          action_items: [
+            { text: "Urgent task", priority: "urgent" },
+            { text: "Low priority task", priority: "low" },
+          ],
+        },
+        meta: { request_id },
+      };
+
+      expect(GetSummaryResponseSchema.parse(input)).toEqual(input);
+    });
+
+    it("rejects camelCase GetSummaryResponse envelope fields", () => {
+      const camelCaseResult = GetSummaryResponseSchema.safeParse({
+        data: {
+          ...validSummary,
+          sourceType: "note",
+          source_type: undefined,
+        },
+        meta: { request_id },
+      });
+      expect(camelCaseResult.success).toBe(false);
+
+      const camelCaseActionItem = GetSummaryResponseSchema.safeParse({
+        data: {
+          ...validSummary,
+          action_items: [{ text: "Task", Priority: "high" }],
+        },
+        meta: { request_id },
+      });
+      expect(camelCaseActionItem.success).toBe(false);
+    });
+
+    it("rejects GetSummaryResponse with empty summary content", () => {
+      const result = GetSummaryResponseSchema.safeParse({
+        data: { ...validSummary, content: "" },
+        meta: { request_id },
+      });
+      expect(result.success).toBe(false);
+    });
   });
 });

@@ -87,6 +87,7 @@ describe("contract schema registry", () => {
     expect(files.has("sync/sync_pull_response.schema.json")).toBe(true);
     expect(files.has("ai/semantic_search_response.schema.json")).toBe(true);
     expect(files.has("ai/ai_stream_event.schema.json")).toBe(true);
+    expect(files.has("ai/get_summary_response.schema.json")).toBe(true);
     expect(files.has("errors/api_error_envelope.schema.json")).toBe(true);
   });
 });

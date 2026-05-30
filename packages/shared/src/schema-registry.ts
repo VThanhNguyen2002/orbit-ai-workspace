@@ -8,6 +8,7 @@ import {
   AiStreamTokenEventSchema,
   AiUsageSchema,
   EmbeddingMetadataSchema,
+  GetSummaryResponseSchema,
   SemanticSearchDataSchema,
   SemanticSearchMetaSchema,
   SemanticSearchRequestSchema,
@@ -476,6 +477,13 @@ export const ContractSchemaDefinitions = defineContractSchemas([
     title: "Summarize Response",
     description: "AI summarization response payload.",
     schema: SummarizeResponseSchema,
+  },
+  {
+    group: "ai",
+    name: "get_summary_response",
+    title: "Get Summary Response",
+    description: "API response envelope for retrieving a stored AI summary.",
+    schema: GetSummaryResponseSchema,
   },
   {
     group: "ai",
