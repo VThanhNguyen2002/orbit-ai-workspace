@@ -77,6 +77,15 @@ decision. It remains non-executable documentation. The later approval remains
 local-only and does not grant hosted, staging, production, or CI execution
 approval.
 
+The local-only dry-run execution runbook is recorded in
+[notes-local-rls-dry-run-execution-runbook.md](../notes-local-rls-dry-run-execution-runbook.md).
+It documents the pre-execution checks, stop conditions, opt-in local harness
+boundary, redacted evidence template, cleanup sequence, and acceptance
+criteria for the approved local-only attempt. It does not approve committed SQL
+files, Supabase migrations, hosted Supabase, staging, production, default CI,
+credentials in git, service-role request-path usage, or public Notes API
+behavior changes.
+
 ## Notes Design Handling
 
 The intended Notes ownership and RLS behavior is documented in architecture

@@ -23,16 +23,19 @@ adds
 with the local preflight checklist, evidence format, and cleanup expectations,
 but it does not execute the artifact or run RLS validation. Slice 6H-3B-4C-LA
 records constrained approval for a future local-only RLS dry-run attempt
-without executing it.
+without executing it. Slice 6H-3B-4C-DR adds the local-only dry-run execution
+runbook in
+[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md)
+without executing the artifact, running Supabase locally, or validating RLS.
 These slices do not add a live Supabase SDK adapter, connect to Supabase,
 introduce credentials, add `.env` files, add migrations or SQL, execute RLS
 tests, or enable live Notes persistence.
 
-The next bounded task is **Slice 6H-3B-4C-DR - Local-only RLS dry-run
-execution runbook**. That task should prepare the careful runbook for the
-approved local-only attempt. It must still avoid automatic execution, staging,
-production, hosted Supabase, default CI, real-data, credential, service-role
-request-path, and public Notes API behavior approval.
+The next bounded action is to follow the runbook only for an approved
+disposable local attempt and produce redacted evidence, or explicitly defer
+local execution before hosted staging planning. That still avoids automatic
+execution, staging, production, hosted Supabase, default CI, real data,
+credential, service-role request-path, and public Notes API behavior approval.
 
 ## 1. Objective
 
@@ -106,6 +109,9 @@ The harness eventually needs to prove:
 - `docs/notes-local-rls-dry-run-preparation.md` records the future local-only
   preflight checklist, manual sequence, evidence format, redaction plan, and
   cleanup checklist.
+- `docs/notes-local-rls-dry-run-execution-runbook.md` records the local-only
+  pre-execution checks, stop conditions, opt-in harness command boundary,
+  redacted evidence template, cleanup sequence, and acceptance criteria.
 - No executable Notes migration exists. RLS intent is documentation only until
   the database artifact policy approves a specific migration.
 - `docs/notes-local-supabase-setup-guide.md` documents the future local-only
@@ -395,14 +401,18 @@ exercise.
     Record constrained approval for a future local-only dry-run attempt. Do not
     execute the dry-run.
 11. **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution runbook
-    (recommended next)**
+    (completed)**
     Prepare the careful runbook for the approved local-only attempt, including
     pre-execution checks, stop conditions, redacted evidence capture, and
     cleanup verification. Do not automatically execute merely because approval
     is recorded.
-12. **Slice 6H-3B-4D - Hosted staging validation plan**
-   Document controlled hosted non-production validation after local execution
-   approval is recorded or explicitly deferred.
+12. **Future approved local-only dry-run execution report**
+    Follow the runbook only in a disposable local target, record redacted
+    evidence, verify cleanup, and avoid claiming RLS enforcement from
+    scaffold-only skips.
+13. **Slice 6H-3B-4D - Hosted staging validation plan**
+   Document controlled hosted non-production validation after local-only
+   evidence is accepted or local execution is explicitly deferred.
 
 ## 14. Definition Of Done
 
@@ -508,7 +518,21 @@ Slice 6H-3B-4C-LA is complete when:
   service-role request-path usage, and public Notes API behavior changes remain
   not approved.
 - Required pre-execution conditions and dry-run stop conditions are documented.
-- The next recommended task is Slice 6H-3B-4C-DR.
+- That completed slice led to Slice 6H-3B-4C-DR.
+- No live SDK adapter, network behavior, credential, `.env` file, migration,
+  SQL artifact, local Supabase run, hosted Supabase connection, RLS execution,
+  service-role request-path usage, or public Notes API behavior change has
+  been introduced.
+
+Slice 6H-3B-4C-DR is complete when:
+
+- `docs/notes-local-rls-dry-run-execution-runbook.md` documents the local-only
+  pre-execution checks, stop conditions, execution sequence, redacted evidence
+  capture, cleanup verification, and acceptance criteria.
+- Related approval, preparation, validation, harness, and policy docs point to
+  the runbook.
+- The runbook keeps current scaffold-only skips separate from accepted RLS
+  enforcement evidence.
 - No live SDK adapter, network behavior, credential, `.env` file, migration,
   SQL artifact, local Supabase run, hosted Supabase connection, RLS execution,
   service-role request-path usage, or public Notes API behavior change has

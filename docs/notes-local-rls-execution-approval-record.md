@@ -13,13 +13,16 @@ Slice 6H-3B-4C-LA records the explicit approval decision:
 
 **Local-only RLS dry-run attempt: approved under constraints.**
 
+Slice 6H-3B-4C-DR adds the local-only execution runbook in
+[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md).
+
 This is documentation-only. It does not execute SQL, create a migration, run
 Supabase locally, connect to hosted Supabase, run live RLS tests, add
 credentials, enable live repository mode, or change public Notes API behavior.
 
-This approval does not authorize automatic execution after this commit. The
-next slice must prepare the local-only dry-run execution runbook and still stop
-at any pre-execution failure or stop condition documented below.
+This approval does not authorize automatic execution after this commit. Any
+future local-only attempt must follow the execution runbook and still stop at
+any pre-execution failure or stop condition documented below.
 
 ## Approval Decision
 
@@ -58,6 +61,7 @@ This approval is limited to:
 
 The approved local-only scope is bound by
 [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
+[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md),
 and [database-migration-policy.md](security/database-migration-policy.md).
 
 ## Explicitly Not Approved
@@ -108,6 +112,7 @@ must be true:
   `SYNAPSE_SUPABASE_TEST_USER_B_ACCESS_TOKEN`.
 - The dry-run evidence template is ready and configured for redaction.
 - The rollback/cleanup checklist is ready for the disposable local target.
+- The local-only execution runbook is reviewed and available.
 - The RLS validation matrix is understood and mapped to
   `apps/api/tests/integration/test_notes_rls_validation.py`.
 - The local artifact is reviewed against
@@ -136,6 +141,8 @@ following occur:
 ## Evidence And Cleanup Requirements
 
 A future local-only dry-run execution report must use the evidence format in
+[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md),
+with the preparation evidence expectations in
 [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md).
 It must include:
 
@@ -151,12 +158,13 @@ Cleanup verification is required even when the dry-run stops early.
 
 ## Next Approval Step
 
-Recommended next task: **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution
-runbook**.
+Slice 6H-3B-4C-DR now prepares the careful runbook for the approved local-only
+attempt. The runbook must not be treated as automatic execution merely because
+approval is recorded here.
 
-That slice should prepare the careful runbook for the approved local-only
-attempt. It must not automatically execute the dry-run merely because approval
-is recorded here.
+Recommended next action: follow the runbook only for an approved disposable
+local attempt and produce redacted evidence, or explicitly defer local
+execution before hosted staging planning.
 
 Hosted staging planning remains deferred until the local-only dry-run is either
 completed with accepted evidence or explicitly deferred.
@@ -176,7 +184,7 @@ Slice 6H-3B-4C-LA is complete when:
   service-role request-path usage, and public Notes API behavior changes remain
   not approved.
 - Required pre-execution conditions and stop conditions are documented.
-- The next recommended task is Slice 6H-3B-4C-DR.
+- That completed slice led to Slice 6H-3B-4C-DR.
 - No SQL file, migration, `.env` file, credential, generated Supabase state,
   local Supabase run, hosted Supabase connection, live RLS test, runtime code,
   test code, or public Notes API behavior change is introduced.

@@ -22,9 +22,13 @@ and kept local RLS execution approval pending at that time. Slice 6H-3B-4C-L
 adds the local-only dry-run preparation checklist in
 [notes-local-rls-dry-run-preparation.md](notes-local-rls-dry-run-preparation.md)
 without executing the artifact. Slice 6H-3B-4C-LA records constrained approval
-for a future local-only RLS dry-run attempt without executing it. The next
-recommended slice is **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution
-runbook**.
+for a future local-only RLS dry-run attempt without executing it. Slice
+6H-3B-4C-DR adds the local-only execution runbook in
+[notes-local-rls-dry-run-execution-runbook.md](notes-local-rls-dry-run-execution-runbook.md)
+without executing the artifact, running Supabase locally, or validating RLS.
+The next recommended action is to follow that runbook only for an approved
+disposable local attempt and produce redacted evidence, or explicitly defer
+local execution before hosted staging planning.
 
 ## 1. Objective
 
@@ -92,6 +96,9 @@ The plan must make future reviewers able to answer:
 - The local dry-run preparation document records the disposable local target
   assumptions, preflight checklist, manual dry-run sequence, evidence format,
   redaction expectations, and rollback/cleanup checklist.
+- The local dry-run execution runbook records the exact local-only preflight
+  commands, stop conditions, opt-in harness command boundary, redacted evidence
+  template, cleanup sequence, and acceptance criteria.
 - No `.sql` Notes migration or auto-applied RLS artifact is approved or
   committed.
 - No RLS behavior has been validated against local or hosted Supabase.
@@ -332,14 +339,19 @@ RLS tests may be added or enabled only after all prerequisites are true:
    Record constrained approval for a future local-only dry-run attempt using
    the preparation document as the review boundary. Do not execute the dry-run.
 8. **Slice 6H-3B-4C-DR - Local-only RLS dry-run execution runbook
-   (recommended next)**
+   (completed)**
    Prepare the careful runbook for the approved local-only attempt, including
    pre-execution checks, stop conditions, redacted evidence capture, and cleanup
    verification. Do not automatically execute merely because approval is
    recorded.
-9. **Slice 6H-3B-4D - Hosted staging validation plan**
+9. **Future approved local-only dry-run execution report**
+   Follow the runbook only in a disposable local target, record redacted
+   evidence, verify cleanup, and avoid claiming RLS enforcement from
+   scaffold-only skips.
+10. **Slice 6H-3B-4D - Hosted staging validation plan**
    Document controlled hosted non-production validation, secret-store handling,
-   workflow separation, redaction, rollback, and evidence requirements.
+   workflow separation, redaction, rollback, and evidence requirements after
+   local-only evidence is accepted or local execution is explicitly deferred.
 
 ## 14. Definition Of Done
 
@@ -436,7 +448,23 @@ Slice 6H-3B-4C-LA is complete when:
   service-role request-path usage, and public Notes API behavior changes remain
   not approved.
 - Required pre-execution conditions and dry-run stop conditions are documented.
-- The next recommended task is Slice 6H-3B-4C-DR.
+- That completed slice led to Slice 6H-3B-4C-DR.
+- No runtime code, tests, executable SQL files, migrations, `.env` files,
+  credentials, generated Supabase state, local Supabase run, hosted Supabase
+  connection, live RLS validation, live repository mode, service-role
+  request-path usage, frontend/UI, Expo, AI, offline sync, or public Notes API
+  behavior change is introduced.
+
+Slice 6H-3B-4C-DR is complete when:
+
+- `docs/notes-local-rls-dry-run-execution-runbook.md` documents the local-only
+  source-of-truth references, required inputs, pre-execution checks, stop
+  conditions, execution sequence, redacted evidence template, cleanup sequence,
+  and acceptance criteria.
+- Related approval, preparation, validation, harness, and policy docs point to
+  the runbook.
+- The runbook states that current scaffold-only skips are safety-gate evidence
+  only and not RLS enforcement evidence.
 - No runtime code, tests, executable SQL files, migrations, `.env` files,
   credentials, generated Supabase state, local Supabase run, hosted Supabase
   connection, live RLS validation, live repository mode, service-role
