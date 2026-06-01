@@ -258,6 +258,26 @@ Recommended follow-up slices:
 Do not proceed from planning to runtime provider calls without explicit approval
 and a reviewed safety gate.
 
+### Slice 7G Update — 2026-06-01
+
+Slice 7G adds `apps/api/app/services/openai_provider.py` as a network-free
+adapter boundary. It defines provider request/response DTOs, an injected
+transport protocol, safe provider/transport errors, and an
+`OpenAISummarizationProvider` adapter that maps deterministic transport results
+to the backend `AiSummaryResult` shape.
+
+The adapter is not wired into the route factory. `FakeSummarizationProvider`
+remains the default runtime provider for local development, tests, and CI. The
+new adapter reads no environment variables, accepts no credentials, imports no
+OpenAI SDK, creates no HTTP client, and makes no network calls by itself.
+
+Tests use an in-file fake transport to cover request construction, synthetic
+success mapping, no-network behavior, no SDK import requirement, safe repr/log
+metadata, timeout/unavailable/malformed response mapping, and redacted
+diagnostic output. Public API behavior remains unchanged. Slice 7H should add
+configuration and credential-mode validation only; live runtime remains
+deferred.
+
 ## Definition of Done
 
 This docs-only slice is complete when:

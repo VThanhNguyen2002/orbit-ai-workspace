@@ -162,6 +162,12 @@ provider API key may be documented only as an explicit fallback stored in a
 deployment secret manager or gitignored local environment, never in source,
 logs, CI output, public errors, or client bundles.
 
+Slice 7G adds only the adapter interface boundary and fake transport tests. The
+adapter accepts an injected transport, reads no credentials, imports no provider
+SDK, and exposes only redacted diagnostics for timeout, unavailable, and
+malformed-response cases. It is not wired into request handling; the fake
+provider remains the default runtime provider.
+
 ## API Key Management
 
 ### Backend API Keys

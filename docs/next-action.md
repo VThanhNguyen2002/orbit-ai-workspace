@@ -2,37 +2,44 @@
 
 ## Objective
 
-Recommended next task: **Slice 7G — OpenAI provider adapter interface and fake
-transport tests**.
+Recommended next task: **Slice 7H — OpenAI config and credential-mode
+validation**.
 
-Slice 7F is complete. The docs-only
-[OpenAI provider integration plan](openai-provider-integration-plan.md) now
-defines:
+Slice 7G is complete. The backend now has:
 
-- Future provider adapter boundaries.
-- Fake provider default behavior for local/test/CI.
-- Credential strategy and Workload Identity Federation requirements.
-- Config, request/response, failure-mode, security, testing, and cost plans.
-- Future slices 7G through 7K.
+- `apps/api/app/services/openai_provider.py` as a network-free provider adapter
+  boundary.
+- Internal OpenAI request/response DTOs with prompt/content hidden from reprs.
+- An injected transport protocol with no SDK, HTTP client, environment lookup,
+  credential input, or network behavior.
+- Safe provider errors and redacted diagnostics for timeout, unavailable, and
+  malformed-response paths.
+- Fake transport tests proving request construction, synthetic success mapping,
+  no-network behavior, no SDK import requirement, and diagnostic redaction.
 
-## Slice 7G Scope
+The adapter is not wired into the API route. `FakeSummarizationProvider` remains
+the default runtime provider for local development, tests, and CI.
 
-Add the first implementation-facing provider adapter boundary without live
-provider runtime behavior.
+## Slice 7H Scope
+
+Add future OpenAI configuration and credential-mode validation without enabling
+live provider runtime behavior.
 
 Include:
 
-- A concrete adapter interface shape for a future OpenAI summarization provider.
-- Fake transport or mocked transport tests only.
-- Error/result models needed to test the adapter boundary safely.
-- Tests proving no network access, SDK dependency, credentials, raw prompt, note
-  content, tokens, API keys, auth headers, or provider raw payloads leak through
-  diagnostics.
+- Typed settings for future OpenAI model, timeout, retry budget, request budget,
+  and auth mode.
+- Validation that defaults remain fake-only and credential-free.
+- Credential-mode parsing for `fake`, `api_key`, and `workload_identity` as
+  configuration shape only.
+- Tests proving invalid config fails closed and no secrets are required for the
+  fake/default path.
+- Docs clarifying that live provider calls and WIF runtime remain deferred.
 
-Do not add OpenAI SDKs, real provider calls, provider credentials, `.env` files,
+Do not add OpenAI SDKs, provider credentials, `.env` files, real provider calls,
 default live network behavior, WIF runtime, frontend work, SSE streaming, SQL,
-migrations, Supabase generated state, or API client changes unless a future
-slice explicitly approves them.
+migrations, Supabase generated state, API client changes, or route behavior
+changes unless a future slice explicitly approves them.
 
 ## Commands To Run
 
@@ -58,31 +65,29 @@ pnpm dlx node-actionlint .github/workflows/ci.yml
 
 ## Definition Of Done
 
-- Adapter/interface work remains network-free by default.
-- Fake provider remains the default local/test/CI path.
+- Defaults remain fake-only, credential-free, and network-free.
+- Future OpenAI settings are typed and validated without reading provider
+  credentials in the adapter.
+- Invalid provider/auth-mode config fails closed.
 - No provider SDK, credential, `.env`, SQL, migration, Supabase state, frontend,
-  or API client behavior is introduced without explicit approval.
-- Any provider errors or diagnostics are redacted before logging or public
-  response handling.
-- Public endpoint behavior and shared-contract-compatible response shape remain
-  unchanged.
+  API client behavior, or public route behavior is introduced.
+- Public errors and diagnostics continue to exclude note content, prompt text,
+  token values, API keys, auth headers, and raw user payloads.
 
 ## Risks
 
-- Adapter scaffolding could drift into live provider implementation.
-- Fake transport tests must not normalize adding real SDK dependencies.
-- Diagnostic coverage must account for provider raw payloads and transport
-  errors without preserving sensitive strings.
-- WIF and API-key credential modes remain planning/config topics until later
-  approved slices.
+- Config scaffolding could accidentally become runtime provider selection.
+- Auth-mode names can imply readiness; docs and tests must keep `api_key` and
+  `workload_identity` non-runtime until explicitly approved.
+- Default CI must not require provider secrets or live network access.
 
 ## External Review Gate
 
-Before proceeding beyond Slice 7G:
+Before proceeding beyond Slice 7H:
 
 1. Include changed files, non-goals, deferred runtime behavior, verification
    evidence, CI status if checked, security observations, and unresolved risks.
 2. Be explicit about anything scaffold-only, mocked/faked, intentionally
    deferred, or unresolved.
-3. Do not automatically continue to config, WIF, mocked OpenAI runtime, or live
+3. Do not automatically continue to WIF planning, mocked OpenAI runtime, or live
    provider harness work.

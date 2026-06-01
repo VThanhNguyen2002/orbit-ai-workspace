@@ -354,6 +354,19 @@ file, API call, WIF runtime, SSE streaming, frontend, SQL, migration, Supabase
 state, backend route behavior, or API client method was added. Slice 7G should
 start with provider adapter interface work and fake transport tests only.
 
+### Slice 7G Update — 2026-06-01
+
+Slice 7G adds a backend-only OpenAI provider adapter boundary in
+`apps/api/app/services/openai_provider.py`. The boundary defines internal
+request/response DTOs, an injected transport protocol, safe provider errors, and
+fake-transport test coverage. It is not selected by runtime configuration and is
+not wired into `POST /v1/ai/notes/{note_id}/summarize`.
+
+No OpenAI SDK, provider dependency, credential, `.env` file, API call, WIF
+runtime, SSE streaming, frontend, SQL, migration, Supabase state, backend route
+behavior, or API client method was added. Slice 7H should validate future
+OpenAI config and credential-mode settings without enabling live provider calls.
+
 ---
 
 ## 14. Definition Of Done (This Slice)
