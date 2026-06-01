@@ -147,6 +147,21 @@ OpenAI-style API keys, Supabase key names, and raw auth header values. The fake
 provider remains the only runtime provider; no live provider secret is required
 or wired by this boundary.
 
+### OpenAI Provider Credential Planning
+
+Slice 7F keeps OpenAI provider integration docs-only. Future provider runtime
+work must keep the fake provider as the default for local tests and CI, keep
+live provider tests explicitly opt-in, and isolate any SDK or HTTP provider
+calls inside a backend provider adapter.
+
+Workload Identity Federation is the preferred future CI/cloud direction where a
+secure token exchange is supported. Any future WIF slice must validate issuer,
+audience, repository/ref/workflow subject constraints, avoid printing raw
+OIDC/JWT/token values, and redact token-exchange diagnostics. A long-lived
+provider API key may be documented only as an explicit fallback stored in a
+deployment secret manager or gitignored local environment, never in source,
+logs, CI output, public errors, or client bundles.
+
 ## API Key Management
 
 ### Backend API Keys

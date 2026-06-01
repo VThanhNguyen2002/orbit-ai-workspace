@@ -11,7 +11,8 @@ Date: 2026-05-30
 Plan the end-to-end AI summarization feature for Synapse Notes without
 implementing any provider runtime code, adding credentials, calling APIs, or
 changing public Notes behavior. This document is the source of truth for all
-downstream AI summarization implementation slices (7B through 7G).
+downstream AI summarization implementation slices (7B and later provider
+integration slices).
 
 ---
 
@@ -314,8 +315,12 @@ opt-in environment variable and never run in default CI.
 | **7C** | Backend fake-provider summarization route skeleton — `POST /v1/ai/notes/{id}/summarize`, `FakeProvider`, SSE streaming, auth + ownership + size checks |
 | **7D** | API client summarization methods — `summarizeNote()`, SSE event parser, typed events |
 | **7E** | Prompt builder and redaction tests — `prompt_builder.py`, log-redaction assertions, security tests |
-| **7F** | OpenAI provider integration planning — `OpenAIProvider`, WIF strategy, opt-in CI gate, cost tracking |
-| **7G** | OpenAI Workload Identity Federation planning — GCP service account, keyless auth, CI integration docs |
+| **7F** | OpenAI provider integration planning — provider boundary, credential/WIF strategy, testing plan, safety gate |
+| **7G** | OpenAI provider adapter interface and fake transport tests |
+| **7H** | OpenAI config and credential-mode validation |
+| **7I** | Workload Identity Federation planning/approval record |
+| **7J** | Mocked OpenAI provider adapter tests |
+| **7K** | Optional live provider harness planning |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -334,6 +339,20 @@ provider response compatibility.
 No OpenAI SDK, provider credential, `.env` file, SSE streaming, frontend, SQL,
 migration, Supabase validation, new backend route, or API client method was
 added. Slice 7F remains planning-only for OpenAI provider integration.
+
+### Slice 7F Update — 2026-06-01
+
+Slice 7F adds the docs-only
+[OpenAI provider integration plan](openai-provider-integration-plan.md). The
+plan defines the future provider adapter boundary, fake-provider default,
+config-driven provider selection, credential and Workload Identity Federation
+strategy, request/response safety rules, provider failure mapping, testing
+strategy, cost/token guardrails, and future slices.
+
+No runtime provider code, OpenAI SDK, provider dependency, credential, `.env`
+file, API call, WIF runtime, SSE streaming, frontend, SQL, migration, Supabase
+state, backend route behavior, or API client method was added. Slice 7G should
+start with provider adapter interface work and fake transport tests only.
 
 ---
 
