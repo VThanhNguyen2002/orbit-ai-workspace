@@ -317,6 +317,24 @@ opt-in environment variable and never run in default CI.
 | **7F** | OpenAI provider integration planning — `OpenAIProvider`, WIF strategy, opt-in CI gate, cost tracking |
 | **7G** | OpenAI Workload Identity Federation planning — GCP service account, keyless auth, CI integration docs |
 
+### Slice 7E Update — 2026-06-01
+
+Slice 7E adds a backend-only prompt boundary in
+`apps/api/app/services/ai_prompting.py`. The summarization service now builds a
+provider-facing prompt from explicit note `title`, `content`, and bounded note
+metadata before calling the provider. Raw note fields stay out of prompt object
+reprs and log-safe metadata.
+
+The same module adds diagnostic redaction for sensitive keys, note title/content
+terms, prompt text, bearer/JWT-like values, provider API keys, and Supabase key
+names. Tests cover prompt assembly, safe metadata, redaction, over-limit
+rejection before provider calls, public error leakage, and continued fake
+provider response compatibility.
+
+No OpenAI SDK, provider credential, `.env` file, SSE streaming, frontend, SQL,
+migration, Supabase validation, new backend route, or API client method was
+added. Slice 7F remains planning-only for OpenAI provider integration.
+
 ---
 
 ## 14. Definition Of Done (This Slice)

@@ -132,6 +132,21 @@ CREATE POLICY "Users can manage own voice memos"
 3. **Provider abstraction**: Can switch to self-hosted models (Ollama) in future without client changes
 4. **Audit logging**: All AI calls logged with timestamp, model, and token count (not content)
 
+### Prompt and Diagnostic Boundaries
+
+Slice 7E adds a backend prompt builder for note summarization. The provider
+prompt is assembled only from explicit note `title`, note `content`, and bounded
+metadata such as content type and character counts. Prompt object reprs and
+log-safe metadata exclude raw title, raw content, user identity, auth headers,
+tokens, provider keys, and internal IDs.
+
+Diagnostics for AI summarization must pass through the redaction helper before
+they are logged or returned from public error paths. The helper masks sensitive
+diagnostic keys, note title/content terms, prompt text, bearer/JWT-like values,
+OpenAI-style API keys, Supabase key names, and raw auth header values. The fake
+provider remains the only runtime provider; no live provider secret is required
+or wired by this boundary.
+
 ## API Key Management
 
 ### Backend API Keys

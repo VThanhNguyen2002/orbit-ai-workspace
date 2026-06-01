@@ -10,14 +10,19 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Protocol
+from zoneinfo import ZoneInfo
 
 from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
 from app.models.responses import ApiErrorDetail
 from app.repositories.notes import get_notes_repository
 from app.schemas.notes import Note
+from app.services.ai_prompting import (
+    NoteSummarizationPrompt,
+    build_note_summarization_prompt,
+)
 from app.services.notes import NoteService
 
 # ---------------------------------------------------------------------------
@@ -46,7 +51,7 @@ class AiSummaryResult:
     model: str
     created_at: str
 
-    def as_dict(self) -> dict:  # type: ignore[type-arg]
+    def as_dict(self) -> dict[str, object]:
         return {
             "id": self.id,
             "user_id": self.user_id,
@@ -80,7 +85,12 @@ class SummarizationProvider(Protocol):
     @property
     def model_name(self) -> str: ...
 
-    def summarize(self, *, source_id: str, content: str) -> AiSummaryResult: ...
+    def summarize(
+        self,
+        *,
+        source_id: str,
+        prompt: NoteSummarizationPrompt,
+    ) -> AiSummaryResult: ...
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +101,7 @@ _FAKE_SUMMARY_TEMPLATE = (
     "This note covers key decisions and next steps identified during the session. "
     "Several action items were extracted for follow-up."
 )
+_UTC = ZoneInfo("UTC")
 _FAKE_ACTION_ITEMS: list[AiActionItem] = [
     AiActionItem(text="Review and confirm the key decisions", priority="high"),
     AiActionItem(text="Schedule a follow-up to track progress", priority="medium"),
@@ -116,7 +127,7 @@ class FakeSummarizationProvider:
         self,
         *,
         source_id: str,
-        content: str,  # noqa: ARG002 — intentionally unused; fake ignores content
+        prompt: NoteSummarizationPrompt,  # noqa: ARG002 — fake ignores raw prompt
     ) -> AiSummaryResult:
         return AiSummaryResult(
             id=str(uuid.uuid4()),
@@ -127,7 +138,7 @@ class FakeSummarizationProvider:
             action_items=list(_FAKE_ACTION_ITEMS),
             provider=self.provider_name,
             model=self.model_name,
-            created_at=datetime.now(UTC).isoformat(),
+            created_at=datetime.now(_UTC).isoformat(),
         )
 
 
@@ -186,7 +197,12 @@ class SummarizationService:
         if input_chars > self._settings.ai_max_input_chars:
             raise AiInputTooLongError(input_chars, self._settings.ai_max_input_chars)
 
-        result = self._provider.summarize(source_id=note.id, content=note.content)
+        prompt = build_note_summarization_prompt(
+            title=note.title,
+            content=note.content,
+            content_type=note.content_type,
+        )
+        result = self._provider.summarize(source_id=note.id, prompt=prompt)
 
         # Inject auth user_id — provider must not know the calling user
         return AiSummaryResult(

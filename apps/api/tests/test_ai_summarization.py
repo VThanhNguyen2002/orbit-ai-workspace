@@ -109,6 +109,72 @@ def test_summarize_note_fake_provider_is_deterministic(ai_client: TestClient) ->
     assert s1["model"] == s2["model"]
 
 
+def test_summarization_service_builds_provider_prompt_from_note_fields(
+    ai_client: TestClient,
+) -> None:
+    from app.core.config import Settings
+    from app.services.ai_prompting import NoteSummarizationPrompt
+    from app.services.ai_summarization import (
+        AiSummaryResult,
+        SummarizationService,
+    )
+    from app.services.notes import get_note_service
+
+    note = _create_note(
+        ai_client,
+        title="Provider prompt source title",
+        content="Provider prompt source content.",
+    )
+
+    class CapturingProvider:
+        captured_prompt: NoteSummarizationPrompt | None = None
+
+        @property
+        def provider_name(self) -> str:
+            return "fake"
+
+        @property
+        def model_name(self) -> str:
+            return "fake-model-v1"
+
+        def summarize(
+            self,
+            *,
+            source_id: str,
+            prompt: NoteSummarizationPrompt,
+        ) -> AiSummaryResult:
+            self.captured_prompt = prompt
+            return AiSummaryResult(
+                id="summary-id",
+                user_id="",
+                source_id=source_id,
+                source_type="note",
+                content="summary",
+                action_items=[],
+                provider=self.provider_name,
+                model=self.model_name,
+                created_at="2026-06-01T00:00:00+00:00",
+            )
+
+    provider = CapturingProvider()
+    service = SummarizationService(
+        note_service=get_note_service(),
+        provider=provider,
+        settings=Settings(ai_summarization_enabled=True),
+    )
+
+    result = service.summarize_note(user_id="dev_user", note_id=note["id"])
+
+    assert result.user_id == "dev_user"
+    assert provider.captured_prompt is not None
+    provider_text = provider.captured_prompt.as_provider_text()
+    assert note["title"] in provider_text
+    assert note["content"] in provider_text
+    assert note["id"] not in provider_text
+    assert "dev_user" not in provider_text
+    assert "Bearer " not in provider_text
+
+
 # ---------------------------------------------------------------------------
 # Snake_case enforcement
 # ---------------------------------------------------------------------------
@@ -202,16 +268,39 @@ def test_summarize_cross_user_note_returns_404(ai_client: TestClient) -> None:
 
 
 def test_summarize_over_limit_content_returns_400(ai_client: TestClient) -> None:
-    # Create a note with exactly the field-level max (50k chars in content)
-    # then patch ai_max_input_chars to a smaller limit to trigger the guard.
+    # Create a valid note, then patch ai_max_input_chars lower to trigger the guard.
     from app.core.config import Settings
+    from app.services.ai_prompting import NoteSummarizationPrompt
     from app.services.ai_summarization import (
-        FakeSummarizationProvider,
+        AiSummaryResult,
         SummarizationService,
     )
     from app.services.notes import get_note_service
 
-    note = _create_note(ai_client, content="x" * 100)  # 100-char content note
+    private_title = "Private launch retrospective"
+    private_content = "SECRET_NOTE_CONTENT must stay out of public errors. " * 3
+    note = _create_note(
+        ai_client,
+        title=private_title,
+        content=private_content,
+    )
+
+    class ProviderShouldNotBeCalled:
+        @property
+        def provider_name(self) -> str:
+            return "fake"
+
+        @property
+        def model_name(self) -> str:
+            return "fake-model-v1"
+
+        def summarize(
+            self,
+            *,
+            source_id: str,
+            prompt: NoteSummarizationPrompt,
+        ) -> AiSummaryResult:
+            raise AssertionError("provider must not be called for over-limit input")
 
     # Patch the summarization service to use limit = 50 chars
     tight_settings = Settings(
@@ -222,7 +311,7 @@ def test_summarize_over_limit_content_returns_400(ai_client: TestClient) -> None
     def _tight_service() -> SummarizationService:
         return SummarizationService(
             note_service=get_note_service(),
-            provider=FakeSummarizationProvider(),
+            provider=ProviderShouldNotBeCalled(),
             settings=tight_settings,
         )
 
@@ -242,6 +331,9 @@ def test_summarize_over_limit_content_returns_400(ai_client: TestClient) -> None
     assert body["error"]["code"] == "VALIDATION_ERROR"
     detail_messages = [d["message"] for d in body["error"]["details"]]
     assert "content_too_long" in detail_messages
+    assert private_title not in response.text
+    assert private_content not in response.text
+    assert "Summarize the following note" not in response.text
 
 
 # ---------------------------------------------------------------------------
