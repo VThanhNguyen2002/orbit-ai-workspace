@@ -278,6 +278,26 @@ diagnostic output. Public API behavior remains unchanged. Slice 7H should add
 configuration and credential-mode validation only; live runtime remains
 deferred.
 
+### Slice 7H Update — 2026-06-01
+
+Slice 7H adds future OpenAI config shape to `apps/api/app/core/config.py`:
+`ai_provider`, `openai_model`, timeout, retry budget, request budget, and
+`openai_auth_mode`. Defaults remain fake-only, disabled, credential-free, and
+network-free.
+
+Unknown AI provider values and unknown OpenAI auth modes fail closed during
+settings parsing without echoing raw values. A runtime validation helper rejects
+OpenAI `api_key` and `workload_identity` modes because neither credential path
+is implemented yet. The existing summarization service factory still returns
+`FakeSummarizationProvider`; OpenAI config does not switch runtime provider
+behavior.
+
+Tests cover default fake config, unsupported provider/auth modes, API-key and
+workload-identity fail-closed paths, fake mode without credentials, safe error
+messages, unchanged fake runtime selection, and exact-fingerprint-only
+`.gitleaksignore` entries. Slice 7I should remain a WIF planning/approval
+record only; WIF runtime remains deferred.
+
 ## Definition of Done
 
 This docs-only slice is complete when:

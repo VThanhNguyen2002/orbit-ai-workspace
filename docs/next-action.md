@@ -2,39 +2,39 @@
 
 ## Objective
 
-Recommended next task: **Slice 7H — OpenAI config and credential-mode
-validation**.
+Recommended next task: **Slice 7I — Workload Identity Federation
+planning/approval record**.
 
-Slice 7G is complete. The backend now has:
+Slice 7H is complete. The backend now has:
 
-- `apps/api/app/services/openai_provider.py` as a network-free provider adapter
-  boundary.
-- Internal OpenAI request/response DTOs with prompt/content hidden from reprs.
-- An injected transport protocol with no SDK, HTTP client, environment lookup,
-  credential input, or network behavior.
-- Safe provider errors and redacted diagnostics for timeout, unavailable, and
-  malformed-response paths.
-- Fake transport tests proving request construction, synthetic success mapping,
-  no-network behavior, no SDK import requirement, and diagnostic redaction.
+- Future OpenAI config fields for provider mode, model, timeout, retry budget,
+  request budget, and auth mode.
+- Fail-closed parsing for unsupported AI provider and OpenAI auth mode values.
+- Runtime validation that rejects OpenAI `api_key` and `workload_identity`
+  modes until those credential paths are explicitly implemented.
+- Tests proving defaults remain fake-only, disabled, credential-free, and
+  network-free.
+- Tests proving OpenAI config does not switch the summarization route away from
+  `FakeSummarizationProvider`.
 
-The adapter is not wired into the API route. `FakeSummarizationProvider` remains
-the default runtime provider for local development, tests, and CI.
+No OpenAI SDK, provider credential, live provider call, WIF runtime, route
+behavior change, frontend work, SSE, SQL, migration, Supabase generated state,
+or API client change has been added.
 
-## Slice 7H Scope
+## Slice 7I Scope
 
-Add future OpenAI configuration and credential-mode validation without enabling
-live provider runtime behavior.
+Create a Workload Identity Federation planning and approval record. Keep this
+docs-only unless a future slice explicitly approves implementation.
 
 Include:
 
-- Typed settings for future OpenAI model, timeout, retry budget, request budget,
-  and auth mode.
-- Validation that defaults remain fake-only and credential-free.
-- Credential-mode parsing for `fake`, `api_key`, and `workload_identity` as
-  configuration shape only.
-- Tests proving invalid config fails closed and no secrets are required for the
-  fake/default path.
-- Docs clarifying that live provider calls and WIF runtime remain deferred.
+- Threat model for CI/cloud token exchange.
+- Required issuer, audience, subject, repository, branch/ref, and workflow
+  constraints.
+- Required secret handling and redaction behavior.
+- Approval checklist before any WIF runtime work.
+- Fallback policy for API-key mode as explicitly reviewed local/cloud fallback.
+- Test plan using fake token exchange only.
 
 Do not add OpenAI SDKs, provider credentials, `.env` files, real provider calls,
 default live network behavior, WIF runtime, frontend work, SSE streaming, SQL,
@@ -65,29 +65,29 @@ pnpm dlx node-actionlint .github/workflows/ci.yml
 
 ## Definition Of Done
 
-- Defaults remain fake-only, credential-free, and network-free.
-- Future OpenAI settings are typed and validated without reading provider
-  credentials in the adapter.
-- Invalid provider/auth-mode config fails closed.
+- WIF runtime remains unimplemented.
 - No provider SDK, credential, `.env`, SQL, migration, Supabase state, frontend,
   API client behavior, or public route behavior is introduced.
-- Public errors and diagnostics continue to exclude note content, prompt text,
-  token values, API keys, auth headers, and raw user payloads.
+- Approval requirements are explicit enough to block accidental token exchange
+  implementation.
+- Token, OIDC, JWT, API-key, auth-header, prompt, note-content, and raw payload
+  logging remain prohibited.
 
 ## Risks
 
-- Config scaffolding could accidentally become runtime provider selection.
-- Auth-mode names can imply readiness; docs and tests must keep `api_key` and
-  `workload_identity` non-runtime until explicitly approved.
-- Default CI must not require provider secrets or live network access.
+- WIF planning can sound like runtime readiness; keep approval and non-runtime
+  language explicit.
+- Claim constraints must be precise enough for future implementation review.
+- API-key fallback policy must not normalize long-lived credentials as the
+  preferred path.
 
 ## External Review Gate
 
-Before proceeding beyond Slice 7H:
+Before proceeding beyond Slice 7I:
 
 1. Include changed files, non-goals, deferred runtime behavior, verification
    evidence, CI status if checked, security observations, and unresolved risks.
 2. Be explicit about anything scaffold-only, mocked/faked, intentionally
    deferred, or unresolved.
-3. Do not automatically continue to WIF planning, mocked OpenAI runtime, or live
+3. Do not automatically continue to mocked OpenAI runtime, WIF runtime, or live
    provider harness work.

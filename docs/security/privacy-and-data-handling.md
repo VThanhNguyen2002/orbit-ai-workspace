@@ -168,6 +168,11 @@ SDK, and exposes only redacted diagnostics for timeout, unavailable, and
 malformed-response cases. It is not wired into request handling; the fake
 provider remains the default runtime provider.
 
+Slice 7H adds config shape and fail-closed validation only. OpenAI `api_key` and
+`workload_identity` modes are accepted as future configuration names but rejected
+by runtime validation because no credential boundary or WIF runtime exists yet.
+Default config remains fake, disabled, credential-free, and network-free.
+
 ## API Key Management
 
 ### Backend API Keys

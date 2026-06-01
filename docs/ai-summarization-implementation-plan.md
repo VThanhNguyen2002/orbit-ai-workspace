@@ -367,6 +367,20 @@ runtime, SSE streaming, frontend, SQL, migration, Supabase state, backend route
 behavior, or API client method was added. Slice 7H should validate future
 OpenAI config and credential-mode settings without enabling live provider calls.
 
+### Slice 7H Update — 2026-06-01
+
+Slice 7H adds safe OpenAI configuration shape and validation in
+`apps/api/app/core/config.py`. Defaults remain `ai_provider="fake"`,
+`openai_auth_mode="fake"`, summarization disabled, and credential-free. Unknown
+AI provider and OpenAI auth mode values fail closed, while `api_key` and
+`workload_identity` modes are rejected by runtime validation until future
+approved slices implement those credential paths.
+
+No OpenAI SDK, provider dependency, credential, `.env` file, API call, WIF
+runtime, SSE streaming, frontend, SQL, migration, Supabase state, backend route
+behavior, or API client method was added. Slice 7I should produce the Workload
+Identity Federation planning/approval record only.
+
 ---
 
 ## 14. Definition Of Done (This Slice)
