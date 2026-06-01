@@ -44,8 +44,12 @@ remain fake-only, disabled, credential-free, and network-free. The `api_key` and
 are rejected by runtime validation because neither credential path is
 implemented.
 
-No OpenAI SDK, provider credentials, token exchange, WIF runtime, live provider
-calls, or route behavior changes exist.
+Slice 7J adds a mocked, internal token exchange boundary with fake exchanger
+tests only. It is not wired into provider selection, routes, GitHub Actions, or
+any live credential flow.
+
+No OpenAI SDK, provider credentials, live token exchange, WIF runtime, live
+provider calls, or route behavior changes exist.
 
 ## WIF Concept Summary
 
@@ -164,12 +168,30 @@ Future WIF tests must remain fake by default:
 
 ## Future Slices
 
-- **Slice 7J — Mocked WIF token exchange boundary tests.**
 - **Slice 7K — OpenAI provider live harness planning.**
 - **Slice 7L — Optional GitHub Actions WIF setup review packet.**
 
 Do not proceed from this approval record to WIF runtime implementation without a
 separate explicit approval.
+
+## Slice 7J Update — 2026-06-01
+
+Slice 7J adds `apps/api/app/services/openai_workload_identity.py` as a mocked,
+network-free WIF token exchange boundary. The module defines typed request,
+subject, result, protocol, fake exchanger, and safe error objects. Raw identity
+assertions and fake access-token placeholders are excluded from reprs, error
+strings, and safe diagnostics.
+
+Tests cover deterministic fake exchange, required issuer/audience/subject
+metadata, unsupported claim fail-closed behavior, unavailable exchange,
+malformed exchange result handling, no-network behavior, no OpenAI SDK import
+requirement, no environment credential reads, synthetic token shape hygiene, and
+exact-fingerprint-only `.gitleaksignore` entries.
+
+This remains scaffold-only. No real token exchange, WIF runtime, GitHub OIDC
+request, provider SDK, credential, API call, route wiring, GitHub Actions
+workflow, SQL, migration, Supabase state, SSE, frontend, or API client change is
+approved or implemented.
 
 ## Definition of Done
 
@@ -177,9 +199,9 @@ This slice is complete when:
 
 - The WIF approval record exists.
 - Existing provider/security planning docs link to the record.
-- `docs/next-action.md` points to Slice 7J.
+- `docs/next-action.md` points to the next approved planning task.
 - Verification passes without runtime code changes.
-- No SDK, credential, token exchange, WIF runtime, API call, `.env` file, SQL,
-  migration, Supabase state, SSE, frontend, route behavior, or API client change
-  is introduced.
+- No SDK, credential, live token exchange, WIF runtime, API call, `.env` file,
+  SQL, migration, Supabase state, SSE, frontend, route behavior, or API client
+  change is introduced.
 - `.gitleaksignore` remains exact-fingerprint only.

@@ -312,6 +312,31 @@ but WIF runtime is not approved. API-key fallback is not approved for
 production. No token exchange, provider SDK, credential, API call, route
 behavior, workflow configuration, or live provider harness was added.
 
+### Slice 7J Update — 2026-06-01
+
+Slice 7J adds a mocked WIF token exchange boundary in
+`apps/api/app/services/openai_workload_identity.py`. The boundary defines typed
+subject metadata, exchange request/result objects, an exchanger protocol, a fake
+exchanger, and safe exchange errors for unavailable or invalid exchange
+outcomes.
+
+The fake exchanger performs only deterministic in-memory checks against explicit
+trusted issuer, audience, subject, repository, ref, workflow, and optional
+environment metadata. It does not parse OIDC/JWT values, perform cryptographic
+validation, read environment variables, import an OpenAI SDK, create network
+clients, or request GitHub OIDC tokens.
+
+Tests cover fake success, required claim metadata, fail-closed unsupported claim
+metadata, unavailable exchange, malformed exchange result mapping, redaction of
+identity assertion and access-token placeholders from reprs/errors/diagnostics,
+no-network behavior, no credential environment reads, no OpenAI SDK import
+requirement, synthetic token shape hygiene, and exact-fingerprint-only
+`.gitleaksignore`.
+
+The boundary is not wired into `OpenAISummarizationProvider`, summarization
+routes, config runtime selection, GitHub Actions, or API clients. WIF runtime and
+live token exchange remain deferred.
+
 ## Definition of Done
 
 This docs-only slice is complete when:

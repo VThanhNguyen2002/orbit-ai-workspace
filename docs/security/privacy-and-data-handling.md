@@ -180,6 +180,13 @@ exchange is not approved. Any future WIF work must satisfy issuer, audience,
 subject, repository/ref/workflow, service-account mapping, rollback, CI
 permission, and redaction requirements before implementation.
 
+Slice 7J adds a mocked WIF token exchange boundary and fake-only tests. It is
+not live runtime wiring: it performs no real token exchange, reads no
+environment credentials, imports no OpenAI SDK, requests no GitHub OIDC token,
+and creates no network clients. The boundary keeps raw identity assertion and
+fake access-token placeholder values out of reprs, error strings, and safe
+diagnostics.
+
 ## API Key Management
 
 ### Backend API Keys
