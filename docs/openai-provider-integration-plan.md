@@ -252,8 +252,9 @@ Recommended follow-up slices:
 - **Slice 7G — OpenAI provider adapter interface and fake transport tests.**
 - **Slice 7H — OpenAI config and credential-mode validation.**
 - **Slice 7I — Workload Identity Federation planning/approval record.**
-- **Slice 7J — Mocked OpenAI provider adapter tests.**
-- **Slice 7K — Optional live provider harness planning.**
+- **Slice 7J — Mocked WIF token exchange boundary tests.**
+- **Slice 7K — OpenAI provider live harness planning.**
+- **Slice 7L — Optional GitHub Actions WIF setup review packet.**
 
 Do not proceed from planning to runtime provider calls without explicit approval
 and a reviewed safety gate.
@@ -297,6 +298,19 @@ workload-identity fail-closed paths, fake mode without credentials, safe error
 messages, unchanged fake runtime selection, and exact-fingerprint-only
 `.gitleaksignore` entries. Slice 7I should remain a WIF planning/approval
 record only; WIF runtime remains deferred.
+
+### Slice 7I Update — 2026-06-01
+
+Slice 7I adds the docs-only
+[OpenAI Workload Identity approval record](openai-workload-identity-approval-record.md).
+The record defines candidate environments, approval requirements, future GitHub
+Actions checklist, security risks, fake-only testing strategy, decision status,
+and follow-up slices for mocked token exchange and live harness planning.
+
+WIF remains the preferred future CI/cloud credential direction where supported,
+but WIF runtime is not approved. API-key fallback is not approved for
+production. No token exchange, provider SDK, credential, API call, route
+behavior, workflow configuration, or live provider harness was added.
 
 ## Definition of Done
 

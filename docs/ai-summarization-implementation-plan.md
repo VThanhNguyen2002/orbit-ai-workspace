@@ -319,8 +319,9 @@ opt-in environment variable and never run in default CI.
 | **7G** | OpenAI provider adapter interface and fake transport tests |
 | **7H** | OpenAI config and credential-mode validation |
 | **7I** | Workload Identity Federation planning/approval record |
-| **7J** | Mocked OpenAI provider adapter tests |
-| **7K** | Optional live provider harness planning |
+| **7J** | Mocked WIF token exchange boundary tests |
+| **7K** | OpenAI provider live harness planning |
+| **7L** | Optional GitHub Actions WIF setup review packet |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -380,6 +381,20 @@ No OpenAI SDK, provider dependency, credential, `.env` file, API call, WIF
 runtime, SSE streaming, frontend, SQL, migration, Supabase state, backend route
 behavior, or API client method was added. Slice 7I should produce the Workload
 Identity Federation planning/approval record only.
+
+### Slice 7I Update — 2026-06-01
+
+Slice 7I adds the docs-only
+[OpenAI Workload Identity approval record](openai-workload-identity-approval-record.md).
+The record documents future WIF candidate environments, approval requirements,
+GitHub Actions checklist, security risks, fake-only testing strategy, and
+decision status.
+
+WIF remains preferred for future CI/cloud provider authentication where
+supported, but WIF runtime is not approved for implementation yet. API-key
+fallback is not approved for production. No SDK, credential, token exchange,
+API call, workflow configuration, route behavior, frontend, SQL, migration, or
+Supabase work was added.
 
 ---
 

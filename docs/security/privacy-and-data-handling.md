@@ -173,6 +173,13 @@ Slice 7H adds config shape and fail-closed validation only. OpenAI `api_key` and
 by runtime validation because no credential boundary or WIF runtime exists yet.
 Default config remains fake, disabled, credential-free, and network-free.
 
+Slice 7I adds the
+[OpenAI Workload Identity approval record](../openai-workload-identity-approval-record.md).
+WIF remains a preferred future direction where supported, but runtime token
+exchange is not approved. Any future WIF work must satisfy issuer, audience,
+subject, repository/ref/workflow, service-account mapping, rollback, CI
+permission, and redaction requirements before implementation.
+
 ## API Key Management
 
 ### Backend API Keys
