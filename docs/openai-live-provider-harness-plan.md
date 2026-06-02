@@ -301,8 +301,9 @@ Recommended follow-up slices:
 - **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
-- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.**
-- **Slice 7L-F — Grant or deny local-only live harness approval with completed evidence.**
+- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.** *(Complete — evidence filled, approval remains DENIED.)*
+- **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Next required step.)*
+- **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
 
 Do not proceed to Slice 7L automatically from this planning slice.

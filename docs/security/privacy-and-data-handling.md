@@ -227,7 +227,14 @@ security/privacy, cost/budget, credential mode, synthetic fixture review,
 rollback/disable, no-default-CI proof, and local-only boundary review. Approval
 remains denied/not granted, and no live execution or credential use is approved.
 
-## API Key Management
+Slice 7L-E fills the
+[OpenAI live harness approval evidence packet](../openai-live-harness-approval-evidence-packet.md)
+with explicit reviewer decision sections and a final evidence decision matrix.
+2 of 10 evidence items are PRESENT; 4 are MISSING; 4 are INSUFFICIENT; 0 have
+been approved by a named reviewer. Approval remains denied/not granted, and no
+live execution or credential use is approved.
+
+
 
 ### Backend API Keys
 
