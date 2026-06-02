@@ -3,9 +3,12 @@
 ## Status
 
 Slice 7K is a documentation-only planning slice for a future opt-in live OpenAI
-provider validation harness. It does not implement the harness, install an
-OpenAI SDK, add credentials, exchange tokens, call OpenAI, change CI defaults,
-wire the OpenAI adapter into runtime selection, or alter public API behavior.
+provider validation harness. Slice 7L adds the
+[OpenAI live harness approval record](openai-live-harness-approval-record.md)
+with approval status still pending. These docs do not implement the harness,
+install an OpenAI SDK, add credentials, exchange tokens, call OpenAI, change CI
+defaults, wire the OpenAI adapter into runtime selection, or alter public API
+behavior.
 
 ## 1. Objective
 
@@ -261,11 +264,16 @@ Before any live harness implementation starts, the following must be approved:
 Approval must not be inferred from this plan. The next slice must record the
 approval decision before skeleton or runtime work begins.
 
+Slice 7L records the approval gate and keeps status as pending/not granted. Any
+future local-only live harness run still requires a later grant or denial record
+with explicit constraints.
+
 ## 14. Future Slices
 
 Recommended follow-up slices:
 
 - **Slice 7L — OpenAI live harness approval record.**
+- **Slice 7L-A — Grant or deny local-only live harness approval constraints.**
 - **Slice 7M — OpenAI SDK adapter planning.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**

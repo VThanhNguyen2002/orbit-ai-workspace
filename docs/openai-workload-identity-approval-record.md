@@ -170,6 +170,7 @@ Future WIF tests must remain fake by default:
 
 - **Slice 7K — OpenAI provider live harness planning.**
 - **Slice 7L — OpenAI live harness approval record.**
+- **Slice 7L-A — Grant or deny local-only live harness approval constraints.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
 
 Do not proceed from this approval record to WIF runtime implementation without a
@@ -205,6 +206,18 @@ workflow wiring.
 Any future live harness using WIF still requires explicit security, cost,
 credential-mode, redaction evidence, rollback/disable, and no-default-CI
 approval before implementation.
+
+## Slice 7L Update — 2026-06-02
+
+Slice 7L adds the docs-only
+[OpenAI live harness approval record](openai-live-harness-approval-record.md).
+That record keeps live harness execution pending/not granted and does not approve
+WIF runtime, GitHub Actions OIDC wiring, real OIDC/JWT exchange, token exchange,
+or exchanged credential use.
+
+WIF approval remains separate from live harness execution approval. Any WIF
+candidate still requires a future approval record with exact constraints before
+implementation.
 
 ## Definition of Done
 

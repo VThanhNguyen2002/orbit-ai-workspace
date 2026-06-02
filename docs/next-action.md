@@ -2,53 +2,51 @@
 
 ## Objective
 
-Recommended next task: **Slice 7L — OpenAI live harness approval record**.
+Recommended next task: **Slice 7L-A — Grant or deny local-only live harness
+approval constraints**.
 
-Slice 7K is complete as a docs-only planning slice. The
-[OpenAI live provider harness plan](openai-live-provider-harness-plan.md)
-documents a future optional live OpenAI provider validation harness without
-implementing the harness, adding an SDK, adding credentials, exchanging tokens,
-calling OpenAI, changing CI defaults, or wiring the OpenAI adapter into runtime
-selection.
+Slice 7L is complete as a docs-only approval-record slice. The
+[OpenAI live harness approval record](openai-live-harness-approval-record.md)
+sets approval status to pending/not granted and records that live harness
+execution is not approved yet.
 
-The plan now defines:
+The record now defines:
 
-- Harness modes for default CI, local opt-in, future GitHub Actions opt-in, and
-  hosted/staging.
-- Required opt-in variables for any future live harness.
-- Credential handling rules that keep fake provider and default CI
-  credential-free.
-- Synthetic-prompt-only live test boundaries.
-- Redaction and logging rules for note content, prompt text, provider response
-  bodies, auth headers, API keys, OIDC/JWT values, access tokens, and raw user
-  payloads.
-- Safety stop conditions for missing credentials, unsupported auth mode, real
-  data, token logging risk, budget overrun, unsafe/malformed output,
-  out-of-harness network calls, and unredactable evidence.
-- Cost, timeout, retry, request-count, and token guardrails.
-- Approval requirements before any live harness implementation.
+- Current approval status: pending/not granted.
+- Candidate local-only synthetic smoke-test scope, not yet granted.
+- Explicitly not approved items, including production/staging execution,
+  default CI live tests, GitHub Actions WIF wiring, real OIDC/JWT exchange,
+  committed keys, committed `.env` files, route switch to OpenAI, background
+  summarization, and persisted live provider outputs.
+- Required approvals before execution.
+- Required pre-execution checklist.
+- Credential handling constraints.
+- Stop conditions.
+- Evidence requirements.
+- Relationship to WIF.
 
 No OpenAI SDK, provider credential, `.env` file, real provider call, live
 harness code, WIF runtime, token exchange, GitHub Actions WIF setup, frontend
 work, SSE streaming, SQL, migration, Supabase generated state, API client
-change, or route behavior change has been added.
+change, route behavior change, or live execution approval has been added.
 
-## Slice 7L Scope
+## Slice 7L-A Scope
 
-Create an approval record for the future OpenAI live provider harness without
-implementing the harness.
+Grant or deny local-only live harness approval constraints without implementing
+the harness.
 
 Include:
 
-- Security approval status.
-- Cost approval status.
-- Credential-mode decision status.
-- Redaction evidence format.
-- Rollback and disable plan.
-- Explicit confirmation that live provider tests remain out of default CI.
-- External review gate.
-- Decision status for local opt-in, GitHub Actions opt-in, and hosted/staging
-  modes.
+- A clear grant or denial decision for local-only live smoke testing.
+- Security/privacy decision.
+- Cost/budget decision.
+- Credential-mode decision.
+- Redaction evidence format decision.
+- Rollback and disable plan decision.
+- No-default-CI confirmation.
+- External review gate decision.
+- Remaining conditions that must be satisfied before any harness skeleton can
+  be implemented.
 
 Do not add OpenAI SDKs, provider credentials, `.env` files, real provider calls,
 live harness code, WIF runtime, token exchange, GitHub Actions WIF wiring,
@@ -80,26 +78,27 @@ pnpm dlx node-actionlint .github/workflows/ci.yml
 
 ## Definition Of Done
 
-- Live provider harness approval remains documentation-only.
+- Local-only live harness approval decision remains documentation-only.
 - No OpenAI SDK, provider credential, `.env`, SQL, migration, Supabase state,
   frontend, API client behavior, public route behavior, WIF runtime, or live
   token exchange is introduced.
 - Token, OIDC, JWT, API-key, auth-header, prompt, note-content, provider
   response, and raw payload logging remain prohibited.
 - Default CI remains fake-only and network-free.
-- Approval status is explicit enough to prevent accidental live provider tests.
+- Grant or denial status is explicit enough to prevent accidental live provider
+  tests.
 
 ## Risks
 
-- An approval record can be mistaken for permission to implement or run live
-  provider calls.
-- Credential-mode approval must avoid normalizing long-lived keys or default CI
+- A grant/deny record can be mistaken for permission to implement or run live
+  provider calls without satisfying every condition.
+- Credential-mode decisions must avoid normalizing long-lived keys or default CI
   network calls.
 - Cost and retry guardrails must remain precise before any implementation slice.
 
 ## External Review Gate
 
-Before proceeding beyond Slice 7L:
+Before proceeding beyond Slice 7L-A:
 
 1. Include changed files, non-goals, deferred runtime behavior, verification
    evidence, CI status if checked, security observations, and unresolved risks.

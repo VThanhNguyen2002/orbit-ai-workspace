@@ -196,6 +196,13 @@ record only coarse redacted diagnostics. It must not log note content, prompt
 text, raw provider response bodies, auth headers, API keys, OIDC/JWT values,
 access tokens, or raw user payloads.
 
+Slice 7L adds the docs-only
+[OpenAI live harness approval record](../openai-live-harness-approval-record.md).
+Approval status remains pending/not granted. No live OpenAI API call, SDK
+implementation, credential use, WIF runtime, default CI live test, GitHub
+Actions WIF wiring, route behavior switch, background summarization, or
+persisted live provider output is approved.
+
 ## API Key Management
 
 ### Backend API Keys

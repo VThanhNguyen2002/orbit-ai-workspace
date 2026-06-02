@@ -322,6 +322,7 @@ opt-in environment variable and never run in default CI.
 | **7J** | Mocked WIF token exchange boundary tests |
 | **7K** | OpenAI provider live harness planning |
 | **7L** | OpenAI live harness approval record |
+| **7L-A** | Grant or deny local-only live harness approval constraints |
 | **7M** | OpenAI SDK adapter planning |
 | **7N** | Opt-in live provider harness skeleton |
 | **7O** | Optional workflow_dispatch live provider validation planning |
@@ -424,6 +425,22 @@ No live harness, SDK, credential, `.env` file, real provider call, WIF runtime,
 token exchange, GitHub Actions WIF wiring, route behavior, API client behavior,
 SSE/frontend work, SQL, migration, Supabase state, or generated state was added.
 Slice 7L should produce the live harness approval record only.
+
+### Slice 7L Update — 2026-06-02
+
+Slice 7L adds the docs-only
+[OpenAI live harness approval record](openai-live-harness-approval-record.md).
+The record keeps live harness execution status pending/not granted, documents a
+candidate local-only synthetic smoke-test scope that is not yet granted, and
+defines required approvals, pre-execution checklist, credential constraints,
+stop conditions, evidence requirements, and WIF separation.
+
+No live OpenAI API call, SDK implementation, credential use, WIF runtime,
+default CI live test, GitHub Actions WIF wiring, route behavior switch,
+background summarization, persisted live provider output, SQL, migration,
+Supabase state, frontend work, SSE, or API client change is approved or added.
+Slice 7L-A should grant or deny local-only live harness approval constraints
+only.
 
 ---
 

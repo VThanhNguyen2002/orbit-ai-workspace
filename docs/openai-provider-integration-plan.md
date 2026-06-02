@@ -255,6 +255,7 @@ Recommended follow-up slices:
 - **Slice 7J — Mocked WIF token exchange boundary tests.**
 - **Slice 7K — OpenAI provider live harness planning.**
 - **Slice 7L — OpenAI live harness approval record.**
+- **Slice 7L-A — Grant or deny local-only live harness approval constraints.**
 - **Slice 7M — OpenAI SDK adapter planning.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
@@ -354,6 +355,22 @@ real API call, live harness code, WIF runtime, token exchange, GitHub Actions
 WIF wiring, backend route behavior, API client behavior, SSE/frontend work,
 Supabase work, SQL, migrations, or generated state. Fake provider remains the
 default runtime path.
+
+### Slice 7L Update — 2026-06-02
+
+Slice 7L adds the docs-only
+[OpenAI live harness approval record](openai-live-harness-approval-record.md).
+The record sets live harness execution status to pending/not granted, documents
+the candidate local-only smoke-test scope that is not yet granted, lists
+explicitly unapproved modes, and defines required approvals, pre-execution
+checks, credential constraints, stop conditions, evidence requirements, and the
+relationship to WIF.
+
+No live OpenAI API call, SDK implementation, credential use, WIF runtime,
+default CI live test, GitHub Actions WIF wiring, route behavior switch,
+background summarization, persisted live provider output, SQL, migration,
+Supabase state, frontend work, SSE, or API client change is approved or added.
+Fake provider remains the default runtime path.
 
 ## Definition of Done
 
