@@ -255,8 +255,10 @@ Recommended follow-up slices:
 - **Slice 7J — Mocked WIF token exchange boundary tests.**
 - **Slice 7K — OpenAI provider live harness planning.**
 - **Slice 7L — OpenAI live harness approval record.**
-- **Slice 7L-A — Grant or deny local-only live harness approval constraints.**
-- **Slice 7M — OpenAI SDK adapter planning.**
+- **Slice 7L-A — Deny local-only live harness approval until prerequisites exist.**
+- **Slice 7L-B — Resolve live harness approval prerequisites.**
+- **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
+- **Slice 7M — OpenAI SDK adapter planning only after approval path is clear.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
 
@@ -371,6 +373,23 @@ default CI live test, GitHub Actions WIF wiring, route behavior switch,
 background summarization, persisted live provider output, SQL, migration,
 Supabase state, frontend work, SSE, or API client change is approved or added.
 Fake provider remains the default runtime path.
+
+### Slice 7L-A Update — 2026-06-02
+
+Slice 7L-A updates the
+[OpenAI live harness approval record](openai-live-harness-approval-record.md)
+to deny local-only live harness approval until prerequisites exist. The record
+now requires explicit security/privacy approval, cost/budget ceiling,
+credential-mode decision, synthetic prompt fixture, redacted evidence template,
+no-default-CI proof, fail-closed config proof, local-only execution boundary,
+rollback/disable plan, and external review gate evidence before a future
+approval can be considered.
+
+The candidate local-only scope remains documented but unauthorized. No live
+execution, SDK implementation, credential use, WIF runtime, token exchange,
+default CI live test, workflow wiring, route behavior switch, API client change,
+SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
+output is approved or added.
 
 ## Definition of Done
 

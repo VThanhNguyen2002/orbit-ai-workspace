@@ -203,6 +203,12 @@ implementation, credential use, WIF runtime, default CI live test, GitHub
 Actions WIF wiring, route behavior switch, background summarization, or
 persisted live provider output is approved.
 
+Slice 7L-A keeps local-only live harness approval not granted until prerequisites
+exist. Required evidence includes security/privacy approval, cost/budget
+ceiling, credential-mode decision, synthetic prompt fixture, redacted evidence
+template, no-default-CI proof, fail-closed config proof, local-only execution
+boundary, rollback/disable plan, and external review gate.
+
 ## API Key Management
 
 ### Backend API Keys

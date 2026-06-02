@@ -322,8 +322,10 @@ opt-in environment variable and never run in default CI.
 | **7J** | Mocked WIF token exchange boundary tests |
 | **7K** | OpenAI provider live harness planning |
 | **7L** | OpenAI live harness approval record |
-| **7L-A** | Grant or deny local-only live harness approval constraints |
-| **7M** | OpenAI SDK adapter planning |
+| **7L-A** | Deny local-only live harness approval until prerequisites exist |
+| **7L-B** | Resolve live harness approval prerequisites |
+| **7L-C** | Grant or deny local-only live harness approval with evidence |
+| **7M** | OpenAI SDK adapter planning only after approval path is clear |
 | **7N** | Opt-in live provider harness skeleton |
 | **7O** | Optional workflow_dispatch live provider validation planning |
 
@@ -439,8 +441,23 @@ No live OpenAI API call, SDK implementation, credential use, WIF runtime,
 default CI live test, GitHub Actions WIF wiring, route behavior switch,
 background summarization, persisted live provider output, SQL, migration,
 Supabase state, frontend work, SSE, or API client change is approved or added.
-Slice 7L-A should grant or deny local-only live harness approval constraints
-only.
+Slice 7L-A should record the local-only approval decision only.
+
+### Slice 7L-A Update — 2026-06-02
+
+Slice 7L-A updates the
+[OpenAI live harness approval record](openai-live-harness-approval-record.md)
+to record that local-only live harness approval is not granted. The denial is
+based on missing explicit security/privacy approval, cost/budget approval,
+credential-mode approval, redaction evidence format, rollback/disable plan, and
+local-only execution checklist evidence.
+
+The candidate local-only scope remains documented but unauthorized. The next
+approval path is Slice 7L-B to resolve prerequisites, then Slice 7L-C to grant
+or deny local-only approval with evidence. No SDK, credential, live API call,
+live harness, WIF runtime, token exchange, workflow wiring, route behavior, API
+client behavior, SSE/frontend work, SQL, migration, Supabase state, or persisted
+live provider output is approved or added.
 
 ---
 

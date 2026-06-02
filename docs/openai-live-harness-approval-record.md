@@ -44,6 +44,26 @@ live smoke test with strict limits:
 
 This candidate scope is not granted by this record.
 
+## Slice 7L-A Decision — 2026-06-02
+
+Local-only live harness approval: **NOT GRANTED**.
+
+The local-only candidate scope remains documented, but it is not authorized for
+implementation or execution. Approval is denied for now because the repository
+does not yet contain explicit evidence for:
+
+- Security/privacy approval.
+- Cost/budget approval.
+- Credential-mode approval.
+- Redaction evidence format.
+- Rollback and disable plan.
+- Local-only execution checklist evidence.
+
+This denial keeps live execution blocked. It does not approve an OpenAI SDK,
+provider credentials, live API calls, WIF runtime, token exchange, default CI
+live tests, GitHub Actions WIF wiring, route behavior changes, API client
+changes, persisted live outputs, or background summarization.
+
 ## 4. Explicitly Not Approved
 
 The following are not approved:
@@ -94,7 +114,25 @@ A future live harness run must not start until this checklist is complete:
 - Evidence output is redacted.
 - Fail-closed behavior is confirmed.
 
-## 7. Credential Handling Constraints
+## 7. Local-Only Approval Prerequisite Checklist
+
+Before any later record may grant local-only live harness execution, the
+repository must contain reviewable evidence for all of the following:
+
+- Security/privacy approval.
+- Cost/budget ceiling.
+- Credential mode decision: API-key local-only or WIF future.
+- Synthetic prompt fixture.
+- Redacted evidence template.
+- No-default-CI proof.
+- Fail-closed config proof.
+- Local-only execution boundary.
+- Rollback and disable plan.
+- External review gate.
+
+Missing any item keeps local-only approval denied.
+
+## 8. Credential Handling Constraints
 
 - No committed credentials.
 - No real values in docs.
@@ -108,7 +146,7 @@ A future live harness run must not start until this checklist is complete:
 - Future credentials must stay outside source files, public config dumps, reprs,
   errors, logs, screenshots, artifacts, and client bundles.
 
-## 8. Stop Conditions
+## 9. Stop Conditions
 
 Future execution must stop if:
 
@@ -126,7 +164,7 @@ Future execution must stop if:
 - WIF runtime, OIDC exchange, or token exchange would occur without separate
   approval.
 
-## 9. Evidence Requirements
+## 10. Evidence Requirements
 
 A future live harness report must include:
 
@@ -144,7 +182,7 @@ A future live harness report must include:
 Evidence must be safe to include in repository docs or issue/PR comments. If the
 evidence cannot be redacted, the run must stop and report only the stop reason.
 
-## 10. Relationship To WIF
+## 11. Relationship To WIF
 
 WIF is preferred for future CI/cloud authentication where the provider and
 environment support a secure, narrowly scoped exchange.
@@ -158,24 +196,26 @@ record must still approve issuer, audience, subject, repository, ref, workflow,
 environment, trust policy, redaction behavior, rollback, and CI permissions
 before any WIF-based live harness can run.
 
-## 11. Future Slices
+## 12. Future Approval Path
 
 Recommended follow-up slices:
 
-- **Slice 7L-A — Grant or deny local-only live harness approval constraints.**
-- **Slice 7M — OpenAI SDK adapter planning.**
+- **Slice 7L-B — Resolve live harness approval prerequisites.**
+- **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
+- **Slice 7M — OpenAI SDK adapter planning only after approval path is clear.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
 
-Do not proceed to Slice 7L-A automatically from this record.
+Do not proceed to Slice 7L-B automatically from this record.
 
-## 12. Definition Of Done
+## 13. Definition Of Done
 
 This slice is complete when:
 
 - `docs/openai-live-harness-approval-record.md` exists.
-- Approval status is unambiguous and remains pending unless explicit approval
-  evidence exists.
+- Approval status is unambiguous and local-only approval remains not granted
+  unless explicit approval evidence exists.
+- The prerequisite checklist is recorded.
 - Related OpenAI provider, WIF, privacy, AI summarization, and next-action docs
   reference this record where useful.
 - No runtime code, tests, SDK, credential, `.env` file, API call, token
