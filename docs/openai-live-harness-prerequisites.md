@@ -163,7 +163,11 @@ Until these blockers are resolved, approval remains **NOT GRANTED**.
 Recommended follow-up slices:
 
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
+- **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
+- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
 - **Slice 7N — Opt-in live provider harness skeleton only after approval.**
 
-Do not proceed to Slice 7L-C automatically from this prerequisite packet.
+Slice 7L-C denied approval because explicit approval evidence is missing or
+insufficient. Do not proceed to Slice 7L-D automatically from this prerequisite
+packet.

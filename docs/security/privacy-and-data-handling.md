@@ -215,6 +215,11 @@ packet. It prepares checklists and a redacted evidence template only; it does
 not approve credentials, SDK/runtime work, WIF runtime, live API calls, or live
 harness execution.
 
+Slice 7L-C denies local-only live harness approval because explicit approval
+evidence is missing or insufficient. No credential use, OpenAI API call, SDK
+runtime, WIF runtime, default CI live test, route behavior switch, background
+summarization, or persisted live provider output is approved.
+
 ## API Key Management
 
 ### Backend API Keys

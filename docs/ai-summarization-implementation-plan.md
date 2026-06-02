@@ -325,6 +325,8 @@ opt-in environment variable and never run in default CI.
 | **7L-A** | Deny local-only live harness approval until prerequisites exist |
 | **7L-B** | Resolve live harness approval prerequisites |
 | **7L-C** | Grant or deny local-only live harness approval with evidence |
+| **7L-D** | Prepare OpenAI live harness approval evidence packet |
+| **7L-E** | Grant or deny local-only live harness approval with evidence |
 | **7M** | OpenAI SDK adapter planning, still no credentials |
 | **7N** | Opt-in live provider harness skeleton |
 | **7O** | Optional workflow_dispatch live provider validation planning |
@@ -472,6 +474,22 @@ WIF runtime, token exchange, workflow wiring, route behavior, API client
 behavior, SSE/frontend work, SQL, migration, Supabase state, or persisted live
 provider output is approved or added. Slice 7L-C should grant or deny
 local-only approval with evidence only.
+
+### Slice 7L-C Update — 2026-06-02
+
+Slice 7L-C updates the
+[OpenAI live harness approval record](openai-live-harness-approval-record.md)
+with an evidence checklist and records the decision as denied/not granted. The
+review finds the redacted evidence template and fail-closed config proof
+present, but security/privacy approval, cost/budget approval, credential-mode
+decision, synthetic prompt fixture, rollback/disable plan, no-default-CI proof,
+local-only boundary evidence, and external review sign-off are missing or
+insufficient.
+
+No SDK, credential, live API call, live harness, WIF runtime, token exchange,
+workflow wiring, route behavior, API client behavior, SSE/frontend work, SQL,
+migration, Supabase state, or persisted live provider output is approved or
+added. Slice 7L-D should prepare the missing approval evidence packet only.
 
 ---
 

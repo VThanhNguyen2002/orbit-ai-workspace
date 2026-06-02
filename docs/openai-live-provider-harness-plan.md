@@ -281,6 +281,12 @@ Slice 7L-B prepares those prerequisite checklists and a redacted evidence
 template. It does not approve execution, credentials, SDK/runtime work, WIF, or
 live API calls.
 
+Slice 7L-C reviews the available evidence and denies local-only live harness
+approval. The evidence packet lacks explicit security/privacy approval,
+cost/budget approval values, credential-mode decision, synthetic prompt fixture,
+approved rollback/disable plan, no-default-CI proof, local-only boundary
+evidence, and external review sign-off.
+
 ## 14. Future Slices
 
 Recommended follow-up slices:
@@ -289,6 +295,8 @@ Recommended follow-up slices:
 - **Slice 7L-A — Deny local-only live harness approval until prerequisites exist.**
 - **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
+- **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
+- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**

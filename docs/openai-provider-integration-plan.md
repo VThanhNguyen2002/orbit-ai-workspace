@@ -258,6 +258,8 @@ Recommended follow-up slices:
 - **Slice 7L-A — Deny local-only live harness approval until prerequisites exist.**
 - **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
+- **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
+- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
@@ -404,6 +406,23 @@ credentials, SDK/runtime work, WIF runtime, token exchange, live API calls,
 workflow changes, default CI live tests, route behavior switches, API client
 changes, SSE/frontend work, SQL, migrations, Supabase work, or persisted live
 provider output.
+
+### Slice 7L-C Update — 2026-06-02
+
+Slice 7L-C updates the
+[OpenAI live harness approval record](openai-live-harness-approval-record.md)
+with an evidence checklist and denies local-only live harness approval. The
+redacted evidence template and fail-closed config proof are present, but
+security/privacy approval, cost/budget approval, credential-mode decision,
+synthetic prompt fixture, rollback/disable plan, no-default-CI proof,
+local-only boundary evidence, and external review sign-off are missing or
+insufficient.
+
+The candidate local-only scope remains unauthorized. No live execution,
+credential use, OpenAI API call, SDK/runtime work, WIF runtime, token exchange,
+workflow change, default CI live test, route behavior switch, API client change,
+SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
+output is approved or added.
 
 ## Definition of Done
 

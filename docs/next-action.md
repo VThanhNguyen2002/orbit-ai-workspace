@@ -2,46 +2,47 @@
 
 ## Objective
 
-Recommended next task: **Slice 7L-C — Grant or deny local-only live harness
-approval with evidence**.
+Recommended next task: **Slice 7L-D — Prepare OpenAI live harness approval
+evidence packet**.
 
-Slice 7L-B is complete as a docs-only prerequisite packet. The
-[OpenAI live harness prerequisites](openai-live-harness-prerequisites.md)
-document prepares checklists and an evidence template for a future local-only
-approval decision, while keeping live harness approval **NOT GRANTED**.
+Slice 7L-C is complete as a docs-only approval decision. The
+[OpenAI live harness approval record](openai-live-harness-approval-record.md)
+now records the local-only live harness approval decision as **DENIED / NOT
+GRANTED**.
 
-The prerequisite packet now covers:
+Evidence review result:
 
-- Security/privacy checklist.
-- Placeholder-only cost/budget checklist.
-- Credential-mode decision checklist.
-- Redacted evidence template.
-- Rollback/disable checklist.
-- No-default-CI proof checklist.
-- Local-only execution boundary.
-- Remaining blockers.
+- PRESENT: redacted evidence template.
+- PRESENT: fail-closed config proof.
+- MISSING: cost/budget approval evidence.
+- MISSING: credential-mode decision evidence.
+- MISSING: synthetic prompt fixture.
+- MISSING: external review sign-off.
+- INSUFFICIENT: security/privacy approval evidence.
+- INSUFFICIENT: rollback/disable plan.
+- INSUFFICIENT: no-default-CI proof.
+- INSUFFICIENT: local-only boundary evidence.
 
 No OpenAI SDK, provider credential, `.env` file, real provider call, live
 harness code, WIF runtime, token exchange, GitHub Actions WIF setup, frontend
 work, SSE streaming, SQL, migration, Supabase generated state, API client
 change, route behavior change, or live execution approval has been added.
 
-## Slice 7L-C Scope
+## Slice 7L-D Scope
 
-Grant or deny local-only live harness approval with evidence, without
-implementing or running the harness.
+Prepare the missing OpenAI live harness approval evidence packet without
+granting approval, implementing the harness, or running live calls.
 
 Include:
 
-- Clear grant or denial decision.
-- Link to approval record commit.
-- Security/privacy evidence.
-- Cost/budget evidence.
-- Credential-mode evidence.
-- Approved or rejected evidence format.
-- Rollback/disable evidence.
-- No-default-CI evidence.
-- External review sign-off or explicit denial.
+- Security/privacy approval evidence.
+- Cost/budget ceiling proposal.
+- Credential-mode decision proposal.
+- Synthetic prompt fixture proposal.
+- Rollback/disable plan evidence.
+- No-default-CI proof.
+- Local-only boundary evidence.
+- External review sign-off request or denial record.
 
 Do not add OpenAI SDKs, provider credentials, `.env` files, real provider calls,
 live harness code, WIF runtime, token exchange, GitHub Actions WIF wiring,
@@ -73,27 +74,27 @@ pnpm dlx node-actionlint .github/workflows/ci.yml
 
 ## Definition Of Done
 
-- Local-only live harness approval decision remains documentation-only.
+- Approval evidence preparation remains documentation-only.
 - No OpenAI SDK, provider credential, `.env`, SQL, migration, Supabase state,
   frontend, API client behavior, public route behavior, WIF runtime, or live
   token exchange is introduced.
 - Token, OIDC, JWT, API-key, auth-header, prompt, note-content, provider
   response, and raw payload logging remain prohibited.
 - Default CI remains fake-only and network-free.
-- Local-only approval remains not granted unless a later evidence-backed record
-  grants it.
+- Local-only approval remains denied/not granted unless a later evidence-backed
+  record grants it.
 
 ## Risks
 
-- A future approval decision can be mistaken for permission to implement or run
-  live provider calls before harness code exists.
+- Evidence preparation can be mistaken for permission to implement or run live
+  provider calls.
 - Credential-mode decisions must avoid normalizing long-lived keys or default
   CI network calls.
 - Cost and retry guardrails must remain precise before any implementation slice.
 
 ## External Review Gate
 
-Before proceeding beyond Slice 7L-C:
+Before proceeding beyond Slice 7L-D:
 
 1. Include changed files, non-goals, deferred runtime behavior, verification
    evidence, CI status if checked, security observations, and unresolved risks.

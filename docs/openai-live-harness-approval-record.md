@@ -75,6 +75,37 @@ This resolves documentation structure only. It does not satisfy or grant the
 approvals themselves. Local-only live harness approval remains **NOT GRANTED**
 until a later evidence-backed record grants it.
 
+## Slice 7L-C Approval Decision — 2026-06-02
+
+Local-only live harness approval decision: **DENIED / NOT GRANTED**.
+
+The repository does not contain enough explicit evidence to grant local-only
+OpenAI live harness approval. Live execution remains blocked. No credential use
+is approved. No OpenAI API calls are approved.
+
+Evidence review:
+
+| Required item | Status | Evidence review |
+|---|---|---|
+| Security/privacy approval evidence | INSUFFICIENT | Guardrails and checklists exist, but there is no explicit approval or reviewer sign-off. |
+| Cost/budget approval evidence | MISSING | Only placeholder budget labels exist; no approved request, token, timeout, retry, or spend values exist. |
+| Credential-mode decision evidence | MISSING | API-key local-only and WIF candidates are documented as not approved; no mode is selected. |
+| Synthetic prompt fixture | MISSING | No approved synthetic prompt fixture or fixture description exists for a future run. |
+| Redacted evidence template | PRESENT | `docs/openai-live-harness-prerequisites.md` contains a redacted evidence template. |
+| Rollback/disable plan | INSUFFICIENT | A rollback/disable checklist exists, but no approved plan or execution owner is recorded. |
+| No-default-CI proof | INSUFFICIENT | Policy language exists, but no explicit proof artifact is recorded for workflow/env behavior. |
+| Fail-closed config proof | PRESENT | Existing config docs and tests show OpenAI live modes fail closed until future runtime slices. |
+| Local-only boundary evidence | INSUFFICIENT | A local-only boundary checklist exists, but no approved boundary evidence or runbook exists. |
+| External review sign-off | MISSING | No external review sign-off is recorded. |
+
+Missing or insufficient evidence blocks approval. The local-only candidate scope
+remains documented but unauthorized.
+
+This decision does not approve an OpenAI SDK, provider credentials, live API
+calls, WIF runtime, token exchange, default CI live tests, GitHub Actions WIF
+wiring, route behavior changes, API client changes, persisted live outputs, or
+background summarization.
+
 ## 4. Explicitly Not Approved
 
 The following are not approved:
@@ -211,12 +242,13 @@ before any WIF-based live harness can run.
 
 Recommended follow-up slices:
 
-- **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
+- **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
+- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
 
-Do not proceed to Slice 7L-C automatically from this record.
+Do not proceed to Slice 7L-D automatically from this record.
 
 ## 13. Definition Of Done
 
