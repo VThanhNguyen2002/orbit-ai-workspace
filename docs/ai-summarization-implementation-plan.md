@@ -325,7 +325,7 @@ opt-in environment variable and never run in default CI.
 | **7L-A** | Deny local-only live harness approval until prerequisites exist |
 | **7L-B** | Resolve live harness approval prerequisites |
 | **7L-C** | Grant or deny local-only live harness approval with evidence |
-| **7M** | OpenAI SDK adapter planning only after approval path is clear |
+| **7M** | OpenAI SDK adapter planning, still no credentials |
 | **7N** | Opt-in live provider harness skeleton |
 | **7O** | Optional workflow_dispatch live provider validation planning |
 
@@ -458,6 +458,20 @@ or deny local-only approval with evidence. No SDK, credential, live API call,
 live harness, WIF runtime, token exchange, workflow wiring, route behavior, API
 client behavior, SSE/frontend work, SQL, migration, Supabase state, or persisted
 live provider output is approved or added.
+
+### Slice 7L-B Update — 2026-06-02
+
+Slice 7L-B adds the docs-only
+[OpenAI live harness prerequisites](openai-live-harness-prerequisites.md)
+packet. It prepares prerequisite checklists for security/privacy, cost/budget,
+credential mode, redacted evidence, rollback/disable, no-default-CI proof, and
+the local-only execution boundary.
+
+Approval remains not granted. No SDK, credential, live API call, live harness,
+WIF runtime, token exchange, workflow wiring, route behavior, API client
+behavior, SSE/frontend work, SQL, migration, Supabase state, or persisted live
+provider output is approved or added. Slice 7L-C should grant or deny
+local-only approval with evidence only.
 
 ---
 

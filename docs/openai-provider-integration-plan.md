@@ -258,7 +258,7 @@ Recommended follow-up slices:
 - **Slice 7L-A — Deny local-only live harness approval until prerequisites exist.**
 - **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
-- **Slice 7M — OpenAI SDK adapter planning only after approval path is clear.**
+- **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
 
@@ -390,6 +390,20 @@ execution, SDK implementation, credential use, WIF runtime, token exchange,
 default CI live test, workflow wiring, route behavior switch, API client change,
 SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
 output is approved or added.
+
+### Slice 7L-B Update — 2026-06-02
+
+Slice 7L-B adds the docs-only
+[OpenAI live harness prerequisites](openai-live-harness-prerequisites.md)
+packet. It prepares security/privacy, cost/budget, credential-mode, redacted
+evidence, rollback/disable, no-default-CI, and local-only execution boundary
+checklists for a later approval decision.
+
+Approval remains not granted. This slice does not approve execution,
+credentials, SDK/runtime work, WIF runtime, token exchange, live API calls,
+workflow changes, default CI live tests, route behavior switches, API client
+changes, SSE/frontend work, SQL, migrations, Supabase work, or persisted live
+provider output.
 
 ## Definition of Done
 

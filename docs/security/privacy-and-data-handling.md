@@ -209,6 +209,12 @@ ceiling, credential-mode decision, synthetic prompt fixture, redacted evidence
 template, no-default-CI proof, fail-closed config proof, local-only execution
 boundary, rollback/disable plan, and external review gate.
 
+Slice 7L-B adds the docs-only
+[OpenAI live harness prerequisites](../openai-live-harness-prerequisites.md)
+packet. It prepares checklists and a redacted evidence template only; it does
+not approve credentials, SDK/runtime work, WIF runtime, live API calls, or live
+harness execution.
+
 ## API Key Management
 
 ### Backend API Keys

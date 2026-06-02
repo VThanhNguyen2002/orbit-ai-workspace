@@ -64,6 +64,17 @@ provider credentials, live API calls, WIF runtime, token exchange, default CI
 live tests, GitHub Actions WIF wiring, route behavior changes, API client
 changes, persisted live outputs, or background summarization.
 
+## Slice 7L-B Prerequisite Packet — 2026-06-02
+
+Slice 7L-B adds the docs-only
+[OpenAI live harness prerequisites](openai-live-harness-prerequisites.md)
+packet. It prepares security/privacy, cost/budget, credential-mode, redacted
+evidence, rollback/disable, no-default-CI, and local-only boundary checklists.
+
+This resolves documentation structure only. It does not satisfy or grant the
+approvals themselves. Local-only live harness approval remains **NOT GRANTED**
+until a later evidence-backed record grants it.
+
 ## 4. Explicitly Not Approved
 
 The following are not approved:
@@ -200,13 +211,12 @@ before any WIF-based live harness can run.
 
 Recommended follow-up slices:
 
-- **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
-- **Slice 7M — OpenAI SDK adapter planning only after approval path is clear.**
+- **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
 - **Slice 7N — Opt-in live provider harness skeleton.**
 - **Slice 7O — Optional workflow_dispatch live provider validation planning.**
 
-Do not proceed to Slice 7L-B automatically from this record.
+Do not proceed to Slice 7L-C automatically from this record.
 
 ## 13. Definition Of Done
 
