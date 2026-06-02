@@ -453,6 +453,20 @@ change, default CI live test, route behavior switch, API client change,
 SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
 output is approved or added.
 
+### Slice 7L-F Update — 2026-06-02
+
+Slice 7L-F converts each MISSING and INSUFFICIENT evidence item in the
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md)
+into a concrete required-action record. 8 items are now `PREPARED / STILL NOT
+APPROVED`. 2 items remain PRESENT (redacted template, fail-closed config).
+
+`PREPARED / STILL NOT APPROVED` is not an approval state. Approval remains
+**DENIED / NOT GRANTED**. No live execution, credential use, OpenAI API call,
+SDK/runtime work, WIF runtime, token exchange, workflow change, default CI
+live test, route behavior switch, API client change, SSE/frontend work, SQL,
+migration, Supabase work, or persisted live provider output is approved or
+added.
+
 
 
 This docs-only slice is complete when:

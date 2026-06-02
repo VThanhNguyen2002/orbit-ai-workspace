@@ -234,6 +234,10 @@ with explicit reviewer decision sections and a final evidence decision matrix.
 been approved by a named reviewer. Approval remains denied/not granted, and no
 live execution or credential use is approved.
 
+Slice 7L-F converts each MISSING and INSUFFICIENT evidence item into a concrete
+required-action record. 8 items are now `PREPARED / STILL NOT APPROVED`. This
+is not an approval state. Approval remains denied/not granted, and no live
+execution or credential use is approved.
 
 
 ### Backend API Keys

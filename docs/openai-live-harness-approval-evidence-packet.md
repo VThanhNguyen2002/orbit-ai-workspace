@@ -50,195 +50,280 @@ INSUFFICIENT. 0 have been explicitly approved by a named reviewer.
 
 Any `MISSING` or `INSUFFICIENT` item keeps approval **DENIED / NOT GRANTED**.
 
-## 4. Reviewer Decision Sections
+## 4. Slice 7L-F Resolution Status
 
-### 4.1 Security/Privacy Reviewer Decision
+Slice 7L-F converts each MISSING or INSUFFICIENT evidence item into a concrete
+required-action record. No items are upgraded to APPROVED because no named
+reviewer has provided explicit sign-off.
+
+| Evidence item | Previous status | Resolution added in 7L-F | New status | Why approval still denied | Next required action |
+|---|---|---|---|---|---|
+| Security/privacy approval | INSUFFICIENT | Required reviewer scope, required approval wording, and blockers documented in section 5.1 | PREPARED / STILL NOT APPROVED | No named reviewer has signed off. Checklists are not approvals. | Named security/privacy reviewer must sign off explicitly. |
+| Cost/budget approval | MISSING | Required placeholder table with all six limit fields and block wording documented in section 5.2 | PREPARED / STILL NOT APPROVED | No numeric values have been approved. Placeholders are not values. | Named cost/budget reviewer must approve actual numeric limits. |
+| Credential-mode decision | MISSING | Candidate comparison table with required evidence per mode documented in section 5.3 | PREPARED / STILL NOT APPROVED | No mode has been selected. Candidates are not decisions. | Named credential-mode reviewer must select and record a mode. |
+| Synthetic prompt fixture | MISSING | Required fixture criteria and storage decision scope documented in section 5.4 | PREPARED / STILL NOT APPROVED | No fixture description or storage decision has been approved. Criteria are not a fixture. | Named fixture reviewer must approve a fixture description. |
+| Redacted evidence template | PRESENT | No change required | PRESENT | — | No action required. |
+| Rollback/disable plan | INSUFFICIENT | Named-owner requirements, required plan elements, and required sign-off format documented in section 5.5 | PREPARED / STILL NOT APPROVED | No named owner or approved plan exists. Checklists are not plans. | Named rollback reviewer must approve a plan with named owner. |
+| No-default-CI proof | INSUFFICIENT | Proof artifact requirements and workflow inspection scope documented in section 5.6 | PREPARED / STILL NOT APPROVED | No explicit proof artifact has been recorded. Policy language is not proof. | Named CI reviewer must provide or record an explicit proof artifact. |
+| Fail-closed config proof | PRESENT | No change required | PRESENT | — | No action required. |
+| Local-only boundary | INSUFFICIENT | Runbook elements, named-enforcer requirement, and sign-off format documented in section 5.7 | PREPARED / STILL NOT APPROVED | No approved runbook or named enforcer exists. Checklists are not runbooks. | Named boundary reviewer must approve a runbook with explicit sign-off. |
+| External review sign-off | MISSING | Required sign-off format and scope documented in section 5.8 | PREPARED / STILL NOT APPROVED | No sign-off of any kind exists. Required-action record is not a sign-off. | External reviewer must provide explicit sign-off against a specific commit or PR. |
+
+**Post 7L-F summary:** 2 PRESENT, 0 MISSING, 0 INSUFFICIENT, 8 PREPARED / STILL NOT APPROVED.
+Approval remains **DENIED / NOT GRANTED**. `PREPARED / STILL NOT APPROVED` is not an approval state.
+
+## 5. Required-Action Records
+
+### 5.1 Security/Privacy Approval: Required-Action Record
 
 **Reviewer placeholder:** `TBD_SECURITY_PRIVACY_REVIEWER`
-**Current decision:** NOT RECORDED
-**Status:** INSUFFICIENT
+**Current status:** PREPARED / STILL NOT APPROVED
 
-Required before recording a positive decision:
+**Required review scope.** The reviewer must confirm in writing that the
+proposed local-only live harness enforces all of the following:
 
-- Explicit confirmation that the proposed harness uses synthetic-only prompts
-  with no real note content, no user PII, no production data.
-- Explicit confirmation that no raw prompt, note content, auth header, API key,
-  OIDC token, JWT, or provider response body will be logged.
-- Explicit confirmation that redacted diagnostics only are acceptable.
-- Explicit confirmation that external review is required before any execution.
-- Named reviewer and date of review.
-- Reference to specific commit or PR comment providing the sign-off.
+- Synthetic prompt only — no real note content.
+- No user PII in prompts or logged output.
+- No production data.
+- No raw prompt text in logs.
+- No raw provider response body in logs.
+- No auth header, API key, OIDC token, or JWT value in logs.
+- Redacted diagnostics only.
+- Fake provider remains default in CI and local development.
+- External review is required before any live execution begins.
 
-Absence of all the above keeps security/privacy status INSUFFICIENT and
-approval blocked.
+**Required approval wording** (or equivalent in reviewer's own form):
 
-### 4.2 Cost/Budget Reviewer Decision
+> I, [reviewer name], confirm that the proposed local-only OpenAI live harness
+> satisfies the security and privacy requirements listed in
+> `docs/openai-live-harness-approval-evidence-packet.md` section 5.1 as of
+> commit [commit SHA]. This confirmation is not live execution approval.
+
+**Blockers.** Until this statement or equivalent is recorded in a PR review,
+issue comment, or committed approval record:
+
+- Security/privacy approval status remains NOT APPROVED.
+- Live harness execution remains blocked.
+- Credential use remains blocked.
+- OpenAI API calls remain blocked.
+
+### 5.2 Cost/Budget Approval: Required-Action Record
 
 **Reviewer placeholder:** `TBD_COST_BUDGET_REVIEWER`
-**Current decision:** NOT RECORDED
-**Status:** MISSING
+**Current status:** PREPARED / STILL NOT APPROVED
 
-Required before recording a positive decision:
+**Required approval table.** The reviewer must choose actual numeric or bounded
+values to replace each placeholder:
 
-- Explicit numeric or bounded value for each placeholder:
+| Future limit | Placeholder label | Required approved value |
+|---|---|---|
+| Max requests per run | `TO_BE_APPROVED_MAX_REQUESTS_PER_RUN` | **NOT APPROVED — reviewer must fill** |
+| Max prompt length | `TO_BE_APPROVED_MAX_PROMPT_LENGTH` | **NOT APPROVED — reviewer must fill** |
+| Max output tokens | `TO_BE_APPROVED_MAX_OUTPUT_TOKENS` | **NOT APPROVED — reviewer must fill** |
+| Max retries | `TO_BE_APPROVED_MAX_RETRIES` | **NOT APPROVED — reviewer must fill** |
+| Max timeout | `TO_BE_APPROVED_MAX_TIMEOUT` | **NOT APPROVED — reviewer must fill** |
+| Max spend ceiling | `TO_BE_APPROVED_MAX_SPEND_CEILING` | **NOT APPROVED — reviewer must fill** |
 
-  | Future limit | Placeholder label | Approved value |
-  |---|---|---|
-  | Max requests per run | `TO_BE_APPROVED_MAX_REQUESTS_PER_RUN` | NOT APPROVED |
-  | Max prompt length | `TO_BE_APPROVED_MAX_PROMPT_LENGTH` | NOT APPROVED |
-  | Max output tokens | `TO_BE_APPROVED_MAX_OUTPUT_TOKENS` | NOT APPROVED |
-  | Max retries | `TO_BE_APPROVED_MAX_RETRIES` | NOT APPROVED |
-  | Max timeout | `TO_BE_APPROVED_MAX_TIMEOUT` | NOT APPROVED |
-  | Max spend ceiling | `TO_BE_APPROVED_MAX_SPEND_CEILING` | NOT APPROVED |
+**Blockers.** Until all six fields have named-reviewer-approved values recorded
+here or in a linked approval record:
 
-- Named reviewer and date of review.
-- Reference to commit or PR sign-off.
+- Cost/budget status remains NOT APPROVED.
+- Any future harness implementation must treat missing budget config as a
+  fail-closed stop condition.
+- Live harness execution remains blocked.
 
-Absence of all the above keeps cost/budget status MISSING and approval blocked.
-
-### 4.3 Credential-Mode Reviewer Decision
+### 5.3 Credential-Mode Decision: Required-Action Record
 
 **Reviewer placeholder:** `TBD_CREDENTIAL_MODE_REVIEWER`
-**Current decision:** NOT RECORDED
-**Status:** MISSING
+**Current status:** PREPARED / STILL NOT APPROVED
 
-Both candidate modes remain not approved:
+**Candidate comparison** (neither approved):
 
-| Future choice | Current status | Required evidence |
+| Future choice | Current status | Required evidence before approval |
 |---|---|---|
-| Local-only API-key candidate | NOT APPROVED | Local-only storage boundary, git exclusion, redaction proof, cleanup step, and reviewer decision. |
-| WIF candidate | NOT APPROVED | Separate WIF approval for issuer, audience, subject, repository/ref/workflow, environment, trust policy, redaction, rollback, and permissions. |
+| Local-only API-key candidate | NOT APPROVED | Local-only storage boundary proof, git-exclusion proof, redaction proof, cleanup step, named reviewer decision. |
+| WIF candidate | NOT APPROVED | Separate WIF approval record covering issuer, audience, subject, repository/ref/workflow, environment, trust policy, redaction, rollback, and CI permissions. |
 
-Required before recording a positive credential-mode decision:
+**Standing rules regardless of which mode is chosen:**
 
-- Selection of exactly one candidate mode.
-- Explicit constraints for that mode (storage, exclusion, redaction, cleanup).
-- Confirmation that no production API-key fallback is approved.
-- Confirmation that credentials stay outside git.
-- Named reviewer and date of review.
-- Reference to commit or PR sign-off.
+- No production API-key fallback is approved.
+- Credential source must stay outside git.
+- No committed `.env` file is allowed.
+- No tokens, keys, OIDC values, or JWT values in logs, artifacts, docs,
+  screenshots, or client bundles.
+- Fake provider remains default until a later approved runtime slice.
 
-Absence of all the above keeps credential-mode status MISSING and approval
-blocked.
+**Blockers.** Until a reviewer explicitly selects one candidate and records the
+required evidence for that candidate:
 
-### 4.4 Synthetic Prompt Fixture Reviewer Decision
+- Credential-mode status remains NOT APPROVED.
+- No credential use is authorized.
+- Live harness execution remains blocked.
+
+### 5.4 Synthetic Prompt Fixture: Required-Action Record
 
 **Reviewer placeholder:** `TBD_SYNTHETIC_FIXTURE_REVIEWER`
-**Current decision:** NOT RECORDED
-**Status:** MISSING
+**Current status:** PREPARED / STILL NOT APPROVED
 
-Required before recording a positive fixture decision:
+**Required fixture criteria.** Any approved fixture must satisfy all of the
+following:
 
-- Approved fixture description (not prompt text) confirming:
-  - Synthetic text only.
-  - No real note content.
-  - No names, emails, or PII.
-  - Short enough for the approved (future) budget.
-  - Cannot be mistaken for production data.
-- Storage and review decision for the fixture (if a future fixture file is committed).
-- Named reviewer and date of review.
-- Reference to commit or PR sign-off.
+- Synthetic text only — not derived from real notes.
+- No real note content.
+- No names, emails, phone numbers, or PII of any kind.
+- Short enough to fit within the approved (future) budget limits.
+- Cannot be mistaken for production data.
+- Reviewed by a named reviewer before any live run uses it.
+- Stored only if it contains no secrets and is clearly marked synthetic.
 
-Do not add actual fixture text to this packet. Adding fixture text without
-explicit budget and fixture review would be mistaken as execution permission.
+**Required reviewer decisions:**
 
-Absence of all the above keeps fixture status MISSING and approval blocked.
+1. Approve or deny the fixture description (not the prompt text).
+2. Approve or deny the fixture storage location (committed doc vs. local-only).
+3. Confirm the fixture does not trigger content-policy filters.
 
-### 4.5 Rollback/Disable Plan Reviewer Decision
+**Blockers.** Until the reviewer approves a synthetic fixture description and
+storage decision:
+
+- Fixture status remains NOT APPROVED.
+- No live run may use any prompt fixture.
+- Live harness execution remains blocked.
+
+### 5.5 Rollback/Disable Plan: Required-Action Record
 
 **Reviewer placeholder:** `TBD_ROLLBACK_REVIEWER`
-**Current decision:** NOT RECORDED
-**Status:** INSUFFICIENT
+**Current status:** PREPARED / STILL NOT APPROVED
 
-The rollback/disable checklist from `docs/openai-live-harness-prerequisites.md`
-exists but is not an approved plan. An approved plan requires:
+**Required plan elements.** An approved rollback/disable plan must document:
 
-- Named execution owner responsible for disable if a run goes wrong.
-- Named rollback owner responsible for ensuring fake-provider default is
-  restored.
-- Explicit confirmation that the live flag can be unset without a code change.
-- Explicit confirmation that any local environment value is cleared after the
-  run.
-- Explicit confirmation that no route or provider default switch is approved.
-- Explicit confirmation that no default CI live test is approved.
+- Named execution owner responsible for disabling the live run if it goes wrong.
+- Named rollback owner responsible for confirming fake-provider default is
+  restored after any live run.
+- Explicit step to unset the live harness flag (no code change required).
+- Explicit step to clear any local environment value after the run.
+- Explicit confirmation that no route or provider default is switched.
+- Explicit confirmation that no default CI live test is introduced.
 - Explicit confirmation that no live provider output is persisted.
-- Reference to commit or PR sign-off.
+- Explicit confirmation that no evidence containing secrets is committed.
 
-Absence of all the above keeps rollback/disable status INSUFFICIENT and
-approval blocked.
+**The checklist in `docs/openai-live-harness-prerequisites.md` section 7 is a
+checklist, not an approved plan.** An approved plan requires a named owner
+and a commit-tied or PR-tied reviewer sign-off.
 
-### 4.6 No-Default-CI Proof Reviewer Decision
+**Blockers.** Until the reviewer records an approved plan with named owners:
+
+- Rollback/disable status remains NOT APPROVED.
+- Live harness execution remains blocked.
+
+### 5.6 No-Default-CI Proof: Required-Action Record
 
 **Reviewer placeholder:** `TBD_CI_REVIEWER`
-**Current decision:** NOT RECORDED
-**Status:** INSUFFICIENT
+**Current status:** PREPARED / STILL NOT APPROVED
 
-Policy language states live tests are skipped by default, but no explicit proof
-artifact is recorded. Required before recording a positive no-default-CI
-decision:
+**Required proof.** The reviewer must provide at least one of the following:
 
-- Reviewer confirmation (issue comment, PR review, or entry here) that:
-  - Normal push CI workflow (`ci.yml`) has no `SYNAPSE_OPENAI_LIVE_TESTS`,
-    `SYNAPSE_AI_PROVIDER=openai`, or other live-enabling environment variables.
-  - Live tests are skipped or absent in the default test run.
-  - No `workflow_dispatch` live provider job exists.
-- Named reviewer and date of review.
-- Reference to commit, workflow file line range, or CI run inspected.
+- A CI workflow inspection result (referenced by workflow file path and line
+  range) confirming that `SYNAPSE_OPENAI_LIVE_TESTS`, `SYNAPSE_AI_PROVIDER=openai`,
+  and all other live-enabling flags are absent from normal push CI jobs.
+- A CI run log reference (run ID and relevant step) confirming that live tests
+  are absent or explicitly skipped.
+- An explicit written confirmation tied to a commit:
 
-Absence of all the above keeps no-default-CI status INSUFFICIENT and approval
-blocked.
+> I, [reviewer name], confirm that as of commit [commit SHA], normal push CI
+> does not set live provider flags and live tests are skipped by default.
 
-### 4.7 Local-Only Boundary Reviewer Decision
+**Standing rules regardless of proof form:**
+
+- No `workflow_dispatch` live provider job exists or is approved.
+- Workflow changes require separate review before they are added.
+- Default CI remains fake-only, credential-free, and network-free.
+
+**Blockers.** Until an explicit proof artifact is recorded here:
+
+- No-default-CI status remains NOT APPROVED.
+- Live harness execution remains blocked.
+
+### 5.7 Local-Only Boundary: Required-Action Record
 
 **Reviewer placeholder:** `TBD_LOCAL_BOUNDARY_REVIEWER`
-**Current decision:** NOT RECORDED
-**Status:** INSUFFICIENT
+**Current status:** PREPARED / STILL NOT APPROVED
 
-The local-only boundary checklist exists in prerequisites but no approved
-boundary runbook, named enforcer, or commit-tied sign-off exists. Required
-before recording a positive local-only boundary decision:
+**Required runbook elements.** An approved local-only boundary runbook must
+confirm:
 
-- Approved runbook confirming:
-  - Local developer machine only.
-  - Explicit opt-in flag required.
-  - Synthetic prompt only.
-  - No background summarization.
-  - No shared credentials.
-  - No committed live evidence containing secrets.
-  - No committed prompt text or raw provider body.
-  - No route behavior switch.
-  - No provider default switch.
-- Named reviewer and date of review.
-- Reference to commit or PR sign-off.
+- Local developer machine only — no CI or hosted execution.
+- Explicit opt-in flag required — no ambient activation.
+- Synthetic prompt only — no real note content.
+- No background summarization.
+- No shared credentials — developer's local environment only.
+- No committed live evidence containing secrets.
+- No committed prompt text or raw provider body.
+- No route behavior switch.
+- No provider default switch.
 
-Absence of all the above keeps local-only boundary status INSUFFICIENT and
-approval blocked.
+**The boundary checklist in `docs/openai-live-harness-prerequisites.md`
+section 9 is a checklist, not an approved runbook.** An approved runbook
+requires a named reviewer and a commit-tied or PR-tied sign-off.
 
-### 4.8 External Review Sign-Off
+**Blockers.** Until the reviewer records an approved runbook with explicit
+sign-off:
+
+- Local-only boundary status remains NOT APPROVED.
+- Local-only live execution remains blocked.
+
+### 5.8 External Review Sign-Off: Required-Action Record
 
 **Reviewer placeholder:** `TBD_EXTERNAL_REVIEWER`
-**Current decision:** NOT RECORDED — NO SIGN-OFF EXISTS
-**Status:** MISSING
+**Current status:** PREPARED / STILL NOT APPROVED
 
-No external reviewer has provided any sign-off on any aspect of the live
-harness plan in this repository. No PR review comment, issue approval, or out-
-of-band approval record exists.
+**Required sign-off form.** The external reviewer must provide at least one of:
 
-Required before a future approval can be considered:
+- A GitHub PR review approval on a slice that adds live harness evidence,
+  with the reviewer explicitly stating whether the local-only live harness
+  approval is granted or denied.
+- A GitHub issue comment from a named external reviewer explicitly covering
+  scope, data boundary, cost ceiling, rollback plan, and approval decision.
+- A committed approval record in repo docs with named reviewer, date, commit
+  SHA, and explicit approval or denial statement.
 
-- Explicit external reviewer sign-off in the form of:
-  - A PR review approval on a slice that adds live harness evidence, or
-  - An issue comment from a named reviewer explicitly approving scope, or
-  - An explicit approval record committed to docs with a named reviewer, date,
-    and scope.
-- The sign-off must cover at minimum: synthetic-only data, no PII, no live
-  production call, budget ceiling, rollback plan, and local-only boundary.
-- The sign-off must be tied to a specific commit or PR so it is auditable.
+**Required scope.** The sign-off must explicitly address:
 
-Absence of all the above keeps external review status MISSING and approval
-blocked.
+- Synthetic-only data — no real notes, no PII.
+- No live production call.
+- Budget ceiling (requires cost/budget approval first).
+- Rollback and disable plan (requires rollback approval first).
+- Local-only execution boundary (requires boundary approval first).
+- Whether local-only live harness approval is **GRANTED** or **DENIED**.
 
-## 5. Redacted Evidence Format
+**Blockers.** Until an external reviewer provides explicit sign-off against a
+specific commit or PR:
+
+- External sign-off status remains NOT APPROVED.
+- Local-only live harness approval remains **DENIED / NOT GRANTED**.
+- Live harness execution remains blocked.
+- Credential use remains blocked.
+- OpenAI API calls remain blocked.
+
+## 6. Decision Rule
+
+If any required reviewer decision is:
+
+- Missing (not recorded at all), or
+- Placeholder-only (no named reviewer, no date, no specific scope), or
+- Insufficient (checklist or required-action record exists but no sign-off), or
+- PREPARED / STILL NOT APPROVED (required-action record filled but not signed),
+
+then:
+
+- Approval remains **DENIED / NOT GRANTED**.
+- Live harness execution remains blocked.
+- Credential use remains blocked.
+- OpenAI API calls remain blocked.
+- OpenAI SDK, runtime, WIF runtime, and live harness skeleton remain blocked.
+
+`PREPARED / STILL NOT APPROVED` is not an approval state.
+
+## 7. Redacted Evidence Format
 
 A future live harness report should use this template with labels and coarse
 metadata only:
@@ -267,56 +352,18 @@ Future report rules:
 - Confirm redaction.
 - If execution stops, record only the stop condition.
 
-## 6. Decision Rule
-
-If any required reviewer decision is:
-
-- Missing (not recorded at all), or
-- Placeholder-only (no named reviewer, no date, no specific scope), or
-- Insufficient (checklist exists but no sign-off), or
-- Not explicitly approved by a named reviewer,
-
-then:
-
-- Approval remains **DENIED / NOT GRANTED**.
-- Live harness execution remains blocked.
-- Credential use remains blocked.
-- OpenAI API calls remain blocked.
-- OpenAI SDK, runtime, WIF runtime, and live harness skeleton remain blocked.
-
-This decision rule applies to each evidence item independently. A subset of
-items being present or partially approved does not unlock execution.
-
-## 7. Security/Privacy Evidence Requirements
-
-A future approval packet must show that the proposed local-only live harness
-would be reviewed for all of the following:
-
-- No real notes.
-- No user PII.
-- No prompt or note-content logging.
-- No raw provider response logging.
-- No auth, token, or key logging.
-- Redacted diagnostics only.
-- Fake provider remains default.
-- External review before execution.
-
-The reviewer decision must be explicit, tied to a commit, and safe to store in
-repo docs or review comments. Absence of that decision keeps live execution
-blocked.
-
 ## 8. Future Approval Path
 
 Recommended follow-up slices:
 
-- **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.**
-  Required next step given that approval remains DENIED / NOT GRANTED and
-  multiple evidence items are MISSING or INSUFFICIENT. Slice 7L-F must collect
-  or explicitly deny each required reviewer decision. If all evidence is
-  provided and explicitly approved, a later record may grant approval. If any
-  item remains missing, approval must remain DENIED / NOT GRANTED.
+- **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.**
+  Required next step. Each `TBD_*` reviewer must either provide explicit sign-off
+  or the evidence item must be permanently denied. If all 8 required items are
+  explicitly approved by named reviewers, a later record may grant approval.
+  If any item remains without explicit approval, approval must remain **DENIED /
+  NOT GRANTED**.
 - **Slice 7N — Opt-in live provider harness skeleton.**
-  Only reachable after all evidence items are explicitly PRESENT and approved.
-  Do not proceed to Slice 7N from this packet.
+  Only reachable after all evidence items are explicitly PRESENT and named-reviewer
+  approved. Do not proceed to Slice 7N from this packet.
 
-Do not proceed to Slice 7L-F automatically from this packet.
+Do not proceed to Slice 7L-G automatically from this packet.

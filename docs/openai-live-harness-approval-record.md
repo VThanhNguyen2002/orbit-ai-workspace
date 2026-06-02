@@ -151,6 +151,35 @@ workflow change, default CI live test, route behavior switch, API client change,
 SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
 output is approved or added.
 
+## Slice 7L-F Evidence Gap Resolution — 2026-06-02
+
+Slice 7L-F converts each MISSING and INSUFFICIENT evidence item into a concrete
+required-action record in the
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md).
+
+Resolution status:
+
+| Evidence item | Previous status | New status | Why approval still denied |
+|---|---|---|---|
+| Security/privacy approval | INSUFFICIENT | PREPARED / STILL NOT APPROVED | No named reviewer has signed off. |
+| Cost/budget approval | MISSING | PREPARED / STILL NOT APPROVED | No numeric values have been approved. |
+| Credential-mode decision | MISSING | PREPARED / STILL NOT APPROVED | No candidate mode has been selected. |
+| Synthetic prompt fixture | MISSING | PREPARED / STILL NOT APPROVED | No fixture description has been approved. |
+| Redacted evidence template | PRESENT | PRESENT | No change. |
+| Rollback/disable plan | INSUFFICIENT | PREPARED / STILL NOT APPROVED | No named owner or approved plan exists. |
+| No-default-CI proof | INSUFFICIENT | PREPARED / STILL NOT APPROVED | No explicit proof artifact recorded. |
+| Fail-closed config proof | PRESENT | PRESENT | No change. |
+| Local-only boundary | INSUFFICIENT | PREPARED / STILL NOT APPROVED | No approved runbook or named enforcer. |
+| External review sign-off | MISSING | PREPARED / STILL NOT APPROVED | No sign-off of any kind exists. |
+
+`PREPARED / STILL NOT APPROVED` is not an approval state.
+
+Approval remains **DENIED / NOT GRANTED**. No live harness execution,
+credential use, OpenAI API call, SDK/runtime work, WIF runtime, token exchange,
+workflow change, default CI live test, route behavior switch, API client change,
+SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
+output is approved or added.
+
 ## 4. Explicitly Not Approved
 
 The following are not approved:
@@ -288,11 +317,12 @@ before any WIF-based live harness can run.
 Recommended follow-up slices:
 
 - **Slice 7L-E — Fill approval evidence packet with reviewer decisions.** *(Complete — evidence filled, approval remains DENIED.)*
-- **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Next required step.)*
-- **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all evidence items are explicitly PRESENT and approved.)*
+- **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Complete — evidence gaps resolved into required-action records, approval remains DENIED.)*
+- **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.** *(Next required step.)*
+- **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all evidence items are explicitly PRESENT and named-reviewer approved.)*
 - **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
 
-Do not proceed to Slice 7L-F automatically from this record.
+Do not proceed to Slice 7L-G automatically from this record.
 
 ## 13. Definition Of Done
 

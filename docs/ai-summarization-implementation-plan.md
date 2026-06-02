@@ -327,7 +327,8 @@ opt-in environment variable and never run in default CI.
 | **7L-C** | Grant or deny local-only live harness approval with evidence |
 | **7L-D** | Prepare OpenAI live harness approval evidence packet |
 | **7L-E** | Fill approval evidence packet with reviewer decisions |
-| **7L-F** | Grant or deny local-only live harness approval with completed evidence |
+| **7L-F** | Resolve missing OpenAI live harness approval evidence (required-action records) |
+| **7L-G** | Collect explicit reviewer approvals or close live harness path |
 | **7M** | OpenAI SDK adapter planning only after the approval path is clear |
 
 ### Slice 7E Update — 2026-06-01
@@ -505,6 +506,24 @@ harness, WIF runtime, token exchange, workflow wiring, route behavior, API
 client behavior, SSE/frontend work, SQL, migration, Supabase state, or persisted
 live provider output is approved or added. Slice 7L-E should fill the evidence
 packet with reviewer decisions only.
+
+### Slice 7L-E Update — 2026-06-02
+
+Slice 7L-E fills the
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md)
+with explicit reviewer decision sections and a final evidence decision matrix.
+2 of 10 evidence items are PRESENT; 4 are MISSING; 4 are INSUFFICIENT; 0 have
+been approved by a named reviewer. Approval remains denied/not granted and no
+live execution or credential use is approved.
+
+### Slice 7L-F Update — 2026-06-02
+
+Slice 7L-F converts each MISSING and INSUFFICIENT evidence item in the
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md)
+into a concrete required-action record. 8 items are now `PREPARED / STILL NOT
+APPROVED`; 2 remain PRESENT. `PREPARED / STILL NOT APPROVED` is not an
+approval state. Approval remains denied/not granted and no live execution or
+credential use is approved.
 
 ---
 
