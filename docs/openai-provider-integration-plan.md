@@ -254,7 +254,10 @@ Recommended follow-up slices:
 - **Slice 7I — Workload Identity Federation planning/approval record.**
 - **Slice 7J — Mocked WIF token exchange boundary tests.**
 - **Slice 7K — OpenAI provider live harness planning.**
-- **Slice 7L — Optional GitHub Actions WIF setup review packet.**
+- **Slice 7L — OpenAI live harness approval record.**
+- **Slice 7M — OpenAI SDK adapter planning.**
+- **Slice 7N — Opt-in live provider harness skeleton.**
+- **Slice 7O — Optional workflow_dispatch live provider validation planning.**
 
 Do not proceed from planning to runtime provider calls without explicit approval
 and a reviewed safety gate.
@@ -336,6 +339,21 @@ requirement, synthetic token shape hygiene, and exact-fingerprint-only
 The boundary is not wired into `OpenAISummarizationProvider`, summarization
 routes, config runtime selection, GitHub Actions, or API clients. WIF runtime and
 live token exchange remain deferred.
+
+### Slice 7K Update — 2026-06-02
+
+Slice 7K adds the docs-only
+[OpenAI live provider harness plan](openai-live-provider-harness-plan.md). The
+plan defines a future optional live-provider validation harness, required
+opt-in gates, fake-only default CI posture, credential handling rules,
+redaction/logging requirements, safety stop conditions, test boundaries, CI
+considerations, cost/token guardrails, approval requirements, and future slices.
+
+This is planning only. It does not add an OpenAI SDK, credentials, `.env` file,
+real API call, live harness code, WIF runtime, token exchange, GitHub Actions
+WIF wiring, backend route behavior, API client behavior, SSE/frontend work,
+Supabase work, SQL, migrations, or generated state. Fake provider remains the
+default runtime path.
 
 ## Definition of Done
 

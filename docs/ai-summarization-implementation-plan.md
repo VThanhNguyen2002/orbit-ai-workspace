@@ -321,7 +321,10 @@ opt-in environment variable and never run in default CI.
 | **7I** | Workload Identity Federation planning/approval record |
 | **7J** | Mocked WIF token exchange boundary tests |
 | **7K** | OpenAI provider live harness planning |
-| **7L** | Optional GitHub Actions WIF setup review packet |
+| **7L** | OpenAI live harness approval record |
+| **7M** | OpenAI SDK adapter planning |
+| **7N** | Opt-in live provider harness skeleton |
+| **7O** | Optional workflow_dispatch live provider validation planning |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -395,6 +398,32 @@ supported, but WIF runtime is not approved for implementation yet. API-key
 fallback is not approved for production. No SDK, credential, token exchange,
 API call, workflow configuration, route behavior, frontend, SQL, migration, or
 Supabase work was added.
+
+### Slice 7J Update — 2026-06-01
+
+Slice 7J adds a mocked, network-free WIF token exchange boundary in
+`apps/api/app/services/openai_workload_identity.py`. It defines typed subject
+metadata, request/result objects, an exchanger protocol, fake exchanger, and
+safe errors for invalid or unavailable exchange outcomes.
+
+The boundary performs no real token exchange, reads no environment credentials,
+requests no GitHub OIDC token, imports no OpenAI SDK, makes no network calls,
+and is not wired into provider selection, routes, GitHub Actions, frontend, or
+API clients.
+
+### Slice 7K Update — 2026-06-02
+
+Slice 7K adds the docs-only
+[OpenAI live provider harness plan](openai-live-provider-harness-plan.md). The
+plan describes a future optional live OpenAI provider validation harness with
+explicit opt-in variables, fake-only default CI, synthetic-prompt-only live test
+boundaries, credential handling rules, redaction/logging requirements,
+safety-stop conditions, cost/token guardrails, and approval requirements.
+
+No live harness, SDK, credential, `.env` file, real provider call, WIF runtime,
+token exchange, GitHub Actions WIF wiring, route behavior, API client behavior,
+SSE/frontend work, SQL, migration, Supabase state, or generated state was added.
+Slice 7L should produce the live harness approval record only.
 
 ---
 

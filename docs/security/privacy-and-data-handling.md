@@ -187,6 +187,15 @@ and creates no network clients. The boundary keeps raw identity assertion and
 fake access-token placeholder values out of reprs, error strings, and safe
 diagnostics.
 
+Slice 7K adds the docs-only
+[OpenAI live provider harness plan](../openai-live-provider-harness-plan.md).
+Any future live provider harness must be skipped by default, use only synthetic
+prompt content, keep fake provider as the default local/test/CI path, require
+explicit opt-in gates, stop on missing budget or credential configuration, and
+record only coarse redacted diagnostics. It must not log note content, prompt
+text, raw provider response bodies, auth headers, API keys, OIDC/JWT values,
+access tokens, or raw user payloads.
+
 ## API Key Management
 
 ### Backend API Keys
