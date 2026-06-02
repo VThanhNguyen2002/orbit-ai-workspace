@@ -151,9 +151,10 @@ The following are still missing before local-only approval can be considered:
 - Explicit approval decision.
 - Actual credential-mode decision.
 - Actual budget numbers.
-- Approved evidence format.
-- Local harness skeleton.
-- Optional SDK planning.
+- Reviewed synthetic prompt fixture decision.
+- Completed approval evidence packet with reviewer decisions.
+- No-default-CI proof artifact.
+- Approved local-only boundary and rollback/disable plan.
 - External review sign-off.
 
 Until these blockers are resolved, approval remains **NOT GRANTED**.
@@ -162,12 +163,12 @@ Until these blockers are resolved, approval remains **NOT GRANTED**.
 
 Recommended follow-up slices:
 
-- **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
-- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
-- **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
-- **Slice 7N — Opt-in live provider harness skeleton only after approval.**
+- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.**
+- **Slice 7L-F — Grant or deny local-only live harness approval with completed evidence.**
+- **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
 
 Slice 7L-C denied approval because explicit approval evidence is missing or
-insufficient. Do not proceed to Slice 7L-D automatically from this prerequisite
-packet.
+insufficient. Slice 7L-D prepares an evidence packet only; approval remains
+**DENIED / NOT GRANTED**. Do not proceed to Slice 7L-E automatically from this
+prerequisite packet.

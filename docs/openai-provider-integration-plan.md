@@ -259,10 +259,9 @@ Recommended follow-up slices:
 - **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
-- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
-- **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
-- **Slice 7N — Opt-in live provider harness skeleton.**
-- **Slice 7O — Optional workflow_dispatch live provider validation planning.**
+- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.**
+- **Slice 7L-F — Grant or deny local-only live harness approval with completed evidence.**
+- **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
 
 Do not proceed from planning to runtime provider calls without explicit approval
 and a reviewed safety gate.
@@ -423,6 +422,22 @@ credential use, OpenAI API call, SDK/runtime work, WIF runtime, token exchange,
 workflow change, default CI live test, route behavior switch, API client change,
 SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
 output is approved or added.
+
+### Slice 7L-D Update — 2026-06-02
+
+Slice 7L-D adds the docs-only
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md).
+The packet prepares a future evidence matrix, reviewer placeholders,
+security/privacy review requirements, placeholder-only cost/budget labels,
+credential-mode comparison, synthetic fixture requirements, redacted report
+format, rollback/disable requirements, no-default-CI proof requirements, and
+local-only boundary evidence requirements.
+
+Approval remains denied/not granted. No live execution, credential use, OpenAI
+API call, SDK/runtime work, WIF runtime, token exchange, workflow change,
+default CI live test, route behavior switch, API client change, SSE/frontend
+work, SQL, migration, Supabase work, or persisted live provider output is
+approved or added.
 
 ## Definition of Done
 

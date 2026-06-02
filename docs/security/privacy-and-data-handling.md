@@ -220,6 +220,13 @@ evidence is missing or insufficient. No credential use, OpenAI API call, SDK
 runtime, WIF runtime, default CI live test, route behavior switch, background
 summarization, or persisted live provider output is approved.
 
+Slice 7L-D adds the docs-only
+[OpenAI live harness approval evidence packet](../openai-live-harness-approval-evidence-packet.md).
+The packet prepares reviewer placeholders and evidence requirements for
+security/privacy, cost/budget, credential mode, synthetic fixture review,
+rollback/disable, no-default-CI proof, and local-only boundary review. Approval
+remains denied/not granted, and no live execution or credential use is approved.
+
 ## API Key Management
 
 ### Backend API Keys

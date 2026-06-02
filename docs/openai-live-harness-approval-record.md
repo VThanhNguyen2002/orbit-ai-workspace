@@ -13,7 +13,7 @@ jobs, change route behavior, or approve live execution.
 
 ## 2. Current Approval Status
 
-Status: **PENDING / NOT GRANTED - live harness execution is not approved yet.**
+Status: **DENIED / NOT GRANTED - live harness execution is not approved.**
 
 The following remain explicitly unapproved:
 
@@ -105,6 +105,19 @@ This decision does not approve an OpenAI SDK, provider credentials, live API
 calls, WIF runtime, token exchange, default CI live tests, GitHub Actions WIF
 wiring, route behavior changes, API client changes, persisted live outputs, or
 background summarization.
+
+## Slice 7L-D Evidence Packet — 2026-06-02
+
+Slice 7L-D adds the docs-only
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md).
+The packet prepares required artifacts, reviewer placeholders, and redacted
+future report format for a later evidence-backed approval decision.
+
+Approval remains **DENIED / NOT GRANTED**. This packet does not approve live
+execution, credential use, OpenAI API calls, SDK/runtime work, WIF runtime,
+token exchange, workflow changes, route behavior changes, API client changes,
+SQL, migrations, Supabase work, persisted live outputs, or background
+summarization.
 
 ## 4. Explicitly Not Approved
 
@@ -242,13 +255,11 @@ before any WIF-based live harness can run.
 
 Recommended follow-up slices:
 
-- **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
-- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
-- **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
-- **Slice 7N — Opt-in live provider harness skeleton.**
-- **Slice 7O — Optional workflow_dispatch live provider validation planning.**
+- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.**
+- **Slice 7L-F — Grant or deny local-only live harness approval with completed evidence.**
+- **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
 
-Do not proceed to Slice 7L-D automatically from this record.
+Do not proceed to Slice 7L-E automatically from this record.
 
 ## 13. Definition Of Done
 

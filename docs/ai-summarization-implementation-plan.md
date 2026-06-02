@@ -326,10 +326,9 @@ opt-in environment variable and never run in default CI.
 | **7L-B** | Resolve live harness approval prerequisites |
 | **7L-C** | Grant or deny local-only live harness approval with evidence |
 | **7L-D** | Prepare OpenAI live harness approval evidence packet |
-| **7L-E** | Grant or deny local-only live harness approval with evidence |
-| **7M** | OpenAI SDK adapter planning, still no credentials |
-| **7N** | Opt-in live provider harness skeleton |
-| **7O** | Optional workflow_dispatch live provider validation planning |
+| **7L-E** | Fill approval evidence packet with reviewer decisions |
+| **7L-F** | Grant or deny local-only live harness approval with completed evidence |
+| **7M** | OpenAI SDK adapter planning only after the approval path is clear |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -490,6 +489,22 @@ No SDK, credential, live API call, live harness, WIF runtime, token exchange,
 workflow wiring, route behavior, API client behavior, SSE/frontend work, SQL,
 migration, Supabase state, or persisted live provider output is approved or
 added. Slice 7L-D should prepare the missing approval evidence packet only.
+
+### Slice 7L-D Update — 2026-06-02
+
+Slice 7L-D adds the docs-only
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md).
+The packet prepares a future evidence matrix, reviewer placeholders,
+security/privacy review requirements, placeholder-only cost/budget labels,
+credential-mode comparison, synthetic prompt fixture requirements, redacted
+report format, rollback/disable requirements, no-default-CI proof requirements,
+local-only boundary evidence requirements, and a future approval path.
+
+Approval remains denied/not granted. No SDK, credential, live API call, live
+harness, WIF runtime, token exchange, workflow wiring, route behavior, API
+client behavior, SSE/frontend work, SQL, migration, Supabase state, or persisted
+live provider output is approved or added. Slice 7L-E should fill the evidence
+packet with reviewer decisions only.
 
 ---
 

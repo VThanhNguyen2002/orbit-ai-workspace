@@ -287,6 +287,11 @@ cost/budget approval values, credential-mode decision, synthetic prompt fixture,
 approved rollback/disable plan, no-default-CI proof, local-only boundary
 evidence, and external review sign-off.
 
+Slice 7L-D adds the docs-only
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md)
+to prepare missing approval artifacts and reviewer placeholders. It does not
+grant approval or authorize live harness implementation or execution.
+
 ## 14. Future Slices
 
 Recommended follow-up slices:
@@ -296,10 +301,9 @@ Recommended follow-up slices:
 - **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
-- **Slice 7L-E — Grant or deny local-only live harness approval with evidence.**
-- **Slice 7M — OpenAI SDK adapter planning, still no credentials.**
-- **Slice 7N — Opt-in live provider harness skeleton.**
-- **Slice 7O — Optional workflow_dispatch live provider validation planning.**
+- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.**
+- **Slice 7L-F — Grant or deny local-only live harness approval with completed evidence.**
+- **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
 
 Do not proceed to Slice 7L automatically from this planning slice.
 
