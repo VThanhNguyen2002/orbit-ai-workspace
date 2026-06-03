@@ -304,7 +304,72 @@ specific commit or PR:
 - Credential use remains blocked.
 - OpenAI API calls remain blocked.
 
-## 6. Decision Rule
+## 6. Slice 7L-G Reviewer Approval Collection — 2026-06-02
+
+### 6.1 Approval Collection Result
+
+| Reviewer role | Expected evidence | Actual evidence found | Decision | Status |
+|---|---|---|---|---|
+| `TBD_SECURITY_PRIVACY_REVIEWER` | Explicit named sign-off per section 5.1 | No sign-off record exists in any PR review, issue comment, or committed doc | Not approved | CLOSED / BLOCKED |
+| `TBD_COST_BUDGET_REVIEWER` | Approved numeric values for all 6 budget placeholders | No numeric values have been recorded | Not approved | CLOSED / BLOCKED |
+| `TBD_CREDENTIAL_MODE_REVIEWER` | Explicit mode selection (API-key local or WIF) with named reviewer | No mode selection or named reviewer sign-off exists | Not approved | CLOSED / BLOCKED |
+| `TBD_SYNTHETIC_FIXTURE_REVIEWER` | Approved fixture description and storage decision | No fixture description or storage decision exists | Not approved | CLOSED / BLOCKED |
+| `TBD_ROLLBACK_REVIEWER` | Approved rollback/disable plan with named owner | No plan or named owner exists | Not approved | CLOSED / BLOCKED |
+| `TBD_CI_REVIEWER` | Explicit CI proof artifact or written confirmation | No proof artifact or confirmation exists | Not approved | CLOSED / BLOCKED |
+| `TBD_LOCAL_BOUNDARY_REVIEWER` | Approved local-only boundary runbook with named sign-off | No runbook or sign-off exists | Not approved | CLOSED / BLOCKED |
+| `TBD_EXTERNAL_REVIEWER` | Explicit external sign-off naming approval or denial | No sign-off of any kind exists in the repository | Not approved | CLOSED / BLOCKED |
+
+**Named reviewer approvals found: 0 of 8 required.**
+
+### 6.2 Path Decision
+
+**Decision: CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST**
+
+The OpenAI live harness path is formally blocked because zero of the eight
+required named reviewer approvals exist in the repository. No placeholder,
+required-action record, checklist, or policy statement can substitute for an
+explicit named reviewer sign-off.
+
+This decision does not close the path permanently. The path may be reopened
+if and when named reviewers provide the explicit sign-offs required by sections
+5.1–5.8 of this packet.
+
+The following remain blocked as of this decision:
+
+- Live harness execution.
+- Provider credentials.
+- OpenAI API calls.
+- OpenAI SDK or runtime work.
+- WIF runtime.
+- Token exchange.
+- GitHub OIDC token requests.
+- GitHub Actions live provider validation.
+- Backend route changes.
+- API client changes.
+- SSE or frontend work.
+- SQL, migrations, Supabase/RLS work, or generated Supabase state.
+
+Fake provider remains the default for local development, tests, and normal CI.
+
+### 6.3 How To Reopen
+
+To reopen the live harness approval path:
+
+1. A named security/privacy reviewer must provide sign-off per section 5.1.
+2. A named cost/budget reviewer must fill and approve the numeric budget table
+   in section 5.2.
+3. A named credential-mode reviewer must select a candidate mode per section 5.3.
+4. A named fixture reviewer must approve a synthetic fixture description per
+   section 5.4.
+5. A named rollback reviewer must approve a plan with named owner per section 5.5.
+6. A named CI reviewer must record an explicit proof artifact per section 5.6.
+7. A named boundary reviewer must approve a local-only runbook per section 5.7.
+8. An external reviewer must provide explicit sign-off per section 5.8.
+
+All eight approvals must be present before any live harness implementation,
+credential use, or real API call is authorized.
+
+## 7. Decision Rule
 
 If any required reviewer decision is:
 
@@ -323,7 +388,7 @@ then:
 
 `PREPARED / STILL NOT APPROVED` is not an approval state.
 
-## 7. Redacted Evidence Format
+## 8. Redacted Evidence Format
 
 A future live harness report should use this template with labels and coarse
 metadata only:
@@ -352,18 +417,17 @@ Future report rules:
 - Confirm redaction.
 - If execution stops, record only the stop condition.
 
-## 8. Future Approval Path
+## 9. Future Path
 
 Recommended follow-up slices:
 
-- **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.**
-  Required next step. Each `TBD_*` reviewer must either provide explicit sign-off
-  or the evidence item must be permanently denied. If all 8 required items are
-  explicitly approved by named reviewers, a later record may grant approval.
-  If any item remains without explicit approval, approval must remain **DENIED /
-  NOT GRANTED**.
-- **Slice 7N — Opt-in live provider harness skeleton.**
-  Only reachable after all evidence items are explicitly PRESENT and named-reviewer
-  approved. Do not proceed to Slice 7N from this packet.
+- **Slice 7M — OpenAI SDK adapter planning.** Docs-only. Planning for a future
+  SDK adapter without implementing it. Recommended next step while live harness
+  path remains blocked. No credentials or SDK installation.
+- **Slice 7L-G reopening — Collect named reviewer approvals.** Only when all
+  eight required reviewers are ready to provide explicit sign-off. If any remain
+  unavailable, the path stays closed.
+- **Slice 7N — Opt-in live provider harness skeleton.** Only reachable after
+  all eight approvals exist and a separate implementation slice is approved.
 
-Do not proceed to Slice 7L-G automatically from this packet.
+Do not proceed to any of the above automatically.

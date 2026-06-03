@@ -259,9 +259,11 @@ Recommended follow-up slices:
 - **Slice 7L-B — Resolve live harness approval prerequisites.**
 - **Slice 7L-C — Grant or deny local-only live harness approval with evidence.**
 - **Slice 7L-D — Prepare OpenAI live harness approval evidence packet.**
-- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.**
-- **Slice 7L-F — Grant or deny local-only live harness approval with completed evidence.**
-- **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
+- **Slice 7L-E — Fill approval evidence packet with reviewer decisions.** *(Complete — evidence filled, approval remains DENIED.)*
+- **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Complete — required-action records added, approval remains DENIED.)*
+- **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.** *(Complete — 0 of 8 named approvals, path CLOSED / BLOCKED.)*
+- **Slice 7M — OpenAI SDK adapter planning.** *(Next recommended step — docs-only, no credentials.)*
+- **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist.)*
 
 Do not proceed from planning to runtime provider calls without explicit approval
 and a reviewed safety gate.
@@ -467,22 +469,18 @@ live test, route behavior switch, API client change, SSE/frontend work, SQL,
 migration, Supabase work, or persisted live provider output is approved or
 added.
 
+### Slice 7L-G Update — 2026-06-02
+
+Slice 7L-G reviewed the evidence packet and approval record for named reviewer
+approvals. **0 of 8 required named reviewer approvals exist.** All eight
+`TBD_*` reviewer slots remain placeholder-only.
+
+**Decision: CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST**
+
+Approval remains **DENIED / NOT GRANTED**. No live execution, credential use,
+OpenAI API call, SDK/runtime work, WIF runtime, token exchange, workflow change,
+default CI live test, route behavior switch, API client change, SSE/frontend
+work, SQL, migration, Supabase work, or persisted live provider output is
+approved or added.
 
 
-This docs-only slice is complete when:
-
-- The OpenAI provider integration plan is documented.
-- Existing AI summarization docs link to the plan.
-- Security docs include the provider credential/WIF guardrails.
-- `docs/next-action.md` points to Slice 7G.
-- Verification passes without adding provider code, provider SDKs, credentials,
-  `.env` files, SQL, migrations, Supabase state, SSE, API client methods,
-  frontend work, or OpenAI API calls.
-
-Safety gate:
-
-- Keep fake provider as default.
-- Keep live provider runtime deferred.
-- Keep WIF runtime deferred.
-- Keep optional live provider tests out of default CI.
-- Keep public diagnostics redacted and contract-compatible.
