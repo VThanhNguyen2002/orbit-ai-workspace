@@ -329,7 +329,8 @@ opt-in environment variable and never run in default CI.
 | **7L-E** | Fill approval evidence packet with reviewer decisions |
 | **7L-F** | Resolve missing OpenAI live harness approval evidence (required-action records) |
 | **7L-G** | Collect explicit reviewer approvals or close live harness path *(Complete — CLOSED / BLOCKED, 0/8 approvals)* |
-| **7M** | OpenAI SDK adapter planning — docs-only, no credentials *(Next recommended step)* |
+| **7M** | OpenAI SDK adapter planning — docs-only, no credentials *(Complete — plan added, no SDK, approval DENIED)* |
+| **7M-A** | OpenAI SDK dependency review packet — docs-only, no installation *(Next recommended step)* |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01
@@ -536,6 +537,20 @@ granted and no live execution or credential use is approved. The live harness
 path may be reopened if named reviewers provide explicit sign-off per sections
 5.1–5.8 of the evidence packet.
 
+### Slice 7M Update — 2026-06-03
+
+Slice 7M adds the docs-only
+[OpenAI SDK adapter plan](openai-sdk-adapter-plan.md). The plan covers the
+future SDK adapter boundary, injectable transport design, credential
+constraints, runtime selection rules, test strategy, failure modes, cost/token
+guardrails, approval gates, and recommended follow-up slices.
+
+No SDK installation, credential use, OpenAI API call, live harness execution,
+WIF runtime, token exchange, workflow change, default CI live test, route
+behavior switch, API client change, SSE/frontend work, SQL, migration, Supabase
+work, or persisted live provider output is approved or added. Approval remains
+denied/not granted. Fake provider remains the default.
+
 ---
 
 ## 14. Definition Of Done (This Slice)
@@ -548,3 +563,4 @@ path may be reopened if named reviewers provide explicit sign-off per sections
 - [x] `gitleaks detect --redact` clean.
 - [x] No `.env`, SQL, migrations, credentials, or Supabase state changed.
 - [x] No provider SDK, no network call, no `OPENAI_API_KEY` added.
+

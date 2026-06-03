@@ -2,78 +2,69 @@
 
 ## Objective
 
-Recommended next task: **Slice 7M — OpenAI SDK adapter planning (docs-only)**.
+Recommended next task: **Slice 7M-A — OpenAI SDK dependency review packet (docs-only)**.
 
-Slice 7L-G is complete. The
-[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md)
-was reviewed for named reviewer approvals.
+Slice 7M is complete. The
+[OpenAI SDK adapter plan](openai-sdk-adapter-plan.md)
+was added as a docs-only planning document.
 
-## Slice 7L-G Result
+## Slice 7M Result
 
-**Named reviewer approvals found: 0 of 8 required.**
+Slice 7M adds `docs/openai-sdk-adapter-plan.md`. The plan covers:
 
-All eight `TBD_*` reviewer slots remain placeholder-only.
+- Future SDK adapter boundary and injectable transport design.
+- Credential constraints and runtime selection rules.
+- Test strategy (mocked SDK client, fake transport, no-network, no-credential).
+- Failure modes and cost/token guardrails.
+- Approval gates required before any implementation begins.
+- Recommended follow-up slices (7M-A, 7M-B, 7M-C, 7N).
 
-**Decision: CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST**
+No SDK installation, credential use, OpenAI API call, live harness execution,
+WIF runtime, token exchange, route behavior switch, API client change,
+SSE/frontend work, SQL, migration, Supabase work, or generated state was added.
+Approval remains **DENIED / NOT GRANTED**. Fake provider remains the default.
 
-| Evidence item | Status |
-|---|---|
-| Security/privacy approval | CLOSED / BLOCKED |
-| Cost/budget approval | CLOSED / BLOCKED |
-| Credential-mode decision | CLOSED / BLOCKED |
-| Synthetic prompt fixture | CLOSED / BLOCKED |
-| Redacted evidence template | PRESENT |
-| Rollback/disable plan | CLOSED / BLOCKED |
-| No-default-CI proof | CLOSED / BLOCKED |
-| Fail-closed config proof | PRESENT |
-| Local-only boundary | CLOSED / BLOCKED |
-| External review sign-off | CLOSED / BLOCKED |
+## Slice 7M-A Scope
 
-Approval remains **DENIED / NOT GRANTED**. The live harness approval path
-is **CLOSED / BLOCKED** until all 8 named reviewers provide explicit sign-off
-per sections 5.1–5.8 of the evidence packet.
-
-No OpenAI SDK, provider credential, `.env` file, real provider call, live
-harness code, WIF runtime, token exchange, GitHub Actions WIF setup, frontend
-work, SSE streaming, SQL, migration, Supabase generated state, API client
-change, route behavior change, or live execution approval has been added.
-
-## Slice 7M Scope
-
-Docs-only planning for a future OpenAI SDK adapter. This slice does not
-implement the adapter, install SDK packages, add credentials, or change
-runtime behavior.
+Docs-only dependency review packet for the OpenAI Python SDK. This slice does
+not install anything, add dependencies, or change runtime behavior.
 
 Recommended scope:
 
-- Document the SDK adapter boundary (types, interface, transport protocol).
-- Document the request/response safety rules.
-- Document how the adapter will be gated behind the credential-mode approval
-  (which remains blocked).
-- Document how tests will use the existing fake transport without the SDK.
-- Do not install `openai`, add SDK imports, or add `.env` values.
+- Research the `openai` Python SDK: current stable version, license, transitive
+  dependencies, size, security advisories.
+- Produce a dependency review packet documenting findings and reviewer
+  placeholders.
+- Identify which transitive dependencies introduce network or crypto requirements.
+- Document the dependency approval gate required before any `pip install openai`
+  is authorized.
+- Do not install `openai`, add SDK imports, change any `pyproject.toml` or
+  lockfile, or add `.env` values.
 - Do not add runtime code.
 - Do not unblock the live harness path.
 
-## Reopening the Live Harness Path
+## Live Harness Path Status
 
-To reopen the live harness approval path the following must occur:
+The live harness approval path remains **CLOSED / BLOCKED UNTIL NAMED APPROVALS
+EXIST** (Slice 7L-G — 0 of 8 named reviewer approvals).
 
-1. A named security/privacy reviewer must sign off per section 5.1.
-2. A named cost/budget reviewer must approve numeric budget values per section 5.2.
-3. A named credential-mode reviewer must select a mode per section 5.3.
-4. A named fixture reviewer must approve a synthetic fixture per section 5.4.
-5. A named rollback reviewer must approve a plan with named owner per section 5.5.
-6. A named CI reviewer must record explicit proof artifact per section 5.6.
-7. A named boundary reviewer must approve a runbook per section 5.7.
-8. An external reviewer must provide explicit sign-off per section 5.8.
+To reopen:
+
+1. Named security/privacy reviewer → sign-off per evidence packet section 5.1.
+2. Named cost/budget reviewer → approve numeric budget values per section 5.2.
+3. Named credential-mode reviewer → select a mode per section 5.3.
+4. Named fixture reviewer → approve a synthetic fixture per section 5.4.
+5. Named rollback reviewer → approve a plan with named owner per section 5.5.
+6. Named CI reviewer → record explicit proof artifact per section 5.6.
+7. Named boundary reviewer → approve a runbook per section 5.7.
+8. External reviewer → provide explicit sign-off per section 5.8.
 
 All 8 must be present before any live harness implementation is authorized.
 
 ## Definition Of Done
 
-- The live harness path remains closed/blocked.
+- The SDK adapter plan is documented.
 - No live harness, SDK, credentials, or real API calls are added.
 - Approval remains denied/not granted.
 
-Do NOT proceed to Slice 7M automatically.
+Do NOT proceed to Slice 7M-A automatically.

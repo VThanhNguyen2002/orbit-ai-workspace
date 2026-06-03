@@ -341,10 +341,25 @@ Recommended follow-up slices:
 - **Slice 7L-E — Fill approval evidence packet with reviewer decisions.** *(Complete — evidence filled, approval remains DENIED.)*
 - **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Complete — required-action records added, approval remains DENIED.)*
 - **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.** *(Complete — 0 of 8 named approvals found, path CLOSED / BLOCKED.)*
-- **Slice 7M — OpenAI SDK adapter planning.** *(Next recommended step — docs-only, no credentials, no SDK installation.)*
+- **Slice 7M — OpenAI SDK adapter planning.** *(Complete — docs-only plan added, no credentials, no SDK, approval remains DENIED.)*
+- **Slice 7M-A — OpenAI SDK dependency review packet.** *(Next recommended step — docs-only, no installation.)*
 - **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist and a separate implementation slice is approved.)*
 
-Do not proceed to Slice 7M automatically from this record.
+Do not proceed to Slice 7M-A automatically from this record.
+
+## Slice 7M OpenAI SDK Adapter Planning — 2026-06-03
+
+Slice 7M adds the docs-only
+[OpenAI SDK adapter plan](openai-sdk-adapter-plan.md). The plan covers the
+future SDK adapter boundary, injectable transport design, credential
+constraints, runtime selection rules, test strategy, failure modes, cost/token
+guardrails, approval gates, and recommended follow-up slices.
+
+Approval remains **DENIED / NOT GRANTED**. No SDK installation, credential
+use, OpenAI API call, live harness execution, WIF runtime, token exchange,
+workflow change, default CI live test, route behavior switch, API client change,
+SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
+output is approved or added. Fake provider remains the default.
 
 ## 13. Definition Of Done
 

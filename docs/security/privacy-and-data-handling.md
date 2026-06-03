@@ -244,6 +244,14 @@ approvals exist. Decision: CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST.
 Approval remains denied/not granted, and no live execution or credential use
 is approved.
 
+Slice 7M adds the docs-only
+[OpenAI SDK adapter plan](../openai-sdk-adapter-plan.md). The plan documents
+the future adapter boundary, injectable transport design, credential constraints,
+runtime selection rules, test strategy, failure modes, cost/token guardrails,
+and approval gates. No SDK installation, credential use, live API call, route
+behavior switch, or live harness execution is approved or added. Approval
+remains denied/not granted. Fake provider remains the default.
+
 
 ### Backend API Keys
 
