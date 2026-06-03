@@ -292,6 +292,39 @@ def test_request_result_and_error_surfaces_exclude_token_values() -> None:
     assert "[REDACTED]" in safe_text
 
 
+def test_wif_error_redacts_raw_assertion_and_token_field_names() -> None:
+    error = WorkloadIdentityExchangeError(
+        code="exchange_invalid_response",
+        diagnostic={
+            "raw_response": {
+                "identity_assertion": _ASSERTION_PLACEHOLDER,
+                "access_token": _ACCESS_TOKEN_PLACEHOLDER,
+            },
+            "provider_payload": "wif synthetic-provider-payload-placeholder",
+        },
+    )
+    safe_text = "\n".join(
+        (
+            str(error),
+            repr(error),
+            _json_text(error.safe_diagnostic()),
+        )
+    )
+
+    for forbidden in (
+        "raw_response",
+        "identity_assertion",
+        "access_token",
+        "provider_payload",
+        _ASSERTION_PLACEHOLDER,
+        _ACCESS_TOKEN_PLACEHOLDER,
+        "synthetic-provider-payload-placeholder",
+    ):
+        assert forbidden not in safe_text
+    assert "[REDACTED]" in safe_text
+    assert "[REDACTED_KEY]" in safe_text
+
+
 def test_fake_exchanger_does_not_require_environment_credentials(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

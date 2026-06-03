@@ -268,6 +268,9 @@ def test_sdk_failures_map_to_safe_transport_errors(
             "prompt": provider_request.messages[1].content,
             "headers": {"Authorization": _AUTH_HEADER_PLACEHOLDER},
             "api_key": "synthetic-api-key-placeholder",
+            "access_token": "synthetic-access-token-placeholder",
+            "identity_assertion": "synthetic-oidc-assertion-placeholder",
+            "raw_response": {"body": provider_request.messages[1].content},
             "token": "synthetic-token-placeholder",
             "message": "OPENAI_API_KEY=synthetic-api-key-placeholder",
             "raw_user_payload": content,
@@ -300,8 +303,13 @@ def test_sdk_failures_map_to_safe_transport_errors(
         "Authorization",
         "synthetic-credential-placeholder",
         "synthetic-api-key-placeholder",
+        "synthetic-access-token-placeholder",
+        "synthetic-oidc-assertion-placeholder",
         "synthetic-token-placeholder",
         "OPENAI_API_KEY",
+        "raw_response",
+        "access_token",
+        "identity_assertion",
     ):
         assert forbidden not in safe_text
     if mode != "timeout":
@@ -588,6 +596,53 @@ def test_request_response_and_error_surfaces_exclude_raw_prompt_content() -> Non
     assert "[REDACTED]" in safe_text
 
 
+def test_adapter_error_redacts_raw_sdk_diagnostic_field_names() -> None:
+    provider_request, title, content = _provider_request(
+        title="Private raw SDK diagnostic note",
+        content="Raw SDK diagnostic content must stay redacted.",
+    )
+    error = OpenAISDKAdapterError(
+        code="sdk_invalid_response",
+        diagnostic={
+            "sdk_response": {
+                "raw_body": provider_request.messages[1].content,
+                "access_token": "synthetic-access-token-placeholder",
+            },
+            "identity_assertion": "synthetic-oidc-assertion-placeholder",
+            "provider_payload": f"{title} {content}",
+        },
+        sensitive_terms=(
+            title,
+            content,
+            provider_request.messages[0].content,
+            provider_request.messages[1].content,
+        ),
+    )
+    safe_text = "\n".join(
+        (
+            str(error),
+            repr(error),
+            _json_text(error.safe_diagnostic()),
+        )
+    )
+
+    for forbidden in (
+        title,
+        content,
+        provider_request.messages[1].content,
+        "sdk_response",
+        "raw_body",
+        "provider_payload",
+        "access_token",
+        "identity_assertion",
+        "synthetic-access-token-placeholder",
+        "synthetic-oidc-assertion-placeholder",
+    ):
+        assert forbidden not in safe_text
+    assert "[REDACTED]" in safe_text
+    assert "[REDACTED_KEY]" in safe_text
+
+
 def test_credential_fields_are_not_part_of_adapter_boundaries() -> None:
     boundary_field_names = {
         field.name
@@ -620,6 +675,8 @@ def test_synthetic_placeholders_do_not_look_like_real_secret_values() -> None:
     for value in (
         _AUTH_HEADER_PLACEHOLDER,
         _UNSAFE_OUTPUT_PLACEHOLDER,
+        _API_KEY_OUTPUT_PLACEHOLDER,
+        _TOKEN_OUTPUT_PLACEHOLDER,
     ):
         assert compact_jwt_pattern.search(value) is None
         assert not value.startswith("sk-")

@@ -111,3 +111,59 @@ def test_redact_diagnostic_masks_sensitive_keys_terms_and_token_values() -> None
 
     assert "[REDACTED]" in redacted_text
     assert "[REDACTED_KEY]" in redacted_text
+
+
+def test_redact_diagnostic_masks_raw_payload_and_token_field_names() -> None:
+    title = "Private provider diagnostics title"
+    content = "Private provider diagnostics content."
+    diagnostic = {
+        "raw_response": {
+            "body": f"Provider body echoed {title} and {content}",
+            "access_token": "synthetic-access-token-placeholder",
+        },
+        "sdk_response": {
+            "raw_body": "SDK-like raw body synthetic-sensitive-placeholder",
+        },
+        "provider_payload": "Provider payload synthetic-payload-placeholder",
+        "identity_assertion": "synthetic-oidc-assertion-placeholder",
+        "id_token": "synthetic-id-token-placeholder",
+        "oidc_token": "synthetic-oidc-token-placeholder",
+        "authorization_header": "Bearer synthetic-auth-placeholder",
+        "nested": [
+            {
+                "raw_payload": f"{title} {content}",
+            }
+        ],
+    }
+
+    redacted = redact_diagnostic(
+        diagnostic,
+        sensitive_terms=(title, content),
+    )
+    redacted_text = _json_text(redacted)
+
+    for forbidden in (
+        title,
+        content,
+        "raw_response",
+        "raw_body",
+        "raw_payload",
+        "sdk_response",
+        "provider_payload",
+        "identity_assertion",
+        "access_token",
+        "id_token",
+        "oidc_token",
+        "authorization_header",
+        "synthetic-access-token-placeholder",
+        "synthetic-sensitive-placeholder",
+        "synthetic-payload-placeholder",
+        "synthetic-oidc-assertion-placeholder",
+        "synthetic-id-token-placeholder",
+        "synthetic-oidc-token-placeholder",
+        "synthetic-auth-placeholder",
+    ):
+        assert forbidden not in redacted_text
+
+    assert "[REDACTED]" in redacted_text
+    assert "[REDACTED_KEY]" in redacted_text

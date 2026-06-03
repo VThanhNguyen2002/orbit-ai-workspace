@@ -270,6 +270,57 @@ def test_malformed_transport_response_maps_to_safe_provider_error() -> None:
     assert "provider-token-placeholder" not in safe_text
 
 
+def test_transport_diagnostics_redact_raw_payload_and_token_fields() -> None:
+    title = "Private raw provider payload note"
+    content = "Raw provider payload content must stay redacted."
+    prompt = _prompt(title=title, content=content)
+    transport = FakeOpenAITransport(
+        mode="unavailable",
+        diagnostic={
+            "raw_response": {
+                "body": prompt.as_provider_text(),
+                "access_token": "synthetic-access-token-placeholder",
+            },
+            "provider_payload": f"{title} {content}",
+            "identity_assertion": "synthetic-oidc-assertion-placeholder",
+            "headers": {"Authorization": "Bearer provider-token-placeholder"},
+        },
+    )
+    provider = OpenAISummarizationProvider(
+        transport=transport,
+        model="test-openai-model",
+    )
+
+    with pytest.raises(OpenAIProviderError) as exc_info:
+        provider.summarize(source_id="note_123", prompt=prompt)
+
+    error = exc_info.value
+    safe_text = "\n".join(
+        (
+            str(error),
+            repr(error),
+            _json_text(error.safe_diagnostic()),
+        )
+    )
+    assert error.code == "provider_unavailable"
+    for forbidden in (
+        title,
+        content,
+        prompt.as_provider_text(),
+        "raw_response",
+        "provider_payload",
+        "identity_assertion",
+        "access_token",
+        "Authorization",
+        "synthetic-access-token-placeholder",
+        "synthetic-oidc-assertion-placeholder",
+        "provider-token-placeholder",
+    ):
+        assert forbidden not in safe_text
+    assert "[REDACTED]" in safe_text
+    assert "[REDACTED_KEY]" in safe_text
+
+
 def test_empty_summary_response_maps_to_safe_provider_error() -> None:
     prompt = _prompt(
         title="Private empty summary note",

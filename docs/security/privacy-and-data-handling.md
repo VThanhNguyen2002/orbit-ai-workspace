@@ -320,6 +320,16 @@ does not require environment reads or socket construction. No SDK dependency,
 credential, `.env` file, live call, route/client change, SQL, migration,
 Supabase state, or live harness is approved or added.
 
+Slice 7M-K adds the
+[OpenAI provider redaction diagnostics audit](../openai-provider-redaction-diagnostics-audit.md).
+The audit hardens raw provider/SDK payload key redaction and token/assertion
+diagnostic key redaction, then verifies prompt/content, auth-header, API-key,
+access-token, identity assertion, provider payload, SDK body, and WIF fake
+token placeholders are absent from safe diagnostics and `repr()`/`str()`
+surfaces. No SDK dependency, credential, `.env` file, live call, route/client
+change, SQL, migration, Supabase state, `.gitleaksignore` broadening, or live
+harness is approved or added.
+
 
 ### Backend API Keys
 
