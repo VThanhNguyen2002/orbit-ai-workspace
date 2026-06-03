@@ -2,69 +2,67 @@
 
 ## Objective
 
-Recommended next task: **Slice 7M-A — OpenAI SDK dependency review packet (docs-only)**.
+Recommended next task: **Slice 7M-B — Mocked SDK adapter interface tests
+without SDK dependency**.
 
-Slice 7M is complete. The
-[OpenAI SDK adapter plan](openai-sdk-adapter-plan.md)
+Slice 7M-A is complete. The
+[OpenAI SDK dependency review packet](openai-sdk-dependency-review-packet.md)
 was added as a docs-only planning document.
 
-## Slice 7M Result
+## Slice 7M-A Result
 
-Slice 7M adds `docs/openai-sdk-adapter-plan.md`. The plan covers:
+Slice 7M-A adds `docs/openai-sdk-dependency-review-packet.md`. The packet
+covers:
 
-- Future SDK adapter boundary and injectable transport design.
-- Credential constraints and runtime selection rules.
-- Test strategy (mocked SDK client, fake transport, no-network, no-credential).
-- Failure modes and cost/token guardrails.
-- Approval gates required before any implementation begins.
-- Recommended follow-up slices (7M-A, 7M-B, 7M-C, 7N).
+- Candidate dependency fields (all `TO_BE_*` placeholder, not yet selected).
+- 8 dependency approval gates (all required before any install).
+- Supply-chain risk checklist (source verification, version pinning,
+  transitive deps, vulnerability scan, update policy, rollback path).
+- Runtime risk checklist (import failure, API shape drift, retry/timeout,
+  response validation, error mapping).
+- Credential/security checklist (no committed keys, no auth header logging,
+  API key mode and WIF both not approved).
+- Testing plan (dependency-free mocked interface tests remain default).
+- CI/build impact checklist (install time, lockfile diff, Python compat,
+  no default live tests, no workflow secret changes).
 
-No SDK installation, credential use, OpenAI API call, live harness execution,
-WIF runtime, token exchange, route behavior switch, API client change,
-SSE/frontend work, SQL, migration, Supabase work, or generated state was added.
-Approval remains **DENIED / NOT GRANTED**. Fake provider remains the default.
+No SDK installation, dependency manifest change, lockfile change, credential
+use, live API call, runtime import, or generated state was added.
 
-## Slice 7M-A Scope
+**OpenAI SDK dependency decision: NOT APPROVED.**
 
-Docs-only dependency review packet for the OpenAI Python SDK. This slice does
-not install anything, add dependencies, or change runtime behavior.
+## Slice 7M-B Scope
+
+Add test coverage for the future SDK adapter using only fake/mocked SDK clients.
+No real SDK install, no network, no credentials.
 
 Recommended scope:
 
-- Research the `openai` Python SDK: current stable version, license, transitive
-  dependencies, size, security advisories.
-- Produce a dependency review packet documenting findings and reviewer
-  placeholders.
-- Identify which transitive dependencies introduce network or crypto requirements.
-- Document the dependency approval gate required before any `pip install openai`
-  is authorized.
-- Do not install `openai`, add SDK imports, change any `pyproject.toml` or
-  lockfile, or add `.env` values.
-- Do not add runtime code.
-- Do not unblock the live harness path.
+- Implement mocked SDK client tests for the `openai_provider.py` adapter
+  boundary using `unittest.mock`.
+- Cover success mapping, failure mapping, timeout, retry, malformed response,
+  and redaction paths.
+- Implement no-network proof via `socket.socket` patch.
+- Implement no-credential proof.
+- Keep tests default-CI-safe: no live network, no SDK install required.
+- Do not install `openai`, change any dependency manifest, add credentials,
+  change runtime code, or modify route behavior.
 
 ## Live Harness Path Status
 
 The live harness approval path remains **CLOSED / BLOCKED UNTIL NAMED APPROVALS
 EXIST** (Slice 7L-G — 0 of 8 named reviewer approvals).
 
-To reopen:
+## Dependency Status
 
-1. Named security/privacy reviewer → sign-off per evidence packet section 5.1.
-2. Named cost/budget reviewer → approve numeric budget values per section 5.2.
-3. Named credential-mode reviewer → select a mode per section 5.3.
-4. Named fixture reviewer → approve a synthetic fixture per section 5.4.
-5. Named rollback reviewer → approve a plan with named owner per section 5.5.
-6. Named CI reviewer → record explicit proof artifact per section 5.6.
-7. Named boundary reviewer → approve a runbook per section 5.7.
-8. External reviewer → provide explicit sign-off per section 5.8.
-
-All 8 must be present before any live harness implementation is authorized.
+**OpenAI SDK dependency: NOT APPROVED.** All 8 dependency approval gates must
+be satisfied before any `pip install openai` is authorized.
 
 ## Definition Of Done
 
-- The SDK adapter plan is documented.
-- No live harness, SDK, credentials, or real API calls are added.
+- The dependency review packet is documented.
+- No SDK, live harness, credentials, or real API calls are added.
 - Approval remains denied/not granted.
+- SDK dependency remains NOT APPROVED.
 
-Do NOT proceed to Slice 7M-A automatically.
+Do NOT proceed to Slice 7M-B automatically.

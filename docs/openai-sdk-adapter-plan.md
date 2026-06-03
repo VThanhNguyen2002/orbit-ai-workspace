@@ -259,13 +259,12 @@ Recommended follow-up slices:
 - **Slice 7M-A — OpenAI SDK dependency review packet.** Docs-only. Research
   the `openai` Python SDK version, license, transitive dependencies, size, and
   security track record. Produce a dependency review packet without installing
-  anything. *Recommended next step.*
+  anything. *(Complete — packet added, dependency NOT APPROVED.)*
 - **Slice 7M-B — Mocked SDK adapter interface tests.** Add test coverage for
   the future adapter using only fake/mocked SDK clients. No real SDK install,
-  no network, no credentials.
-- **Slice 7M-C — SDK config validation and fail-closed runtime guard.** Extend
-  `config.py` validation to reject any SDK-related config state that is not yet
-  approved. Keep fake provider as default.
+  no network, no credentials. *(Recommended next step.)*
+- **Slice 7M-C — SDK dependency approval or denial record.** Named reviewers
+  complete every dependency approval gate and record their decision.
 - **Slice 7N — Opt-in live provider harness skeleton.** Only reachable after
   all 8 named reviewer approvals exist and a separate implementation slice is
   approved. Not authorized by this plan.
@@ -277,8 +276,9 @@ Do not proceed to any of the above automatically.
 This slice is complete when:
 
 - `docs/openai-sdk-adapter-plan.md` exists.
-- Referenced docs are minimally updated to point to this plan.
-- `docs/next-action.md` recommends Slice 7M-A.
+- `docs/openai-sdk-dependency-review-packet.md` exists.
+- Referenced docs are minimally updated to point to both documents.
+- `docs/next-action.md` recommends Slice 7M-B.
 - No runtime code, tests, SDK, credential, `.env` file, API call, token
   exchange, WIF runtime, backend route, API client method, SSE/frontend,
   Supabase, SQL, migration, or generated state is added.

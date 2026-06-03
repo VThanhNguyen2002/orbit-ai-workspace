@@ -263,7 +263,8 @@ Recommended follow-up slices:
 - **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Complete — required-action records added, approval remains DENIED.)*
 - **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.** *(Complete — 0 of 8 named approvals, path CLOSED / BLOCKED.)*
 - **Slice 7M — OpenAI SDK adapter planning.** *(Complete — docs-only plan added, no credentials, no SDK.)*
-- **Slice 7M-A — OpenAI SDK dependency review packet.** *(Next recommended step — docs-only, no installation.)*
+- **Slice 7M-A — OpenAI SDK dependency review packet.** *(Complete — packet added, dependency NOT APPROVED.)*
+- **Slice 7M-B — Mocked SDK adapter interface tests without SDK dependency.** *(Next recommended step.)*
 - **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist.)*
 
 Do not proceed from planning to runtime provider calls without explicit approval

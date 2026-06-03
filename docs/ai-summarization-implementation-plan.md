@@ -330,7 +330,8 @@ opt-in environment variable and never run in default CI.
 | **7L-F** | Resolve missing OpenAI live harness approval evidence (required-action records) |
 | **7L-G** | Collect explicit reviewer approvals or close live harness path *(Complete — CLOSED / BLOCKED, 0/8 approvals)* |
 | **7M** | OpenAI SDK adapter planning — docs-only, no credentials *(Complete — plan added, no SDK, approval DENIED)* |
-| **7M-A** | OpenAI SDK dependency review packet — docs-only, no installation *(Next recommended step)* |
+| **7M-A** | OpenAI SDK dependency review packet — docs-only, no installation *(Complete — packet added, dependency NOT APPROVED)* |
+| **7M-B** | Mocked SDK adapter interface tests without SDK dependency *(Next recommended step)* |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01
@@ -550,6 +551,20 @@ WIF runtime, token exchange, workflow change, default CI live test, route
 behavior switch, API client change, SSE/frontend work, SQL, migration, Supabase
 work, or persisted live provider output is approved or added. Approval remains
 denied/not granted. Fake provider remains the default.
+
+### Slice 7M-A Update — 2026-06-03
+
+Slice 7M-A adds the docs-only
+[OpenAI SDK dependency review packet](openai-sdk-dependency-review-packet.md).
+The packet covers supply-chain risk, runtime risk, credential/security
+constraints, testing plan, CI impact checklist, dependency approval gates, and
+decision status for a future `openai` Python SDK dependency.
+
+No SDK installation, dependency manifest change, lockfile change, credential
+use, live API call, runtime import, WIF runtime, token exchange, route behavior
+switch, API client change, SSE/frontend work, SQL, migration, Supabase work, or
+generated state is approved or added. **OpenAI SDK dependency decision: NOT
+APPROVED.** Fake provider remains the default.
 
 ---
 

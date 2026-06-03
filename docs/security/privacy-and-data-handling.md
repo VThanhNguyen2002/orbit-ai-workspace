@@ -252,6 +252,14 @@ and approval gates. No SDK installation, credential use, live API call, route
 behavior switch, or live harness execution is approved or added. Approval
 remains denied/not granted. Fake provider remains the default.
 
+Slice 7M-A adds the docs-only
+[OpenAI SDK dependency review packet](../openai-sdk-dependency-review-packet.md).
+The packet evaluates supply-chain risk, runtime risk, credential/security
+constraints, testing requirements, and CI impact for a future OpenAI Python SDK
+dependency decision. No SDK installation, dependency manifest change, credential
+use, live API call, or runtime code is approved or added. OpenAI SDK dependency
+decision remains **NOT APPROVED**. Fake provider remains the default.
+
 
 ### Backend API Keys
 
