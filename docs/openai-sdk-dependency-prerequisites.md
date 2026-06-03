@@ -248,8 +248,9 @@ Recommended follow-up slices:
 - **Slice 7M-F — Optional SDK dependency install.** Only reachable after Slice
   7M-H records explicit named approval for every gate. Includes `pyproject.toml`
   edit, lockfile regeneration, and CI verification.
-- **Slice 7M-G — Keep mocked SDK adapter path dependency-free.** Documents permanent or long-term strategy for maintaining
-  the mocked adapter boundary without installing the real SDK. Recommended since Slice 7M-E denied approval again.
+- **Slice 7M-G — Keep mocked SDK adapter path dependency-free.** *(Complete — Record: `docs/openai-sdk-dependency-free-strategy.md`.)*
+- **Slice 7M-H — Dependency-free OpenAI adapter hardening plan.**
+- **Slice 7M-I — Provider boundary cleanup/refactor planning.**
 
 Do not proceed to any of the above automatically.
 

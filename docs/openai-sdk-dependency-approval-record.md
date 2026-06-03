@@ -200,8 +200,9 @@ Recommended follow-up slices:
   *(Complete — all evidence missing. Record: `docs/openai-sdk-dependency-reevaluation-record.md`. Decision remains NOT APPROVED / DENIED.)*
 - **Slice 7M-F — Optional SDK dependency install.** Only reachable after Slice
   7M-H records explicit named approval for every gate in section 4.
-- **Slice 7M-G — Keep mocked adapter path dependency-free.** Permanent or long-term dependency-free strategy since Slice 7M-E
-  denied approval again.
+- **Slice 7M-G — Keep mocked adapter path dependency-free.** *(Complete — Record: `docs/openai-sdk-dependency-free-strategy.md`.)*
+- **Slice 7M-H — Dependency-free OpenAI adapter hardening plan.**
+- **Slice 7M-I — Provider boundary cleanup/refactor planning.**
 - **Slice 7N — Live harness skeleton.** Only reachable after all 8 live harness
   approvals exist and a separate implementation slice is approved. Live path
   remains CLOSED.

@@ -103,9 +103,10 @@ Future approval may be reconsidered only if:
 
 ## 10. Future Path
 
-Since the dependency remains denied, the recommended future path is:
-* **Slice 7M-G — Keep mocked SDK adapter path dependency-free**
-* **Slice 7M-H** — Optional revisit only if dependency approval evidence is supplied.
+Since the dependency remains denied and the strategy is to stay dependency-free, the recommended future path is:
+* **Slice 7M-H — Dependency-free OpenAI adapter hardening plan**
+* **Slice 7M-I — Provider boundary cleanup/refactor planning**
+* **Slice 7N — Live harness skeleton** (only if live path is reopened and approved)
 
 ## 11. Definition of Done
 
