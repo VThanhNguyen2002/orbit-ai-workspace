@@ -268,6 +268,16 @@ reads no environment credentials, creates no network clients, logs no prompt or
 note content, renders no raw SDK body, and is not wired into runtime provider
 selection. The OpenAI SDK dependency remains **NOT APPROVED**.
 
+Slice 7M-C adds the docs-only
+[OpenAI SDK dependency approval record](../openai-sdk-dependency-approval-record.md).
+The record explicitly denies the `openai` Python SDK dependency. All 12 required
+approval gates (dependency owner, security/privacy, license, supply-chain, CI
+impact, rollback, no-default-live-run, external review, pinned version,
+transitive dep review, vulnerability scan plan, update policy) are MISSING.
+Decision: **NOT APPROVED / DENIED**. No install, manifest change, runtime
+import, credential use, or live API call is approved. Fake provider remains the
+default.
+
 
 ### Backend API Keys
 

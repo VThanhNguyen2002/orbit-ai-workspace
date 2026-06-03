@@ -2,47 +2,43 @@
 
 ## Objective
 
-Recommended next task: **Slice 7M-C — SDK dependency approval or denial
-record**.
+Recommended next task: **Slice 7M-D — Resolve OpenAI SDK dependency approval
+prerequisites**.
 
-Slice 7M-B is complete. The mocked SDK adapter boundary and tests were added
-without installing or importing the real OpenAI SDK and without wiring any live
-runtime path.
+Slice 7M-C is complete. The OpenAI SDK dependency approval record records the
+dependency decision as NOT APPROVED / DENIED. All 12 required approval gates
+are MISSING. No named reviewer approval exists for any gate.
 
-## Slice 7M-B Result
+## Slice 7M-C Result
 
-Slice 7M-B adds:
+Slice 7M-C adds:
 
-- `apps/api/app/services/openai_sdk_adapter.py` — typed SDK-like messages,
-  requests, responses, usage metadata, injected client protocol, adapter, and
-  safe redacted adapter errors.
-- `apps/api/tests/test_openai_sdk_adapter.py` — fake SDK client tests covering
-  request construction, success mapping, no SDK import, no environment
-  credential lookup, no network use, timeout/rate-limit/unavailable mapping,
-  malformed response handling, empty/unsafe output handling, and redaction.
+- `docs/openai-sdk-dependency-approval-record.md` — explicit denial record for
+  the `openai` Python SDK dependency. Decision: **NOT APPROVED / DENIED**.
+  All 12 gate items (dependency owner, security/privacy, license, supply-chain,
+  CI impact, rollback, no-default-live-run, external review, pinned version,
+  transitive dep review, vulnerability scan plan, update policy) are MISSING.
 
-No real SDK dependency, dependency manifest change, lockfile change,
-credential, `.env` file, OpenAI API call, WIF runtime, token exchange, backend
-route change, API client change, SSE/frontend work, SQL, migration, Supabase
-work, or generated state was added.
+No SDK install, dependency manifest change, lockfile change, credential,
+`.env` file, live API call, WIF runtime, token exchange, backend route change,
+API client change, SSE/frontend work, SQL, migration, Supabase work, or
+generated state was added.
 
-**OpenAI SDK dependency decision: NOT APPROVED.**
+**OpenAI SDK dependency decision: NOT APPROVED / DENIED.**
 
-## Slice 7M-C Scope
+## Slice 7M-D Scope
 
-Record an explicit approval or denial decision for the OpenAI SDK dependency.
-Named reviewers must complete the dependency gates before any install is
-authorized.
+Resolve the specific denial rationale items from the approval record:
 
-Recommended scope:
+- Select candidate SDK package and version.
+- Review and document SDK license.
+- Enumerate transitive dependencies.
+- Prepare a vulnerability scan plan.
+- Review CI/build impact.
+- Document a rollback plan.
+- Solicit named reviewers for each gate.
 
-- Record dependency owner, security/privacy, license, supply-chain, CI/build,
-  rollback, no-default-live-run, and external review decisions.
-- Keep all candidate version, license, vulnerability, transitive dependency,
-  and lockfile-impact fields evidence-backed.
-- Keep the decision separate from implementation. Approval, if granted later,
-  only authorizes a future dependency install slice.
-- If approval is denied or incomplete, keep the OpenAI SDK dependency blocked.
+Docs-only. No SDK install, credential, live harness, or runtime change.
 
 ## Live Harness Path Status
 
@@ -51,17 +47,16 @@ EXIST** (Slice 7L-G — 0 of 8 named reviewer approvals).
 
 ## Dependency Status
 
-**OpenAI SDK dependency: NOT APPROVED.** All dependency approval gates must be
-satisfied before any SDK install is authorized.
+**OpenAI SDK dependency: NOT APPROVED / DENIED.** All dependency approval gates
+must be satisfied before any SDK install is authorized.
 
 ## Definition Of Done
 
-- A dependency approval or denial record exists.
-- Named reviewer decisions are explicit and evidence-backed.
+- Denial rationale items are addressed with concrete evidence.
 - No SDK install, dependency manifest change, lockfile change, credential,
   `.env` file, live API call, WIF runtime, token exchange, live harness, route
   behavior change, API client change, SSE/frontend work, SQL, migration,
   Supabase work, or generated state is added.
 - Fake provider remains the default.
 
-Do NOT proceed to Slice 7M-C automatically.
+Do NOT proceed to Slice 7M-D automatically.

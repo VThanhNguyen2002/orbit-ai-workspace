@@ -6,7 +6,11 @@ Slice 7M-A is a documentation-only dependency review slice. It reviews the
 future OpenAI SDK dependency decision without installing or approving the
 dependency.
 
-**OpenAI SDK dependency decision: NOT APPROVED.**
+**OpenAI SDK dependency decision: NOT APPROVED / DENIED.**
+
+Slice 7M-C has recorded the explicit denial. See
+`docs/openai-sdk-dependency-approval-record.md`. All 12 required approval
+gates are MISSING. No install is authorized.
 
 This packet does not install the SDK, add any package manifest entry, change
 any lockfile, add credentials, perform API calls, or change runtime behavior.
@@ -206,12 +210,20 @@ Recommended follow-up slices:
   Add test coverage for the future adapter using only fake/mocked SDK clients
   (no real SDK install). *Complete — dependency-free mocked boundary added.*
 - **Slice 7M-C — SDK dependency approval or denial record.** Named reviewers
-  complete every approval gate in section 6 and record their decision. Only
-  after this record is complete may the dependency be installed.
-- **Slice 7M-D — Optional SDK dependency install.** Only reachable after Slice
-  7M-C records explicit named approval for every gate.
+  complete every approval gate in section 6 and record their decision.
+  *Complete — decision: NOT APPROVED / DENIED. All 12 gates MISSING.*
+  Record: `docs/openai-sdk-dependency-approval-record.md`.
+- **Slice 7M-D — Resolve OpenAI SDK dependency approval prerequisites.**
+  Address each denial rationale item: select version, review license, enumerate
+  transitive deps, run vulnerability scan, review CI impact, document rollback
+  plan. Docs-only. No install.
+- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Only
+  reachable after Slice 7M-D resolves all prerequisite items and named reviewers
+  provide explicit sign-offs.
+- **Slice 7M-F — Optional SDK dependency install.** Only reachable after Slice
+  7M-E records explicit named approval for every gate.
 - **Slice 7N — Opt-in live provider harness skeleton.** Only reachable after
-  all 8 live harness approvals exist and a separate implementation slice is
+  all 8 named reviewer approvals exist and a separate implementation slice is
   approved. Not authorized by this packet.
 
 Do not proceed to any of the above automatically.

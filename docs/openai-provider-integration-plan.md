@@ -271,7 +271,10 @@ Recommended follow-up slices:
 - **Slice 7M — OpenAI SDK adapter planning.** *(Complete — docs-only plan added, no credentials, no SDK.)*
 - **Slice 7M-A — OpenAI SDK dependency review packet.** *(Complete — packet added, dependency NOT APPROVED.)*
 - **Slice 7M-B — Mocked SDK adapter interface tests without SDK dependency.** *(Complete — fake-only boundary added, not runtime-wired.)*
-- **Slice 7M-C — SDK dependency approval or denial record.** *(Next recommended step.)*
+- **Slice 7M-C — SDK dependency approval or denial record.** *(Complete — NOT APPROVED / DENIED, all 12 gates MISSING. Record: `docs/openai-sdk-dependency-approval-record.md`.)*
+- **Slice 7M-D — Resolve OpenAI SDK dependency approval prerequisites.** Docs-only.
+- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Only after 7M-D complete and named reviewers sign off.
+- **Slice 7M-F — Optional SDK dependency install.** Only if 7M-E grants approval.
 - **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist.)*
 
 Do not proceed from planning to runtime provider calls without explicit approval
@@ -534,3 +537,19 @@ clients, and is not wired into runtime route or provider selection.
 
 OpenAI SDK dependency remains **NOT APPROVED**. Fake provider remains the
 runtime default. Slice 7M-C should record dependency approval or denial only.
+
+### Slice 7M-C Update — 2026-06-03
+
+Slice 7M-C adds the docs-only
+[OpenAI SDK dependency approval record](openai-sdk-dependency-approval-record.md).
+The record explicitly denies the `openai` Python SDK dependency. All 12
+required approval gates (dependency owner, security/privacy, license,
+supply-chain, CI impact, rollback, no-default-live-run, external review, pinned
+version, transitive dep review, vulnerability scan plan, update policy) are
+MISSING. Decision: **NOT APPROVED / DENIED**.
+
+No SDK install, dependency manifest change, lockfile change, credential use,
+live API call, WIF runtime, token exchange, route behavior switch, API client
+change, SSE/frontend work, SQL, migration, Supabase work, or generated state is
+approved or added. Fake provider remains the default. Slice 7M-D should resolve
+the specific denial prerequisite items only.

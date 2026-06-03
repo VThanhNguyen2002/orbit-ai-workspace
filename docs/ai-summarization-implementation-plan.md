@@ -332,7 +332,10 @@ opt-in environment variable and never run in default CI.
 | **7M** | OpenAI SDK adapter planning — docs-only, no credentials *(Complete — plan added, no SDK, approval DENIED)* |
 | **7M-A** | OpenAI SDK dependency review packet — docs-only, no installation *(Complete — packet added, dependency NOT APPROVED)* |
 | **7M-B** | Mocked SDK adapter interface tests without SDK dependency *(Complete — fake-only boundary added, not runtime-wired)* |
-| **7M-C** | SDK dependency approval or denial record *(Next recommended step)* |
+| **7M-C** | SDK dependency approval or denial record *(Complete — NOT APPROVED / DENIED, all 12 gates MISSING)* |
+| **7M-D** | Resolve OpenAI SDK dependency approval prerequisites — docs-only |
+| **7M-E** | Re-evaluate SDK dependency approval with evidence — only after prerequisites resolved |
+| **7M-F** | Optional SDK dependency install — only if approved by 7M-E |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01
@@ -585,6 +588,22 @@ route behavior switch, API client change, SSE/frontend work, SQL, migration,
 Supabase work, or generated state is approved or added. **OpenAI SDK dependency
 decision remains NOT APPROVED.** Fake provider remains the default. Slice 7M-C
 should record dependency approval or denial only.
+
+### Slice 7M-C Update — 2026-06-03
+
+Slice 7M-C adds the docs-only
+[OpenAI SDK dependency approval record](openai-sdk-dependency-approval-record.md).
+The record explicitly denies the `openai` Python SDK dependency. All 12
+required approval gates (dependency owner, security/privacy, license,
+supply-chain, CI impact, rollback, no-default-live-run, external review, pinned
+version, transitive dep review, vulnerability scan plan, update policy) are
+MISSING. Decision: **NOT APPROVED / DENIED**.
+
+No SDK install, dependency manifest change, lockfile change, credential use,
+live API call, WIF runtime, token exchange, route behavior switch, API client
+change, SSE/frontend work, SQL, migration, Supabase work, or generated state is
+approved or added. Fake provider remains the default. Slice 7M-D should resolve
+the specific denial prerequisite items only.
 
 ---
 
