@@ -2,9 +2,11 @@
 
 ## Status
 
-Slice 7M is a documentation-only planning slice. It plans a future
-OpenAI SDK-backed provider adapter for note summarization without implementing
-it, installing dependencies, adding credentials, or changing runtime behavior.
+Slice 7M began as a documentation-only planning slice for a future OpenAI
+SDK-backed provider adapter. Slice 7M-B adds only a mocked SDK adapter
+interface boundary and dependency-free tests. It does not install the SDK, add
+credentials, import the real SDK, make network calls, or change runtime
+behavior.
 
 The live harness approval path remains **CLOSED / BLOCKED UNTIL NAMED APPROVALS
 EXIST** (Slice 7L-G decision). This plan does not reopen, satisfy, or bypass
@@ -16,9 +18,9 @@ Plan how a future OpenAI SDK-backed provider adapter would be built, tested,
 and gated safely within the existing Synapse backend, while keeping the fake
 provider as the default for all local development, tests, and CI.
 
-This plan produces only documentation. It is not implementation permission. It
-does not install the OpenAI SDK, add any dependency, change any config default,
-enable any live provider path, or touch runtime code.
+This plan is not live implementation permission. It does not install the OpenAI
+SDK, add any dependency, change any config default, enable any live provider
+path, or authorize runtime route selection.
 
 ## 2. Non-Goals
 
@@ -50,6 +52,11 @@ This slice explicitly excludes:
 - `apps/api/app/services/openai_provider.py` defines a network-free OpenAI
   adapter boundary with injected transport and fake transport tests. It reads
   no credentials, imports no OpenAI SDK, creates no HTTP client, and is not
+  wired into runtime provider selection.
+- `apps/api/app/services/openai_sdk_adapter.py` defines a mocked SDK adapter
+  boundary with typed SDK-like request/response/protocol shapes. It accepts only
+  an injected fake SDK-like client in tests, imports no SDK, reads no
+  credentials or environment values, creates no network clients, and is not
   wired into runtime provider selection.
 - `apps/api/app/services/openai_workload_identity.py` defines a mocked WIF
   token exchange boundary with fake exchanger tests only. It performs no real
@@ -121,19 +128,21 @@ boundaries:
   behind the provider selection path so it does not affect modules that do not
   need it and does not cause import errors when the SDK is absent.
 
-### Planned adapter shape (for planning only — not implemented)
+### Mocked adapter shape (implemented for tests only)
 
 ```text
-OpenAISummarizationProvider(
-    transport: OpenAITransportProtocol,   # injectable; real SDK client or fake
-    config: OpenAIConfig,                 # timeout, retries, model, auth mode
-    redactor: DiagnosticRedactor,         # from ai_prompting.py
+OpenAISDKAdapter(
+    client: OpenAISDKClient,              # injected fake SDK-like client
+    timeout_seconds: int,                 # explicit metadata, no env lookup
+    request_budget: int,                  # explicit metadata, no env lookup
 )
 ```
 
-The real SDK transport wraps the OpenAI SDK client. The fake transport — used
-in tests — returns deterministic responses without network access, SDK import
-requirement, or credential reads.
+The adapter implements the existing injected-transport shape by accepting an
+`OpenAIProviderRequest`, building an `OpenAISDKRequest`, calling only the
+injected client, validating the typed SDK-like response, and returning an
+`OpenAIProviderResponse`. The real SDK client remains unimplemented and
+unapproved.
 
 ## 6. Credential Constraints
 
@@ -173,7 +182,7 @@ All default tests must remain network-free and credential-free.
 | Test type | Approach |
 |---|---|
 | Fake transport tests | Inject a fake SDK client; prove request construction, success mapping, failure mapping. No network, no SDK install required. |
-| Mocked SDK client tests | Use `unittest.mock` or equivalent to patch the SDK client; prove timeout, retry, and rate-limit behavior. |
+| Mocked SDK client tests | Use an injected fake SDK-like client or mocks; prove timeout, rate-limit, unavailable, malformed response, and unsafe output behavior. |
 | Malformed SDK response tests | Inject fake responses with missing/invalid fields; prove the adapter rejects them before returning public responses. |
 | Redaction tests | Assert that SDK error messages, timeout details, and rate-limit messages are redacted before logging. |
 | No-network proof | Patch `socket.socket` or equivalent at the test level; assert no network attempt is made during default test runs. |
@@ -231,10 +240,11 @@ raw payloads.
 The adapter must fail closed if any guardrail configuration is missing or
 invalid.
 
-## 11. Approval Gates Before Implementation
+## 11. Approval Gates Before Real SDK Runtime Implementation
 
-No SDK adapter implementation may begin until all of the following are
-approved and recorded in the relevant approval documents:
+No real SDK dependency-backed or runtime-wired adapter implementation may begin
+until all of the following are approved and recorded in the relevant approval
+documents:
 
 | Gate | Required approver | Evidence location |
 |---|---|---|
@@ -260,9 +270,9 @@ Recommended follow-up slices:
   the `openai` Python SDK version, license, transitive dependencies, size, and
   security track record. Produce a dependency review packet without installing
   anything. *(Complete — packet added, dependency NOT APPROVED.)*
-- **Slice 7M-B — Mocked SDK adapter interface tests.** Add test coverage for
-  the future adapter using only fake/mocked SDK clients. No real SDK install,
-  no network, no credentials. *(Recommended next step.)*
+- **Slice 7M-B — Mocked SDK adapter interface tests.** Add dependency-free
+  mocked SDK adapter boundary tests. No real SDK install, no network, no
+  credentials. *(Complete — fake-only boundary added, not runtime-wired.)*
 - **Slice 7M-C — SDK dependency approval or denial record.** Named reviewers
   complete every dependency approval gate and record their decision.
 - **Slice 7N — Opt-in live provider harness skeleton.** Only reachable after
@@ -277,9 +287,14 @@ This slice is complete when:
 
 - `docs/openai-sdk-adapter-plan.md` exists.
 - `docs/openai-sdk-dependency-review-packet.md` exists.
+- `apps/api/app/services/openai_sdk_adapter.py` exists as a mocked,
+  dependency-free SDK boundary only.
+- `apps/api/tests/test_openai_sdk_adapter.py` covers fake SDK client request
+  construction, success mapping, safe failure mapping, no SDK import,
+  no-credential/no-network behavior, and redaction.
 - Referenced docs are minimally updated to point to both documents.
-- `docs/next-action.md` recommends Slice 7M-B.
-- No runtime code, tests, SDK, credential, `.env` file, API call, token
+- `docs/next-action.md` recommends Slice 7M-C.
+- No real SDK, dependency install, credential, `.env` file, API call, token
   exchange, WIF runtime, backend route, API client method, SSE/frontend,
   Supabase, SQL, migration, or generated state is added.
 - Fake provider remains the default.

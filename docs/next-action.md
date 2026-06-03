@@ -2,51 +2,47 @@
 
 ## Objective
 
-Recommended next task: **Slice 7M-B — Mocked SDK adapter interface tests
-without SDK dependency**.
+Recommended next task: **Slice 7M-C — SDK dependency approval or denial
+record**.
 
-Slice 7M-A is complete. The
-[OpenAI SDK dependency review packet](openai-sdk-dependency-review-packet.md)
-was added as a docs-only planning document.
+Slice 7M-B is complete. The mocked SDK adapter boundary and tests were added
+without installing or importing the real OpenAI SDK and without wiring any live
+runtime path.
 
-## Slice 7M-A Result
+## Slice 7M-B Result
 
-Slice 7M-A adds `docs/openai-sdk-dependency-review-packet.md`. The packet
-covers:
+Slice 7M-B adds:
 
-- Candidate dependency fields (all `TO_BE_*` placeholder, not yet selected).
-- 8 dependency approval gates (all required before any install).
-- Supply-chain risk checklist (source verification, version pinning,
-  transitive deps, vulnerability scan, update policy, rollback path).
-- Runtime risk checklist (import failure, API shape drift, retry/timeout,
-  response validation, error mapping).
-- Credential/security checklist (no committed keys, no auth header logging,
-  API key mode and WIF both not approved).
-- Testing plan (dependency-free mocked interface tests remain default).
-- CI/build impact checklist (install time, lockfile diff, Python compat,
-  no default live tests, no workflow secret changes).
+- `apps/api/app/services/openai_sdk_adapter.py` — typed SDK-like messages,
+  requests, responses, usage metadata, injected client protocol, adapter, and
+  safe redacted adapter errors.
+- `apps/api/tests/test_openai_sdk_adapter.py` — fake SDK client tests covering
+  request construction, success mapping, no SDK import, no environment
+  credential lookup, no network use, timeout/rate-limit/unavailable mapping,
+  malformed response handling, empty/unsafe output handling, and redaction.
 
-No SDK installation, dependency manifest change, lockfile change, credential
-use, live API call, runtime import, or generated state was added.
+No real SDK dependency, dependency manifest change, lockfile change,
+credential, `.env` file, OpenAI API call, WIF runtime, token exchange, backend
+route change, API client change, SSE/frontend work, SQL, migration, Supabase
+work, or generated state was added.
 
 **OpenAI SDK dependency decision: NOT APPROVED.**
 
-## Slice 7M-B Scope
+## Slice 7M-C Scope
 
-Add test coverage for the future SDK adapter using only fake/mocked SDK clients.
-No real SDK install, no network, no credentials.
+Record an explicit approval or denial decision for the OpenAI SDK dependency.
+Named reviewers must complete the dependency gates before any install is
+authorized.
 
 Recommended scope:
 
-- Implement mocked SDK client tests for the `openai_provider.py` adapter
-  boundary using `unittest.mock`.
-- Cover success mapping, failure mapping, timeout, retry, malformed response,
-  and redaction paths.
-- Implement no-network proof via `socket.socket` patch.
-- Implement no-credential proof.
-- Keep tests default-CI-safe: no live network, no SDK install required.
-- Do not install `openai`, change any dependency manifest, add credentials,
-  change runtime code, or modify route behavior.
+- Record dependency owner, security/privacy, license, supply-chain, CI/build,
+  rollback, no-default-live-run, and external review decisions.
+- Keep all candidate version, license, vulnerability, transitive dependency,
+  and lockfile-impact fields evidence-backed.
+- Keep the decision separate from implementation. Approval, if granted later,
+  only authorizes a future dependency install slice.
+- If approval is denied or incomplete, keep the OpenAI SDK dependency blocked.
 
 ## Live Harness Path Status
 
@@ -55,14 +51,17 @@ EXIST** (Slice 7L-G — 0 of 8 named reviewer approvals).
 
 ## Dependency Status
 
-**OpenAI SDK dependency: NOT APPROVED.** All 8 dependency approval gates must
-be satisfied before any `pip install openai` is authorized.
+**OpenAI SDK dependency: NOT APPROVED.** All dependency approval gates must be
+satisfied before any SDK install is authorized.
 
 ## Definition Of Done
 
-- The dependency review packet is documented.
-- No SDK, live harness, credentials, or real API calls are added.
-- Approval remains denied/not granted.
-- SDK dependency remains NOT APPROVED.
+- A dependency approval or denial record exists.
+- Named reviewer decisions are explicit and evidence-backed.
+- No SDK install, dependency manifest change, lockfile change, credential,
+  `.env` file, live API call, WIF runtime, token exchange, live harness, route
+  behavior change, API client change, SSE/frontend work, SQL, migration,
+  Supabase work, or generated state is added.
+- Fake provider remains the default.
 
-Do NOT proceed to Slice 7M-B automatically.
+Do NOT proceed to Slice 7M-C automatically.

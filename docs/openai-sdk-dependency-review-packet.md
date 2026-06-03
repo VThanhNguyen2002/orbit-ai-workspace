@@ -204,7 +204,7 @@ Recommended follow-up slices:
 
 - **Slice 7M-B — Mocked SDK adapter interface tests without SDK dependency.**
   Add test coverage for the future adapter using only fake/mocked SDK clients
-  (no real SDK install). *Recommended immediate next step.*
+  (no real SDK install). *Complete — dependency-free mocked boundary added.*
 - **Slice 7M-C — SDK dependency approval or denial record.** Named reviewers
   complete every approval gate in section 6 and record their decision. Only
   after this record is complete may the dependency be installed.
@@ -222,10 +222,13 @@ This slice is complete when:
 
 - `docs/openai-sdk-dependency-review-packet.md` exists.
 - Referenced docs are minimally updated to point to this packet.
-- `docs/next-action.md` recommends Slice 7M-B.
-- No runtime code, tests, SDK, credential, `.env` file, API call, token
-  exchange, WIF runtime, backend route, API client method, SSE/frontend,
-  Supabase, SQL, migration, lockfile, or generated state is added.
+- `apps/api/app/services/openai_sdk_adapter.py` and
+  `apps/api/tests/test_openai_sdk_adapter.py` provide mocked SDK boundary
+  coverage without installing or importing the real SDK.
+- `docs/next-action.md` recommends Slice 7M-C.
+- No SDK dependency, credential, `.env` file, API call, token exchange, WIF
+  runtime, backend route, API client method, SSE/frontend, Supabase, SQL,
+  migration, lockfile, or generated state is added.
 - Fake provider remains the default.
 - Default CI remains fake-only and network-free.
 - `.gitleaksignore` remains exact-fingerprint only.

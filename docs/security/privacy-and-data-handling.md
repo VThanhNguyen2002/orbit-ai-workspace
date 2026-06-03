@@ -260,16 +260,24 @@ dependency decision. No SDK installation, dependency manifest change, credential
 use, live API call, or runtime code is approved or added. OpenAI SDK dependency
 decision remains **NOT APPROVED**. Fake provider remains the default.
 
+Slice 7M-B adds a mocked SDK adapter boundary and fake-only tests. The boundary
+accepts an injected SDK-like client, builds typed SDK-like requests, validates
+typed SDK-like responses, and maps timeout, rate-limit, unavailable, malformed,
+empty, or unsafe output cases to redacted safe errors. It imports no real SDK,
+reads no environment credentials, creates no network clients, logs no prompt or
+note content, renders no raw SDK body, and is not wired into runtime provider
+selection. The OpenAI SDK dependency remains **NOT APPROVED**.
+
 
 ### Backend API Keys
 
-```
-OPENAI_API_KEY=replace-with-openai-api-key
-GROQ_API_KEY=replace-with-groq-api-key
-GOOGLE_AI_KEY=replace-with-google-ai-key
-SUPABASE_SERVICE_ROLE_KEY=replace-with-service-role-key
-SUPABASE_JWT_SECRET=replace-with-legacy-jwt-secret
-```
+Secret names are documented without example values:
+
+- `OPENAI_API_KEY` — future provider fallback only; not approved or required.
+- `GROQ_API_KEY` — future provider fallback only.
+- `GOOGLE_AI_KEY` — future provider fallback only.
+- `SUPABASE_SERVICE_ROLE_KEY` — backend system operations only.
+- `SUPABASE_JWT_SECRET` — legacy JWT verification only if explicitly approved.
 
 **Rules:**
 - All API keys stored as environment variables

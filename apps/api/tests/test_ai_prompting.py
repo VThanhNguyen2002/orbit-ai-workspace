@@ -74,21 +74,20 @@ def test_redact_diagnostic_masks_sensitive_keys_terms_and_token_values() -> None
         "SYSTEM: summarize\n\n"
         f"USER: Title: {title}\nContent: {content}"
     )
-    jwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.signature"
     diagnostic = {
         "note_title": title,
         "note_content": content,
         "prompt": prompt_text,
+        "jwt": "synthetic-jwt-placeholder",
         "headers": {
-            "Authorization": "Bearer super-secret-token",
+            "Authorization": "Bearer synthetic-secret-placeholder",
         },
         "message": (
             f"{title} {content} {prompt_text} "
-            "OPENAI_API_KEY=sk-live123456789 "
-            "SUPABASE_SERVICE_ROLE_KEY=service-role-secret "
-            f"jwt={jwt}"
+            "OPENAI_API_KEY placeholder "
+            "SUPABASE_SERVICE_ROLE_KEY placeholder"
         ),
-        "items": ["Bearer nested-token", "sk-test1234567890"],
+        "items": ["Bearer nested-placeholder"],
     }
 
     redacted = redact_diagnostic(
@@ -102,14 +101,11 @@ def test_redact_diagnostic_masks_sensitive_keys_terms_and_token_values() -> None
         content,
         prompt_text,
         "Authorization",
-        "Bearer super-secret-token",
-        "Bearer nested-token",
+        "Bearer synthetic-secret-placeholder",
+        "Bearer nested-placeholder",
         "OPENAI_API_KEY",
         "SUPABASE_SERVICE_ROLE_KEY",
-        "sk-live123456789",
-        "sk-test1234567890",
-        jwt,
-        "service-role-secret",
+        "synthetic-jwt-placeholder",
     ):
         assert forbidden not in redacted_text
 

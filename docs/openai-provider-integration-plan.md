@@ -59,6 +59,12 @@ Shared AI contracts already include `SummarizeRequestSchema`,
 `SummarizeResponseSchema`, `GetSummaryResponseSchema`, `AiUsageSchema`, and SSE
 event schemas. The OpenAI provider runtime is still deferred.
 
+Slice 7M-B adds `apps/api/app/services/openai_sdk_adapter.py` as a mocked SDK
+adapter boundary. It defines typed SDK-like messages, requests, responses,
+usage metadata, an injected client protocol, and safe adapter errors. It imports
+no real SDK, reads no environment credentials, creates no network clients, and
+is not wired into runtime provider selection.
+
 ## Provider Interface Plan
 
 Future provider work should keep the existing backend boundary:
@@ -264,7 +270,8 @@ Recommended follow-up slices:
 - **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.** *(Complete — 0 of 8 named approvals, path CLOSED / BLOCKED.)*
 - **Slice 7M — OpenAI SDK adapter planning.** *(Complete — docs-only plan added, no credentials, no SDK.)*
 - **Slice 7M-A — OpenAI SDK dependency review packet.** *(Complete — packet added, dependency NOT APPROVED.)*
-- **Slice 7M-B — Mocked SDK adapter interface tests without SDK dependency.** *(Next recommended step.)*
+- **Slice 7M-B — Mocked SDK adapter interface tests without SDK dependency.** *(Complete — fake-only boundary added, not runtime-wired.)*
+- **Slice 7M-C — SDK dependency approval or denial record.** *(Next recommended step.)*
 - **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist.)*
 
 Do not proceed from planning to runtime provider calls without explicit approval
@@ -485,4 +492,45 @@ default CI live test, route behavior switch, API client change, SSE/frontend
 work, SQL, migration, Supabase work, or persisted live provider output is
 approved or added.
 
+### Slice 7M Update — 2026-06-03
 
+Slice 7M adds the docs-only
+[OpenAI SDK adapter plan](openai-sdk-adapter-plan.md). The plan covers the
+future SDK adapter boundary, injectable transport design, credential
+constraints, runtime selection rules, test strategy, failure modes, cost/token
+guardrails, approval gates, and recommended follow-up slices.
+
+No SDK installation, credential use, OpenAI API call, live harness execution,
+WIF runtime, token exchange, workflow change, default CI live test, route
+behavior switch, API client change, SSE/frontend work, SQL, migration, Supabase
+work, or persisted live provider output is approved or added.
+
+### Slice 7M-A Update — 2026-06-03
+
+Slice 7M-A adds the docs-only
+[OpenAI SDK dependency review packet](openai-sdk-dependency-review-packet.md).
+The packet covers supply-chain risk, runtime risk, credential/security
+constraints, testing plan, CI impact checklist, dependency approval gates, and
+decision status for a future OpenAI Python SDK dependency.
+
+No SDK installation, dependency manifest change, lockfile change, credential
+use, live API call, runtime import, WIF runtime, token exchange, route behavior
+switch, API client change, SSE/frontend work, SQL, migration, Supabase work, or
+generated state is approved or added. **OpenAI SDK dependency decision: NOT
+APPROVED.**
+
+### Slice 7M-B Update — 2026-06-03
+
+Slice 7M-B adds a mocked SDK adapter boundary in
+`apps/api/app/services/openai_sdk_adapter.py` and dependency-free tests in
+`apps/api/tests/test_openai_sdk_adapter.py`.
+
+The boundary accepts only an injected SDK-like client, builds typed SDK-like
+requests from existing provider requests, maps deterministic fake SDK responses
+back to provider-safe responses, and maps timeout, rate-limit, unavailable,
+malformed, empty, or unsafe output cases to redacted safe errors. It imports no
+real OpenAI SDK, reads no credentials or environment values, creates no network
+clients, and is not wired into runtime route or provider selection.
+
+OpenAI SDK dependency remains **NOT APPROVED**. Fake provider remains the
+runtime default. Slice 7M-C should record dependency approval or denial only.

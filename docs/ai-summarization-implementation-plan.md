@@ -331,7 +331,8 @@ opt-in environment variable and never run in default CI.
 | **7L-G** | Collect explicit reviewer approvals or close live harness path *(Complete — CLOSED / BLOCKED, 0/8 approvals)* |
 | **7M** | OpenAI SDK adapter planning — docs-only, no credentials *(Complete — plan added, no SDK, approval DENIED)* |
 | **7M-A** | OpenAI SDK dependency review packet — docs-only, no installation *(Complete — packet added, dependency NOT APPROVED)* |
-| **7M-B** | Mocked SDK adapter interface tests without SDK dependency *(Next recommended step)* |
+| **7M-B** | Mocked SDK adapter interface tests without SDK dependency *(Complete — fake-only boundary added, not runtime-wired)* |
+| **7M-C** | SDK dependency approval or denial record *(Next recommended step)* |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01
@@ -566,6 +567,25 @@ switch, API client change, SSE/frontend work, SQL, migration, Supabase work, or
 generated state is approved or added. **OpenAI SDK dependency decision: NOT
 APPROVED.** Fake provider remains the default.
 
+### Slice 7M-B Update — 2026-06-03
+
+Slice 7M-B adds a mocked SDK adapter boundary in
+`apps/api/app/services/openai_sdk_adapter.py` and tests in
+`apps/api/tests/test_openai_sdk_adapter.py`.
+
+The boundary uses typed dataclasses and a protocol for SDK-like messages,
+requests, responses, usage metadata, and an injected client. It maps existing
+provider requests into SDK-like requests, maps deterministic fake SDK responses
+back to provider-safe responses, and maps timeout, rate-limit, unavailable,
+malformed, empty, or unsafe output cases to redacted safe errors.
+
+No real OpenAI SDK import, dependency install, credential use, environment
+lookup, network client creation, live API call, WIF runtime, token exchange,
+route behavior switch, API client change, SSE/frontend work, SQL, migration,
+Supabase work, or generated state is approved or added. **OpenAI SDK dependency
+decision remains NOT APPROVED.** Fake provider remains the default. Slice 7M-C
+should record dependency approval or denial only.
+
 ---
 
 ## 14. Definition Of Done (This Slice)
@@ -578,4 +598,3 @@ APPROVED.** Fake provider remains the default.
 - [x] `gitleaks detect --redact` clean.
 - [x] No `.env`, SQL, migrations, credentials, or Supabase state changed.
 - [x] No provider SDK, no network call, no `OPENAI_API_KEY` added.
-
