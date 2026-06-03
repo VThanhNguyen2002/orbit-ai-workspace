@@ -39,6 +39,8 @@ FakeSDKMode = Literal["success", "timeout", "rate_limit", "unavailable"]
 
 _AUTH_HEADER_PLACEHOLDER = "Bearer synthetic-credential-placeholder"
 _UNSAFE_OUTPUT_PLACEHOLDER = f"Authorization: {_AUTH_HEADER_PLACEHOLDER}"
+_API_KEY_OUTPUT_PLACEHOLDER = "openai_api_key: synthetic-api-key-placeholder"
+_TOKEN_OUTPUT_PLACEHOLDER = "access token: synthetic-token-placeholder"
 
 
 class FakeSDKClient:
@@ -200,6 +202,49 @@ def test_adapter_does_not_require_environment_credentials(
     assert response.summary_text == "Synthetic SDK summary."
 
 
+def test_adapter_does_not_read_environment_mapping(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FailingEnviron(dict[str, str]):
+        def get(self, *_args: object, **_kwargs: object) -> str | None:
+            raise AssertionError("Mocked SDK adapter must not inspect os.environ")
+
+        def __getitem__(self, _key: str) -> str:
+            raise AssertionError("Mocked SDK adapter must not index os.environ")
+
+    monkeypatch.setattr(os, "environ", FailingEnviron())
+    adapter = OpenAISDKAdapter(
+        client=FakeSDKClient(),
+        timeout_seconds=17,
+        request_budget=4096,
+    )
+    provider_request, _title, _content = _provider_request()
+
+    response = adapter.complete(provider_request)
+
+    assert response.summary_text == "Synthetic SDK summary."
+
+
+def test_adapter_does_not_construct_network_sockets(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def _fail_socket(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError("Mocked SDK adapter must not construct network sockets")
+
+    monkeypatch.setattr(socket, "socket", _fail_socket)
+    monkeypatch.setattr(socket, "create_connection", _fail_socket)
+    adapter = OpenAISDKAdapter(
+        client=FakeSDKClient(),
+        timeout_seconds=17,
+        request_budget=4096,
+    )
+    provider_request, _title, _content = _provider_request()
+
+    response = adapter.complete(provider_request)
+
+    assert response.summary_text == "Synthetic SDK summary."
+
+
 @pytest.mark.parametrize(
     ("mode", "expected_code", "expected_provider_kind"),
     [
@@ -222,6 +267,9 @@ def test_sdk_failures_map_to_safe_transport_errors(
         diagnostic={
             "prompt": provider_request.messages[1].content,
             "headers": {"Authorization": _AUTH_HEADER_PLACEHOLDER},
+            "api_key": "synthetic-api-key-placeholder",
+            "token": "synthetic-token-placeholder",
+            "message": "OPENAI_API_KEY=synthetic-api-key-placeholder",
             "raw_user_payload": content,
         },
     )
@@ -251,6 +299,9 @@ def test_sdk_failures_map_to_safe_transport_errors(
         provider_request.messages[1].content,
         "Authorization",
         "synthetic-credential-placeholder",
+        "synthetic-api-key-placeholder",
+        "synthetic-token-placeholder",
+        "OPENAI_API_KEY",
     ):
         assert forbidden not in safe_text
     if mode != "timeout":
@@ -281,6 +332,127 @@ def test_malformed_sdk_response_maps_to_safe_error() -> None:
 
 
 @pytest.mark.parametrize(
+    ("response", "expected_reason"),
+    [
+        (
+            OpenAISDKResponse(
+                model="",
+                summary_text="Synthetic SDK summary.",
+            ),
+            "missing_model",
+        ),
+        (
+            OpenAISDKResponse(
+                model=object(),  # type: ignore[arg-type]
+                summary_text="Synthetic SDK summary.",
+            ),
+            "invalid_model_type",
+        ),
+        (
+            OpenAISDKResponse(
+                model="test-openai-model",
+                summary_text=object(),  # type: ignore[arg-type]
+            ),
+            "invalid_summary_type",
+        ),
+        (
+            OpenAISDKResponse(
+                model="test-openai-model",
+                summary_text="Synthetic SDK summary.",
+                action_items=[
+                    OpenAISDKActionItem(
+                        text="Review synthetic SDK adapter output",
+                        priority="high",
+                    ),
+                ],  # type: ignore[arg-type]
+            ),
+            "invalid_action_items_type",
+        ),
+        (
+            OpenAISDKResponse(
+                model="test-openai-model",
+                summary_text="Synthetic SDK summary.",
+                action_items=(object(),),  # type: ignore[arg-type]
+            ),
+            "unexpected_action_item_type",
+        ),
+        (
+            OpenAISDKResponse(
+                model="test-openai-model",
+                summary_text="Synthetic SDK summary.",
+                action_items=(
+                    OpenAISDKActionItem(
+                        text=object(),  # type: ignore[arg-type]
+                        priority="high",
+                    ),
+                ),
+            ),
+            "invalid_action_item_text_type",
+        ),
+        (
+            OpenAISDKResponse(
+                model="test-openai-model",
+                summary_text="Synthetic SDK summary.",
+                action_items=(
+                    OpenAISDKActionItem(
+                        text="Review synthetic SDK adapter output",
+                        priority="unsupported",  # type: ignore[arg-type]
+                    ),
+                ),
+            ),
+            "invalid_action_item_priority",
+        ),
+        (
+            OpenAISDKResponse(
+                model="test-openai-model",
+                summary_text="Synthetic SDK summary.",
+                usage=object(),  # type: ignore[arg-type]
+            ),
+            "invalid_usage_type",
+        ),
+        (
+            OpenAISDKResponse(
+                model="test-openai-model",
+                summary_text="Synthetic SDK summary.",
+                created_at=object(),  # type: ignore[arg-type]
+            ),
+            "invalid_created_at_type",
+        ),
+    ],
+)
+def test_malformed_sdk_response_fields_map_to_safe_error(
+    response: OpenAISDKResponse,
+    expected_reason: str,
+) -> None:
+    provider_request, title, content = _provider_request(
+        title="Private malformed SDK field note",
+        content="Malformed SDK field diagnostics must stay redacted.",
+    )
+    adapter = OpenAISDKAdapter(
+        client=FakeSDKClient(response=response),
+        timeout_seconds=17,
+        request_budget=4096,
+    )
+
+    with pytest.raises(OpenAISDKAdapterError) as exc_info:
+        adapter.complete(provider_request)
+
+    safe_text = "\n".join(
+        (
+            str(exc_info.value),
+            repr(exc_info.value),
+            _json_text(exc_info.value.safe_diagnostic()),
+        )
+    )
+    assert exc_info.value.code == "sdk_invalid_response"
+    assert exc_info.value.kind == "malformed_response"
+    assert expected_reason in safe_text
+    assert title not in safe_text
+    assert content not in safe_text
+    assert provider_request.messages[1].content not in safe_text
+
+
+@pytest.mark.parametrize(
     "response",
     [
         OpenAISDKResponse(
@@ -290,6 +462,14 @@ def test_malformed_sdk_response_maps_to_safe_error() -> None:
         OpenAISDKResponse(
             model="test-openai-model",
             summary_text=_UNSAFE_OUTPUT_PLACEHOLDER,
+        ),
+        OpenAISDKResponse(
+            model="test-openai-model",
+            summary_text=_API_KEY_OUTPUT_PLACEHOLDER,
+        ),
+        OpenAISDKResponse(
+            model="test-openai-model",
+            summary_text=_TOKEN_OUTPUT_PLACEHOLDER,
         ),
         OpenAISDKResponse(
             model="test-openai-model",
@@ -307,6 +487,26 @@ def test_malformed_sdk_response_maps_to_safe_error() -> None:
             action_items=(
                 OpenAISDKActionItem(
                     text=_UNSAFE_OUTPUT_PLACEHOLDER,
+                    priority="high",
+                ),
+            ),
+        ),
+        OpenAISDKResponse(
+            model="test-openai-model",
+            summary_text="Synthetic SDK summary.",
+            action_items=(
+                OpenAISDKActionItem(
+                    text=_API_KEY_OUTPUT_PLACEHOLDER,
+                    priority="high",
+                ),
+            ),
+        ),
+        OpenAISDKResponse(
+            model="test-openai-model",
+            summary_text="Synthetic SDK summary.",
+            action_items=(
+                OpenAISDKActionItem(
+                    text=_TOKEN_OUTPUT_PLACEHOLDER,
                     priority="high",
                 ),
             ),
@@ -338,6 +538,10 @@ def test_empty_or_unsafe_output_maps_to_safe_error(
     assert content not in safe_text
     assert "Authorization" not in safe_text
     assert "synthetic-credential-placeholder" not in safe_text
+    assert "openai_api_key" not in safe_text
+    assert "synthetic-api-key-placeholder" not in safe_text
+    assert "access token" not in safe_text
+    assert "synthetic-token-placeholder" not in safe_text
 
 
 def test_request_response_and_error_surfaces_exclude_raw_prompt_content() -> None:

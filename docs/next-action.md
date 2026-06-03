@@ -2,28 +2,32 @@
 
 ## Objective
 
-Recommended next task: **Slice 7M-J — Dependency-free adapter hardening tests**.
+Recommended next task: **Slice 7M-K — Redaction and diagnostics audit for AI provider boundary**.
 
-Slice 7M-I is complete. The provider boundary cleanup/refactor plan has been documented.
+Slice 7M-J is complete. Dependency-free OpenAI SDK adapter hardening tests have been added.
 
-## Slice 7M-I Result
+## Slice 7M-J Result
 
-Slice 7M-I adds:
+Slice 7M-J adds:
 
-- `docs/openai-provider-boundary-cleanup-plan.md` — documents provider boundary cleanup/refactor planning for the AI summarization provider layer without implementing runtime code.
+- focused dependency-free tests for stricter SDK-like response validation,
+  unsafe output rejection, redacted diagnostics, no-network proof, and
+  no-environment-read proof.
+- safe adapter validation for malformed SDK-like response field shapes.
 
-No SDK install, dependency manifest change, lockfile change, credential, `.env` file, live API call, WIF runtime, token exchange, backend route change, API client change, SSE/frontend work, SQL, migration, Supabase work, test change, runtime code change, or generated state was added.
+No SDK install, dependency manifest change, lockfile change, credential, `.env` file, live API call, WIF runtime, token exchange, backend route change, API client change, SSE/frontend work, SQL, migration, Supabase work, live runtime, or generated state was added.
 
 **OpenAI SDK dependency decision: NOT APPROVED / DENIED.**
 
-## Slice 7M-J Scope
+## Slice 7M-K Scope
 
-Dependency-free adapter hardening tests:
+Redaction and diagnostics audit for AI provider boundary:
 
-- Add focused tests for the dependency-free OpenAI adapter boundary.
-- Preserve no-network, no-env, no-SDK-import, redacted-diagnostics, and fake-default behavior.
+- Audit AI provider, prompt, and adapter diagnostic surfaces.
+- Confirm prompt/content/credential-like values remain redacted in logs,
+  reprs, safe diagnostics, and public error paths.
 
-No SDK install, credential, live harness, route/API behavior change, or dependency change.
+No SDK install, credential, live harness, route/API behavior change, dependency change, or live provider runtime.
 
 ## Live Harness Path Status
 
@@ -35,8 +39,8 @@ The live harness approval path remains **CLOSED / BLOCKED UNTIL NAMED APPROVALS 
 
 ## Definition Of Done
 
-- Dependency-free adapter hardening tests are added without importing the real SDK.
+- Redaction and diagnostics audit is completed without broadening runtime scope.
 - No SDK install, dependency manifest change, lockfile change, credential, `.env` file, live API call, WIF runtime, token exchange, live harness, route behavior change, API client change, SSE/frontend work, SQL, migration, Supabase work, or generated state is added.
 - Fake provider remains the default.
 
-Do NOT proceed to Slice 7M-J automatically.
+Do NOT proceed to Slice 7M-K automatically.

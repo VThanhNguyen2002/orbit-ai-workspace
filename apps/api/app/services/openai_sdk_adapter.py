@@ -37,12 +37,18 @@ OpenAISDKAdapterErrorCode = Literal[
 
 _ALLOWED_PRIORITIES: frozenset[str] = frozenset(("urgent", "high", "medium", "low"))
 _UNSAFE_OUTPUT_MARKERS: tuple[str, ...] = (
+    "access token",
     "api key",
     "api_key",
     "auth header",
     "auth_header",
     "authorization",
     "bearer ",
+    "id token",
+    "jwt",
+    "oidc",
+    "openai_api_key",
+    "token:",
 )
 _PROVIDER_FAILURE_KIND_BY_CODE: dict[
     OpenAISDKAdapterErrorCode,
@@ -161,10 +167,12 @@ class OpenAISDKActionItem:
     text: str = field(repr=False)
     priority: ActionItemPriority
 
-    def log_safe_metadata(self) -> dict[str, int | str]:
+    def log_safe_metadata(self) -> dict[str, int | str | None]:
         return {
-            "text_chars": len(self.text),
+            "text_chars": len(self.text) if isinstance(self.text, str) else None,
+            "text_type": type(self.text).__name__,
             "priority": self.priority,
+            "priority_type": type(self.priority).__name__,
         }
 
 
@@ -177,13 +185,30 @@ class OpenAISDKResponse:
     created_at: str | None = None
 
     def log_safe_metadata(self) -> dict[str, object]:
+        action_items = self.action_items if isinstance(self.action_items, tuple) else ()
+        usage = (
+            self.usage.log_safe_metadata()
+            if isinstance(self.usage, OpenAISDKUsage)
+            else {"usage_type": type(self.usage).__name__}
+        )
         return {
-            "model_present": bool(self.model.strip()),
-            "summary_chars": len(self.summary_text),
-            "action_item_count": len(self.action_items),
-            "action_items": [item.log_safe_metadata() for item in self.action_items],
-            "usage": self.usage.log_safe_metadata(),
+            "model_present": isinstance(self.model, str) and bool(self.model.strip()),
+            "model_type": type(self.model).__name__,
+            "summary_chars": (
+                len(self.summary_text) if isinstance(self.summary_text, str) else None
+            ),
+            "summary_type": type(self.summary_text).__name__,
+            "action_item_count": len(action_items),
+            "action_items_type": type(self.action_items).__name__,
+            "action_items": [
+                item.log_safe_metadata()
+                if isinstance(item, OpenAISDKActionItem)
+                else {"item_type": type(item).__name__}
+                for item in action_items
+            ],
+            "usage": usage,
             "created_at_present": self.created_at is not None,
+            "created_at_type": type(self.created_at).__name__,
         }
 
 
@@ -352,9 +377,23 @@ class OpenAISDKAdapter:
                 },
             )
 
+        if not isinstance(raw_response.model, str):
+            raise self._invalid_response_error(
+                reason="invalid_model_type",
+                response=raw_response,
+                request=request,
+                provider_request=provider_request,
+            )
         if not raw_response.model.strip():
             raise self._invalid_response_error(
                 reason="missing_model",
+                response=raw_response,
+                request=request,
+                provider_request=provider_request,
+            )
+        if not isinstance(raw_response.summary_text, str):
+            raise self._invalid_response_error(
+                reason="invalid_summary_type",
                 response=raw_response,
                 request=request,
                 provider_request=provider_request,
@@ -375,10 +414,42 @@ class OpenAISDKAdapter:
                 extra_sensitive_terms=(raw_response.summary_text,),
             )
 
+        if not isinstance(raw_response.action_items, tuple):
+            raise self._invalid_response_error(
+                reason="invalid_action_items_type",
+                response=raw_response,
+                request=request,
+                provider_request=provider_request,
+            )
+        if not isinstance(raw_response.usage, OpenAISDKUsage):
+            raise self._invalid_response_error(
+                reason="invalid_usage_type",
+                response=raw_response,
+                request=request,
+                provider_request=provider_request,
+            )
+        if raw_response.created_at is not None and not isinstance(
+            raw_response.created_at,
+            str,
+        ):
+            raise self._invalid_response_error(
+                reason="invalid_created_at_type",
+                response=raw_response,
+                request=request,
+                provider_request=provider_request,
+            )
+
         for item in raw_response.action_items:
             if not isinstance(item, OpenAISDKActionItem):
                 raise self._invalid_response_error(
                     reason="unexpected_action_item_type",
+                    response=raw_response,
+                    request=request,
+                    provider_request=provider_request,
+                )
+            if not isinstance(item.text, str):
+                raise self._invalid_response_error(
+                    reason="invalid_action_item_text_type",
                     response=raw_response,
                     request=request,
                     provider_request=provider_request,

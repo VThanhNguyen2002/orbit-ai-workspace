@@ -190,7 +190,7 @@ Future implementation should be split into small, explicit slices:
 
 Recommended future sequence:
 
-- **Slice 7M-J — Dependency-free adapter hardening tests**
+- **Slice 7M-J — Dependency-free adapter hardening tests** *(Complete — focused dependency-free adapter tests added; no SDK, credentials, network, or runtime route change.)*
 - **Slice 7M-K — Redaction and diagnostics audit for AI provider boundary**
 - **Slice 7M-L — Provider boundary cleanup/refactor implementation**
 - **Slice 7N — Live harness skeleton** only if the live path is reopened and

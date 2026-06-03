@@ -312,6 +312,14 @@ boundaries. It requires future cleanup to preserve redaction, no raw prompt or
 note content logging, no credential/token examples, fake provider defaults, and
 the **NOT APPROVED / DENIED** SDK dependency path.
 
+Slice 7M-J adds dependency-free OpenAI SDK adapter hardening tests. The tests
+verify malformed SDK-like responses map to safe redacted errors, unsafe
+API-key/token/auth-header placeholder output is rejected without rendering those
+values, diagnostics do not expose prompt or note content, and adapter execution
+does not require environment reads or socket construction. No SDK dependency,
+credential, `.env` file, live call, route/client change, SQL, migration,
+Supabase state, or live harness is approved or added.
+
 
 ### Backend API Keys
 

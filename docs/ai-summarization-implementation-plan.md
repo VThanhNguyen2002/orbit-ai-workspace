@@ -339,7 +339,7 @@ opt-in environment variable and never run in default CI.
 | **7M-G** | Keep mocked adapter path dependency-free *(Complete — Record: `docs/openai-sdk-dependency-free-strategy.md`)* |
 | **7M-H** | Dependency-free OpenAI adapter hardening plan *(Complete — Record: `docs/openai-sdk-adapter-hardening-plan.md`)* |
 | **7M-I** | Provider boundary cleanup/refactor planning *(Complete — Record: `docs/openai-provider-boundary-cleanup-plan.md`)* |
-| **7M-J** | Dependency-free adapter hardening tests |
+| **7M-J** | Dependency-free adapter hardening tests *(Complete — stricter SDK-like response validation and redaction/no-network/no-env tests)* |
 | **7M-K** | Redaction and diagnostics audit for AI provider boundary |
 | **7M-L** | Provider boundary cleanup/refactor implementation |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
@@ -656,6 +656,26 @@ exchange, route behavior switch, API client change, SSE/frontend work, SQL,
 migration, Supabase work, live harness, or generated state is approved or
 added. OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Slice 7M-J
 should add dependency-free adapter hardening tests only.
+
+### Slice 7M-J Update — 2026-06-03
+
+Slice 7M-J adds dependency-free hardening tests for
+`apps/api/app/services/openai_sdk_adapter.py` in
+`apps/api/tests/test_openai_sdk_adapter.py`.
+
+The tests cover stricter SDK-like response field validation, malformed response
+safe-error mapping, empty and unsafe output rejection, redacted
+timeout/rate-limit/unavailable diagnostics, `repr()`/`str()`/safe diagnostic
+surfaces, API-key/token/auth-header placeholder redaction, no environment-read
+proof, and no socket/network-construction proof.
+
+The adapter now maps malformed SDK-like field shapes to `sdk_invalid_response`
+instead of relying on incidental Python attribute errors. No real OpenAI SDK
+import, dependency install, credential use, `.env` file, live API call, WIF
+runtime, token exchange, route behavior switch, API client change,
+SSE/frontend work, SQL, migration, Supabase work, live harness, or generated
+state is approved or added. OpenAI SDK dependency remains **NOT APPROVED /
+DENIED**. Slice 7M-K should audit provider redaction and diagnostics only.
 
 ---
 
