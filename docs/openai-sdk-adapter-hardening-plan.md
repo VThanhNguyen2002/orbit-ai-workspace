@@ -93,9 +93,10 @@ The following security properties must be maintained and verified:
 ## 10. Future Slices
 
 Recommended sequence for following this hardening plan:
-- **Slice 7M-I — Provider boundary cleanup/refactor planning**
+- **Slice 7M-I — Provider boundary cleanup/refactor planning** *(Complete — Record: `docs/openai-provider-boundary-cleanup-plan.md`.)*
 - **Slice 7M-J — Dependency-free adapter hardening tests**
 - **Slice 7M-K — Redaction and diagnostics audit for AI provider boundary**
+- **Slice 7M-L — Provider boundary cleanup/refactor implementation**
 - **Slice 7N — Live harness skeleton** (only if the live path is reopened and approved by all named reviewers)
 
 ## 11. Definition of Done

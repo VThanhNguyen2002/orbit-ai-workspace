@@ -338,7 +338,10 @@ opt-in environment variable and never run in default CI.
 | **7M-F** | Optional SDK dependency install — only if approved by 7M-H |
 | **7M-G** | Keep mocked adapter path dependency-free *(Complete — Record: `docs/openai-sdk-dependency-free-strategy.md`)* |
 | **7M-H** | Dependency-free OpenAI adapter hardening plan *(Complete — Record: `docs/openai-sdk-adapter-hardening-plan.md`)* |
-| **7M-I** | Provider boundary cleanup/refactor planning |
+| **7M-I** | Provider boundary cleanup/refactor planning *(Complete — Record: `docs/openai-provider-boundary-cleanup-plan.md`)* |
+| **7M-J** | Dependency-free adapter hardening tests |
+| **7M-K** | Redaction and diagnostics audit for AI provider boundary |
+| **7M-L** | Provider boundary cleanup/refactor implementation |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01
@@ -627,11 +630,32 @@ The record formally re-evaluates the dependency decision against the prepared
 checklists. All 12 approval gates remain MISSING since no named reviewer has
 provided explicit, concrete sign-offs or evidence.
 
-Decision remains **NOT APPROVED / DENIED**. No SDK install, dependency manifest change,
-lockfile change, credential use, live API call, WIF runtime, token exchange,
-route behavior switch, API client change, SSE/frontend work, SQL, migration,
-Supabase work, or generated state is approved or added. Fake provider remains
-the default. Slice 7M-G should document keeping the mocked adapter path dependency-free.
+Decision remains **NOT APPROVED / DENIED**. No SDK install, dependency manifest
+change, lockfile change, credential use, live API call, WIF runtime, token
+exchange, route behavior switch, API client change, SSE/frontend work, SQL,
+migration, Supabase work, or generated state is approved or added. Fake
+provider remains the default. Slice 7M-G should document keeping the mocked
+adapter path dependency-free.
+
+### Slice 7M-I Update — 2026-06-03
+
+Slice 7M-I adds the docs-only
+[OpenAI provider boundary cleanup plan](openai-provider-boundary-cleanup-plan.md).
+The plan documents current route, service, prompt builder, fake provider,
+OpenAI provider transport, dependency-free SDK adapter, config/fail-closed
+validation, and test boundaries.
+
+It identifies future cleanup themes and refactor candidates for clearer
+provider protocol naming, prompt/request separation, diagnostics redaction,
+adapter isolation, stable typed dataclasses/protocols, vendor-specific leakage
+prevention, shared error taxonomy, and fake-provider default preservation.
+
+No runtime code, tests, SDK install, dependency manifest change, lockfile
+change, credential use, `.env` file, live API call, WIF runtime, token
+exchange, route behavior switch, API client change, SSE/frontend work, SQL,
+migration, Supabase work, live harness, or generated state is approved or
+added. OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Slice 7M-J
+should add dependency-free adapter hardening tests only.
 
 ---
 

@@ -291,7 +291,10 @@ Recommended follow-up slices:
   records explicit named approval for every gate.
 - **Slice 7M-G — Keep mocked adapter path dependency-free.** *(Complete — Record: `docs/openai-sdk-dependency-free-strategy.md`.)*
 - **Slice 7M-H — Dependency-free OpenAI adapter hardening plan.** *(Complete — Record: `docs/openai-sdk-adapter-hardening-plan.md`.)*
-- **Slice 7M-I — Provider boundary cleanup/refactor planning.**
+- **Slice 7M-I — Provider boundary cleanup/refactor planning.** *(Complete — Record: `docs/openai-provider-boundary-cleanup-plan.md`.)*
+- **Slice 7M-J — Dependency-free adapter hardening tests.**
+- **Slice 7M-K — Redaction and diagnostics audit for AI provider boundary.**
+- **Slice 7M-L — Provider boundary cleanup/refactor implementation.**
 - **Slice 7N — Opt-in live provider harness skeleton.** Only reachable after
   all 8 named reviewer approvals exist and a separate implementation slice is
   approved. Not authorized by this plan.

@@ -279,7 +279,10 @@ Recommended follow-up slices:
 - **Slice 7M-F — Optional SDK dependency install.** Only if 7M-H grants approval.
 - **Slice 7M-G — Keep mocked adapter path dependency-free.** *(Complete — Record: `docs/openai-sdk-dependency-free-strategy.md`.)*
 - **Slice 7M-H — Dependency-free OpenAI adapter hardening plan.** *(Complete — Record: `docs/openai-sdk-adapter-hardening-plan.md`.)*
-- **Slice 7M-I — Provider boundary cleanup/refactor planning.**
+- **Slice 7M-I — Provider boundary cleanup/refactor planning.** *(Complete — Record: `docs/openai-provider-boundary-cleanup-plan.md`.)*
+- **Slice 7M-J — Dependency-free adapter hardening tests.**
+- **Slice 7M-K — Redaction and diagnostics audit for AI provider boundary.**
+- **Slice 7M-L — Provider boundary cleanup/refactor implementation.**
 - **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist.)*
 
 Do not proceed from planning to runtime provider calls without explicit approval
@@ -570,7 +573,25 @@ route behavior switch, API client change, SSE/frontend work, SQL, migration,
 Supabase work, or generated state is approved or added. Fake provider remains
 the default.
 
-Slice 7M-G should document keeping the mocked adapter path dependency-free.
+### Slice 7M-I Update — 2026-06-03
+
+Slice 7M-I adds the docs-only
+[OpenAI provider boundary cleanup plan](openai-provider-boundary-cleanup-plan.md).
+The plan maps the route, summarization service, prompt builder, fake provider,
+OpenAI provider transport, dependency-free SDK adapter, config/fail-closed
+validation, and test boundaries.
+
+The plan recommends future cleanup around protocol naming, prompt/request
+separation, diagnostics redaction, adapter isolation, typed dataclasses and
+protocols, vendor-specific leakage prevention, error taxonomy consolidation,
+and fake-provider default preservation.
+
+No runtime code, tests, SDK install, dependency manifest change, lockfile
+change, credential use, `.env` file, live API call, WIF runtime, token
+exchange, route behavior switch, API client change, SSE/frontend work, SQL,
+migration, Supabase work, live harness, or generated state is approved or
+added. OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Fake provider
+remains the default.
 
 Slice 7M-C adds the docs-only
 [OpenAI SDK dependency approval record](openai-sdk-dependency-approval-record.md).

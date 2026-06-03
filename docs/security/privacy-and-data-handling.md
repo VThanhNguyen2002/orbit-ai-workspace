@@ -304,6 +304,14 @@ Slice 7M-H adds the docs-only
 The plan scopes hardening work (e.g., test improvements, type refinements, safety diagnostics)
 for the dependency-free adapter without authorizing any vendor SDK dependency or credentials.
 
+Slice 7M-I adds the docs-only
+[OpenAI provider boundary cleanup plan](../openai-provider-boundary-cleanup-plan.md).
+The plan maps the route, service, prompt builder, fake provider, OpenAI provider
+transport, dependency-free SDK adapter, config/fail-closed validation, and test
+boundaries. It requires future cleanup to preserve redaction, no raw prompt or
+note content logging, no credential/token examples, fake provider defaults, and
+the **NOT APPROVED / DENIED** SDK dependency path.
+
 
 ### Backend API Keys
 

@@ -94,5 +94,8 @@ The SDK dependency path may reopen only if ALL of the following are satisfied:
 
 Recommended next steps for the dependency-free adapter:
 - **Slice 7M-H — Dependency-free OpenAI adapter hardening plan** *(Complete — Record: `docs/openai-sdk-adapter-hardening-plan.md`.)*
-- **Slice 7M-I — Provider boundary cleanup/refactor planning**
+- **Slice 7M-I — Provider boundary cleanup/refactor planning** *(Complete — Record: `docs/openai-provider-boundary-cleanup-plan.md`.)*
+- **Slice 7M-J — Dependency-free adapter hardening tests**
+- **Slice 7M-K — Redaction and diagnostics audit for AI provider boundary**
+- **Slice 7M-L — Provider boundary cleanup/refactor implementation**
 - **Slice 7N — Live harness skeleton** (only if live path is reopened and approved by all 8 reviewers)
