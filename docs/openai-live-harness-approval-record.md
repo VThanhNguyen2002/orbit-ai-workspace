@@ -180,6 +180,28 @@ workflow change, default CI live test, route behavior switch, API client change,
 SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
 output is approved or added.
 
+## Slice 7L-G Reviewer Approval Collection — 2026-06-02
+
+Slice 7L-G reviewed the
+[OpenAI live harness approval evidence packet](openai-live-harness-approval-evidence-packet.md)
+to determine whether named reviewer approvals exist.
+
+**Named reviewer approvals found: 0 of 8 required.**
+
+All eight `TBD_*` reviewer slots remain placeholder-only. No sign-off record
+exists in any PR review, issue comment, or committed document.
+
+**Decision: CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST**
+
+Approval remains **DENIED / NOT GRANTED**. No live harness execution,
+credential use, OpenAI API call, SDK/runtime work, WIF runtime, token exchange,
+workflow change, default CI live test, route behavior switch, API client change,
+SSE/frontend work, SQL, migration, Supabase work, or persisted live provider
+output is approved or added.
+
+The path may be reopened when all eight named reviewers provide explicit
+sign-off per sections 5.1–5.8 of the evidence packet.
+
 ## 4. Explicitly Not Approved
 
 The following are not approved:
@@ -317,12 +339,12 @@ before any WIF-based live harness can run.
 Recommended follow-up slices:
 
 - **Slice 7L-E — Fill approval evidence packet with reviewer decisions.** *(Complete — evidence filled, approval remains DENIED.)*
-- **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Complete — evidence gaps resolved into required-action records, approval remains DENIED.)*
-- **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.** *(Next required step.)*
-- **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all evidence items are explicitly PRESENT and named-reviewer approved.)*
-- **Slice 7M — OpenAI SDK adapter planning only after the approval path is clear.**
+- **Slice 7L-F — Resolve missing OpenAI live harness approval evidence.** *(Complete — required-action records added, approval remains DENIED.)*
+- **Slice 7L-G — Collect explicit reviewer approvals or close live harness path.** *(Complete — 0 of 8 named approvals found, path CLOSED / BLOCKED.)*
+- **Slice 7M — OpenAI SDK adapter planning.** *(Next recommended step — docs-only, no credentials, no SDK installation.)*
+- **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist and a separate implementation slice is approved.)*
 
-Do not proceed to Slice 7L-G automatically from this record.
+Do not proceed to Slice 7M automatically from this record.
 
 ## 13. Definition Of Done
 

@@ -328,8 +328,9 @@ opt-in environment variable and never run in default CI.
 | **7L-D** | Prepare OpenAI live harness approval evidence packet |
 | **7L-E** | Fill approval evidence packet with reviewer decisions |
 | **7L-F** | Resolve missing OpenAI live harness approval evidence (required-action records) |
-| **7L-G** | Collect explicit reviewer approvals or close live harness path |
-| **7M** | OpenAI SDK adapter planning only after the approval path is clear |
+| **7L-G** | Collect explicit reviewer approvals or close live harness path *(Complete — CLOSED / BLOCKED, 0/8 approvals)* |
+| **7M** | OpenAI SDK adapter planning — docs-only, no credentials *(Next recommended step)* |
+| **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -524,6 +525,16 @@ into a concrete required-action record. 8 items are now `PREPARED / STILL NOT
 APPROVED`; 2 remain PRESENT. `PREPARED / STILL NOT APPROVED` is not an
 approval state. Approval remains denied/not granted and no live execution or
 credential use is approved.
+
+### Slice 7L-G Update — 2026-06-02
+
+Slice 7L-G reviewed the evidence packet and approval record to determine
+whether named reviewer approvals exist. **0 of 8 required named approvals
+exist.** All eight `TBD_*` reviewer slots remain placeholder-only. Decision:
+**CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST**. Approval remains denied/not
+granted and no live execution or credential use is approved. The live harness
+path may be reopened if named reviewers provide explicit sign-off per sections
+5.1–5.8 of the evidence packet.
 
 ---
 
