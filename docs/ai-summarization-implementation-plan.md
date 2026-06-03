@@ -701,6 +701,25 @@ generated state is approved or added. OpenAI SDK dependency remains **NOT
 APPROVED / DENIED**. Slice 7M-L should implement provider boundary cleanup only
 within the existing fake-only, dependency-free constraints.
 
+### Slice 7M-L Update — 2026-06-03
+
+Slice 7M-L implements a small provider boundary cleanup from the
+[OpenAI provider boundary cleanup plan](openai-provider-boundary-cleanup-plan.md).
+`OpenAIProviderRequest` now owns the provider-facing sensitive-term derivation
+used for safe diagnostics, and both `OpenAISummarizationProvider` and the
+dependency-free `OpenAISDKAdapter` use that request-owned list when building
+safe errors.
+
+This removes duplicate prompt/request sensitive-term helpers from the provider
+and SDK adapter modules while keeping behavior unchanged. Focused tests cover
+request-owned sensitive-term redaction through provider-safe errors.
+
+No SDK install, dependency manifest change, lockfile change, credential use,
+`.env` file, live API call, WIF runtime, token exchange, route behavior switch,
+API client change, SSE/frontend work, SQL, migration, Supabase work, live
+harness, `.gitleaksignore` broadening, or generated state is approved or
+added. OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
+
 ---
 
 ## 14. Definition Of Done (This Slice)

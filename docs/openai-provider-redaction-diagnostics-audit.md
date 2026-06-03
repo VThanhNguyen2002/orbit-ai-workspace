@@ -110,12 +110,23 @@ This audit does not approve or add:
 
 Recommended next task:
 
-- **Slice 7M-L — Provider boundary cleanup/refactor implementation**
+- **Slice 7M-L — Provider boundary cleanup/refactor implementation** *(Complete — provider request sensitive-term derivation now feeds provider and SDK adapter diagnostics.)*
 
 Later work remains blocked from live execution unless the live path is reopened
 and approved by the required named reviewers.
 
-## 9. Definition Of Done
+## 9. Slice 7M-L Follow-up
+
+Slice 7M-L kept the redaction behavior unchanged while clarifying ownership:
+`OpenAIProviderRequest` now owns provider-facing sensitive-term derivation, and
+both `OpenAISummarizationProvider` and the dependency-free `OpenAISDKAdapter`
+use that request-owned list when creating safe errors.
+
+No SDK dependency/import, credential, `.env` file, live call, WIF runtime, live
+harness, route/API client change, SQL, migration, Supabase state,
+`.gitleaksignore` broadening, or generated state was added.
+
+## 10. Definition Of Done
 
 - Redaction/diagnostics audit record exists.
 - Focused tests cover prompt/content, credential-like fields, raw payloads,

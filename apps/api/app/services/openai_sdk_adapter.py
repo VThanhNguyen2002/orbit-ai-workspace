@@ -516,21 +516,10 @@ class OpenAISDKAdapter:
                 "diagnostic": diagnostic,
             },
             sensitive_terms=(
-                *_provider_request_sensitive_terms(provider_request),
+                *provider_request.sensitive_terms(),
                 *extra_sensitive_terms,
             ),
         )
-
-
-def _provider_request_sensitive_terms(
-    request: OpenAIProviderRequest,
-) -> tuple[str, ...]:
-    terms: list[str] = []
-    for message in request.messages:
-        terms.append(message.content)
-        terms.extend(line for line in message.content.splitlines() if line)
-
-    return tuple(terms)
 
 
 def _contains_unsafe_output_marker(value: str) -> bool:

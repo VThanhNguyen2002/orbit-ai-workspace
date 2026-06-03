@@ -330,6 +330,14 @@ surfaces. No SDK dependency, credential, `.env` file, live call, route/client
 change, SQL, migration, Supabase state, `.gitleaksignore` broadening, or live
 harness is approved or added.
 
+Slice 7M-L implements a narrow provider-boundary cleanup. `OpenAIProviderRequest`
+now owns provider-facing sensitive-term derivation, and both the OpenAI provider
+transport boundary and the dependency-free SDK adapter use that request-owned
+list when creating safe diagnostics. This preserves prompt/content redaction,
+keeps fake provider defaults unchanged, and adds no SDK dependency, credential,
+`.env` file, live call, route/client change, SQL, migration, Supabase state,
+`.gitleaksignore` broadening, or live harness.
+
 
 ### Backend API Keys
 

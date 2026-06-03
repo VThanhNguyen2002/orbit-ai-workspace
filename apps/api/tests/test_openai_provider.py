@@ -191,6 +191,40 @@ def test_request_and_error_surfaces_exclude_prompt_and_credentials() -> None:
         assert forbidden not in safe_text
 
 
+def test_provider_request_owns_sensitive_terms_for_safe_errors() -> None:
+    title = "Private request-owned redaction note"
+    content = "Request-owned sensitive terms must redact provider text."
+    prompt = _prompt(title=title, content=content)
+    request = OpenAIProviderRequest.from_prompt(
+        model="test-openai-model",
+        prompt=prompt,
+        max_output_tokens=None,
+    )
+    error = OpenAIProviderError(
+        code="provider_unavailable",
+        diagnostic={
+            "message": prompt.as_provider_text(),
+            "nested": {
+                "echoed_title": title,
+                "echoed_content": content,
+            },
+        },
+        sensitive_terms=request.sensitive_terms(),
+    )
+
+    safe_text = "\n".join(
+        (
+            str(error),
+            repr(error),
+            _json_text(error.safe_diagnostic()),
+        )
+    )
+
+    for forbidden in (title, content, prompt.as_provider_text()):
+        assert forbidden not in safe_text
+    assert "[REDACTED]" in safe_text
+
+
 @pytest.mark.parametrize(
     ("mode", "expected_code"),
     [

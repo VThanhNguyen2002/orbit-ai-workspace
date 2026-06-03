@@ -76,6 +76,15 @@ class OpenAIProviderRequest:
             max_output_tokens=max_output_tokens,
         )
 
+    def sensitive_terms(self) -> tuple[str, ...]:
+        """Return provider-facing prompt terms that must not leave diagnostics."""
+        terms: list[str] = [self._provider_text()]
+        for message in self.messages:
+            terms.append(message.content)
+            terms.extend(line for line in message.content.splitlines() if line)
+
+        return tuple(term for term in terms if term)
+
     def log_safe_metadata(self) -> dict[str, int | str | None]:
         metadata = self.prompt_metadata.as_dict()
         return {
@@ -87,6 +96,12 @@ class OpenAIProviderRequest:
             "message_count": len(self.messages),
             "max_output_tokens": self.max_output_tokens,
         }
+
+    def _provider_text(self) -> str:
+        return "\n\n".join(
+            f"{message.role.upper()}:\n{message.content}"
+            for message in self.messages
+        )
 
 
 @dataclass(frozen=True)
@@ -201,7 +216,6 @@ class OpenAISummarizationProvider:
             raise self._safe_error(
                 code=_FAILURE_CODES[exc.kind],
                 request=request,
-                prompt=prompt,
                 diagnostic={
                     "request": request.log_safe_metadata(),
                     "transport": exc.diagnostic,
@@ -211,13 +225,11 @@ class OpenAISummarizationProvider:
             raise self._safe_error(
                 code="provider_timeout",
                 request=request,
-                prompt=prompt,
                 diagnostic={"request": request.log_safe_metadata()},
             ) from None
 
         return self._result_from_response(
             source_id=source_id,
-            prompt=prompt,
             request=request,
             response=response,
         )
@@ -226,7 +238,6 @@ class OpenAISummarizationProvider:
         self,
         *,
         source_id: str,
-        prompt: NoteSummarizationPrompt,
         request: OpenAIProviderRequest,
         response: OpenAIProviderResponse,
     ) -> AiSummaryResult:
@@ -234,7 +245,6 @@ class OpenAISummarizationProvider:
             raise self._safe_error(
                 code="provider_invalid_response",
                 request=request,
-                prompt=prompt,
                 diagnostic={
                     "request": request.log_safe_metadata(),
                     "response": {"summary_text": response.summary_text},
@@ -242,7 +252,6 @@ class OpenAISummarizationProvider:
             )
 
         action_items = self._validated_action_items(
-            prompt=prompt,
             request=request,
             response=response,
         )
@@ -262,7 +271,6 @@ class OpenAISummarizationProvider:
     def _validated_action_items(
         self,
         *,
-        prompt: NoteSummarizationPrompt,
         request: OpenAIProviderRequest,
         response: OpenAIProviderResponse,
     ) -> list[AiActionItem]:
@@ -272,7 +280,6 @@ class OpenAISummarizationProvider:
                 raise self._safe_error(
                     code="provider_invalid_response",
                     request=request,
-                    prompt=prompt,
                     diagnostic={
                         "request": request.log_safe_metadata(),
                         "response": {"action_item_priority": item.priority},
@@ -287,7 +294,6 @@ class OpenAISummarizationProvider:
         *,
         code: OpenAIProviderErrorCode,
         request: OpenAIProviderRequest,
-        prompt: NoteSummarizationPrompt,
         diagnostic: object,
     ) -> OpenAIProviderError:
         return OpenAIProviderError(
@@ -298,14 +304,5 @@ class OpenAISummarizationProvider:
                 "request": request.log_safe_metadata(),
                 "diagnostic": diagnostic,
             },
-            sensitive_terms=_prompt_sensitive_terms(prompt),
+            sensitive_terms=request.sensitive_terms(),
         )
-
-
-def _prompt_sensitive_terms(prompt: NoteSummarizationPrompt) -> tuple[str, ...]:
-    terms: list[str] = [prompt.as_provider_text()]
-    for message in prompt.messages:
-        terms.append(message.content)
-        terms.extend(line for line in message.content.splitlines() if line)
-
-    return tuple(terms)

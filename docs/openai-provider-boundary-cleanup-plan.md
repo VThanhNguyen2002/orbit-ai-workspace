@@ -192,19 +192,42 @@ Recommended future sequence:
 
 - **Slice 7M-J — Dependency-free adapter hardening tests** *(Complete — focused dependency-free adapter tests added; no SDK, credentials, network, or runtime route change.)*
 - **Slice 7M-K — Redaction and diagnostics audit for AI provider boundary** *(Complete — Record: `docs/openai-provider-redaction-diagnostics-audit.md`.)*
-- **Slice 7M-L — Provider boundary cleanup/refactor implementation**
+- **Slice 7M-L — Provider boundary cleanup/refactor implementation** *(Complete — request-owned provider sensitive-term derivation now feeds provider and SDK adapter safe diagnostics.)*
 - **Slice 7N — Live harness skeleton** only if the live path is reopened and
   approved by the required named reviewers.
 
-## 12. Definition Of Done
+## 12. Slice 7M-L Implementation Record
 
-- This docs-only plan exists.
-- Referenced docs are minimally updated to point to this plan and the next
-  recommended task.
-- No runtime code, tests, dependency manifests, lockfiles, CI workflows,
-  `.env` files, SQL, migrations, generated state, credentials, SDK imports,
-  network calls, WIF runtime, live harness, routes, API clients, SSE, frontend,
-  Supabase, or public behavior are changed.
+Slice 7M-L performed a narrow provider-boundary cleanup:
+
+- `OpenAIProviderRequest` now owns the provider-facing sensitive-term list used
+  to redact prompt/request text before diagnostics leave provider boundaries.
+- `OpenAISummarizationProvider` and the dependency-free `OpenAISDKAdapter`
+  both use `OpenAIProviderRequest.sensitive_terms()` when building safe errors.
+- Duplicate prompt/request sensitive-term helpers were removed from the provider
+  and SDK adapter modules.
+- Focused tests cover request-owned sensitive-term redaction through safe
+  provider errors.
+
+Behavior remains unchanged:
+
+- Fake provider remains the runtime default.
+- OpenAI runtime remains fail-closed.
+- No OpenAI SDK dependency/import, credential, `.env` file, live call, WIF
+  runtime, live harness, route/API client change, SQL, migration, Supabase work,
+  or generated state was added.
+- OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
+
+## 13. Slice 7M-L Definition Of Done
+
+- Request-owned provider sensitive-term derivation is implemented and covered by
+  focused tests.
+- Provider and SDK adapter diagnostics continue to redact prompt text, note
+  content, raw provider/SDK payloads, and credential-like values.
+- No dependency manifests, lockfiles, CI workflows, `.env` files, SQL,
+  migrations, generated state, credentials, SDK imports, network calls, WIF
+  runtime, live harness, routes, API clients, SSE, frontend, Supabase, or public
+  behavior are changed.
 - OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
 - Fake provider remains the default.
-- Fast verification passes, or manual commit handoff is documented.
+- Verification passes, or manual commit handoff is documented.
