@@ -336,7 +336,9 @@ opt-in environment variable and never run in default CI.
 | **7M-D** | Resolve OpenAI SDK dependency approval prerequisites — docs-only *(Complete — all 12 gates PREPARED / STILL NOT APPROVED)* |
 | **7M-E** | Re-evaluate SDK dependency approval with evidence *(Complete — all evidence missing, decision remains NOT APPROVED / DENIED)* |
 | **7M-F** | Optional SDK dependency install — only if approved by 7M-H |
-| **7M-G** | Keep mocked adapter path dependency-free — recommended since approval denied |
+| **7M-G** | Keep mocked adapter path dependency-free *(Complete — Record: `docs/openai-sdk-dependency-free-strategy.md`)* |
+| **7M-H** | Dependency-free OpenAI adapter hardening plan *(Complete — Record: `docs/openai-sdk-adapter-hardening-plan.md`)* |
+| **7M-I** | Provider boundary cleanup/refactor planning |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01

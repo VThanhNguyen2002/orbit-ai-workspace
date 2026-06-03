@@ -2,26 +2,26 @@
 
 ## Objective
 
-Recommended next task: **Slice 7M-H — Dependency-free OpenAI adapter hardening plan**.
+Recommended next task: **Slice 7M-I — Provider boundary cleanup/refactor planning**.
 
-Slice 7M-G is complete. The dependency-free strategy for the OpenAI SDK adapter has been formalized since the SDK dependency approval was denied.
+Slice 7M-H is complete. The dependency-free OpenAI adapter hardening plan has been documented.
 
-## Slice 7M-G Result
+## Slice 7M-H Result
 
-Slice 7M-G adds:
+Slice 7M-H adds:
 
-- `docs/openai-sdk-dependency-free-strategy.md` — documents the safe baseline, allowed future work, explicitly blocked work, and testing direction for keeping the mocked SDK adapter dependency-free.
+- `docs/openai-sdk-adapter-hardening-plan.md` — documents the plan to harden the mocked SDK adapter boundary (tests, diagnostics, redaction) without installing the SDK.
 
 No SDK install, dependency manifest change, lockfile change, credential, `.env` file, live API call, WIF runtime, token exchange, backend route change, API client change, SSE/frontend work, SQL, migration, Supabase work, or generated state was added.
 
 **OpenAI SDK dependency decision: NOT APPROVED / DENIED.**
 
-## Slice 7M-H Scope
+## Slice 7M-I Scope
 
-Dependency-free OpenAI adapter hardening plan:
+Provider boundary cleanup/refactor planning:
 
-- Plan how to refine the mocked SDK adapter boundary and type interfaces without introducing the real SDK dependency.
-- Document fail-closed improvements and provider boundary cleanup.
+- Plan the cleanup of the provider boundary (e.g., separating protocol definitions, consolidating provider logic).
+- Ensure vendor-specific logic does not leak into the core domain layers.
 
 Docs-only. No SDK install, credential, live harness, or runtime change.
 
@@ -35,8 +35,8 @@ The live harness approval path remains **CLOSED / BLOCKED UNTIL NAMED APPROVALS 
 
 ## Definition Of Done
 
-- Hardening plan is documented.
+- Cleanup/refactor plan is documented.
 - No SDK install, dependency manifest change, lockfile change, credential, `.env` file, live API call, WIF runtime, token exchange, live harness, route behavior change, API client change, SSE/frontend work, SQL, migration, Supabase work, or generated state is added.
 - Fake provider remains the default.
 
-Do NOT proceed to Slice 7M-H or 7M-I automatically.
+Do NOT proceed to Slice 7M-I automatically.

@@ -293,7 +293,16 @@ remain MISSING since no named reviewer has provided concrete sign-offs or eviden
 Decision remains **NOT APPROVED / DENIED**. No SDK install, dependency manifest
 change, lockfile change, credential use, live API call, WIF runtime, token exchange,
 or generated state is approved or added. Fake provider remains the default.
-Slice 7M-G should document keeping the mocked adapter path dependency-free.
+
+Slice 7M-G adds the docs-only
+[OpenAI SDK dependency-free strategy](../openai-sdk-dependency-free-strategy.md).
+The strategy formally documents the rules for keeping the mocked SDK adapter boundary
+dependency-free since SDK approval was denied.
+
+Slice 7M-H adds the docs-only
+[OpenAI SDK adapter hardening plan](../openai-sdk-adapter-hardening-plan.md).
+The plan scopes hardening work (e.g., test improvements, type refinements, safety diagnostics)
+for the dependency-free adapter without authorizing any vendor SDK dependency or credentials.
 
 
 ### Backend API Keys
