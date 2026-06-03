@@ -278,6 +278,14 @@ Decision: **NOT APPROVED / DENIED**. No install, manifest change, runtime
 import, credential use, or live API call is approved. Fake provider remains the
 default.
 
+Slice 7M-D adds the docs-only
+[OpenAI SDK dependency prerequisites](../openai-sdk-dependency-prerequisites.md).
+The document prepares required-action checklists for all 12 missing approval
+gates. All gates move from MISSING to PREPARED / STILL NOT APPROVED. PREPARED /
+STILL NOT APPROVED is not an approval state. Dependency decision remains **NOT
+APPROVED / DENIED**. No install, manifest change, runtime import, credential use,
+or live API call is approved. Fake provider remains the default.
+
 
 ### Backend API Keys
 

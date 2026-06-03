@@ -8,9 +8,10 @@ dependency.
 
 **OpenAI SDK dependency decision: NOT APPROVED / DENIED.**
 
-Slice 7M-C has recorded the explicit denial. See
-`docs/openai-sdk-dependency-approval-record.md`. All 12 required approval
-gates are MISSING. No install is authorized.
+Slice 7M-C has recorded the explicit denial. Slice 7M-D has prepared
+required-action checklists for all 12 missing gates. All gates are now
+PREPARED / STILL NOT APPROVED. See
+`docs/openai-sdk-dependency-prerequisites.md`.
 
 This packet does not install the SDK, add any package manifest entry, change
 any lockfile, add credentials, perform API calls, or change runtime behavior.
@@ -217,6 +218,8 @@ Recommended follow-up slices:
   Address each denial rationale item: select version, review license, enumerate
   transitive deps, run vulnerability scan, review CI impact, document rollback
   plan. Docs-only. No install.
+  *Complete — all 12 gates PREPARED / STILL NOT APPROVED.*
+  Record: `docs/openai-sdk-dependency-prerequisites.md`.
 - **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Only
   reachable after Slice 7M-D resolves all prerequisite items and named reviewers
   provide explicit sign-offs.

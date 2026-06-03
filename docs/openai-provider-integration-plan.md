@@ -273,8 +273,11 @@ Recommended follow-up slices:
 - **Slice 7M-B — Mocked SDK adapter interface tests without SDK dependency.** *(Complete — fake-only boundary added, not runtime-wired.)*
 - **Slice 7M-C — SDK dependency approval or denial record.** *(Complete — NOT APPROVED / DENIED, all 12 gates MISSING. Record: `docs/openai-sdk-dependency-approval-record.md`.)*
 - **Slice 7M-D — Resolve OpenAI SDK dependency approval prerequisites.** Docs-only.
+  *(Complete — all 12 gates PREPARED / STILL NOT APPROVED.
+  Record: `docs/openai-sdk-dependency-prerequisites.md`.)*
 - **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Only after 7M-D complete and named reviewers sign off.
 - **Slice 7M-F — Optional SDK dependency install.** Only if 7M-E grants approval.
+- **Slice 7M-G — Keep mocked adapter path dependency-free if approval denied.**
 - **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist.)*
 
 Do not proceed from planning to runtime provider calls without explicit approval
@@ -535,10 +538,22 @@ malformed, empty, or unsafe output cases to redacted safe errors. It imports no
 real OpenAI SDK, reads no credentials or environment values, creates no network
 clients, and is not wired into runtime route or provider selection.
 
-OpenAI SDK dependency remains **NOT APPROVED**. Fake provider remains the
-runtime default. Slice 7M-C should record dependency approval or denial only.
+OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Fake provider remains
+the runtime default.
 
-### Slice 7M-C Update — 2026-06-03
+### Slice 7M-D Update — 2026-06-03
+
+Slice 7M-D adds the docs-only
+[OpenAI SDK dependency prerequisites](openai-sdk-dependency-prerequisites.md).
+The document prepares required-action checklists for all 12 missing approval
+gates. All gates move from MISSING to PREPARED / STILL NOT APPROVED.
+
+PREPARED / STILL NOT APPROVED is not an approval state. Dependency decision
+remains **NOT APPROVED / DENIED**. No SDK install, dependency manifest change,
+lockfile change, credential use, live API call, WIF runtime, token exchange,
+route behavior switch, API client change, SSE/frontend work, SQL, migration,
+Supabase work, or generated state is approved or added. Fake provider remains
+the default. Slice 7M-E should collect named reviewer sign-offs only.
 
 Slice 7M-C adds the docs-only
 [OpenAI SDK dependency approval record](openai-sdk-dependency-approval-record.md).

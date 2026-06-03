@@ -68,23 +68,27 @@ The following evidence was reviewed to produce this record:
 
 | Evidence item | Status | Decision | Notes |
 |---|---|---|---|
-| Dependency owner approval | MISSING | **DENIED** | No named dependency owner has approved. `TBD` slot in review packet section 6. |
-| Security / privacy approval | MISSING | **DENIED** | `TBD_SECURITY_PRIVACY_REVIEWER` remains placeholder-only. No sign-off present. |
-| License approval | MISSING | **DENIED** | `openai` SDK license not yet reviewed. License field is `TO_BE_REVIEWED` in review packet. |
-| Supply-chain risk approval | MISSING | **DENIED** | No transitive dependency enumeration; no vulnerability scan plan approved; no named reviewer. |
-| CI / build impact approval | MISSING | **DENIED** | Install time, package size, and lockfile diff not reviewed. No named CI reviewer. |
-| Rollback plan approval | MISSING | **DENIED** | No rollback path documented or approved. No named rollback owner. |
-| No-default-live-run proof | MISSING | **DENIED** | No named CI reviewer has confirmed that CI remains fake-only after dependency install. |
-| External review gate | MISSING | **DENIED** | `TBD_EXTERNAL_REVIEWER` remains placeholder-only. No external sign-off present. |
-| Pinned version selection | MISSING | **DENIED** | Candidate version is `TO_BE_SELECTED`. No version pinned. |
-| Transitive dependency review | MISSING | **DENIED** | Transitive dependencies not enumerated. Each must be reviewed for license, security, and size. |
-| Vulnerability scan plan | MISSING | **DENIED** | `pip-audit` or equivalent not run. No open CVE status confirmed for any candidate version. |
-| Update policy | MISSING | **DENIED** | No explicit policy for reviewing SDK updates before applying them. |
+| Dependency owner approval | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 4. No named reviewer sign-off yet. |
+| Security / privacy approval | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 5. `TBD_SECURITY_PRIVACY_REVIEWER` empty. |
+| License approval | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 6. License not yet identified. |
+| Supply-chain risk approval | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 7. No dep enumeration; no vuln scan. |
+| CI / build impact approval | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 8. No CI review completed. |
+| Rollback plan approval | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 9. No rollback path documented. |
+| No-default-live-run proof | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 10. No CI reviewer confirmation. |
+| External review gate | PREPARED / STILL NOT APPROVED | **DENIED** | Checklist in prerequisites section 11. No external reviewer identified. |
+| Pinned version selection | PREPARED / STILL NOT APPROVED | **DENIED** | Requirement in prerequisites section 4. No version selected. |
+| Transitive dependency review | PREPARED / STILL NOT APPROVED | **DENIED** | Requirement in prerequisites section 7. No enumeration performed. |
+| Vulnerability scan plan | PREPARED / STILL NOT APPROVED | **DENIED** | Requirement in prerequisites section 7. No scan planned or run. |
+| Update policy | PREPARED / STILL NOT APPROVED | **DENIED** | Requirement in prerequisites section 4. No policy defined. |
 
-**Decision rule:** Because every required approval gate is MISSING, the SDK
+**Decision rule:** Because every required approval gate is PREPARED / STILL NOT
+APPROVED (prerequisites defined but not satisfied by named reviewers), the SDK
 dependency must remain NOT APPROVED. No install, manifest change, runtime
 import, credential use, API call, or live harness activation is allowed until
 all gates are resolved.
+
+See `docs/openai-sdk-dependency-prerequisites.md` for the full prerequisite
+checklist for each gate.
 
 ---
 
@@ -188,15 +192,16 @@ sign-offs:
 Recommended follow-up slices:
 
 - **Slice 7M-D — Resolve OpenAI SDK dependency approval prerequisites.**
-  Address each denial rationale item: select candidate version, review license,
-  enumerate transitive dependencies, run vulnerability scan, review CI impact,
-  document rollback plan. Solicit named reviewers for each gate. Docs-only
-  update to approval checklist only.
-- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** If all
-  prerequisite evidence exists, named reviewers submit explicit sign-offs.
-  Record decisions. Update this document with confirmed evidence.
+  *(Complete — all 12 gates PREPARED / STILL NOT APPROVED.
+  Record: `docs/openai-sdk-dependency-prerequisites.md`.)*
+- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Named
+  reviewers fill prerequisite checklists and provide explicit sign-offs. Update
+  this document with confirmed evidence.
 - **Slice 7M-F — Optional SDK dependency install.** Only reachable after Slice
   7M-E records explicit named approval for every gate in section 4.
+- **Slice 7M-G — Keep mocked adapter path dependency-free if approval remains
+  denied.** Permanent or long-term dependency-free strategy if Slice 7M-E
+  denies approval again.
 - **Slice 7N — Live harness skeleton.** Only reachable after all 8 live harness
   approvals exist and a separate implementation slice is approved. Live path
   remains CLOSED.

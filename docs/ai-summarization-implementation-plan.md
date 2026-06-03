@@ -333,9 +333,10 @@ opt-in environment variable and never run in default CI.
 | **7M-A** | OpenAI SDK dependency review packet — docs-only, no installation *(Complete — packet added, dependency NOT APPROVED)* |
 | **7M-B** | Mocked SDK adapter interface tests without SDK dependency *(Complete — fake-only boundary added, not runtime-wired)* |
 | **7M-C** | SDK dependency approval or denial record *(Complete — NOT APPROVED / DENIED, all 12 gates MISSING)* |
-| **7M-D** | Resolve OpenAI SDK dependency approval prerequisites — docs-only |
+| **7M-D** | Resolve OpenAI SDK dependency approval prerequisites — docs-only *(Complete — all 12 gates PREPARED / STILL NOT APPROVED)* |
 | **7M-E** | Re-evaluate SDK dependency approval with evidence — only after prerequisites resolved |
 | **7M-F** | Optional SDK dependency install — only if approved by 7M-E |
+| **7M-G** | Keep mocked adapter path dependency-free if approval remains denied |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 
 ### Slice 7E Update — 2026-06-01
@@ -604,6 +605,21 @@ live API call, WIF runtime, token exchange, route behavior switch, API client
 change, SSE/frontend work, SQL, migration, Supabase work, or generated state is
 approved or added. Fake provider remains the default. Slice 7M-D should resolve
 the specific denial prerequisite items only.
+
+### Slice 7M-D Update — 2026-06-03
+
+Slice 7M-D adds the docs-only
+[OpenAI SDK dependency prerequisites](openai-sdk-dependency-prerequisites.md).
+The document prepares required-action checklists for all 12 missing approval
+gates. All gates move from MISSING to PREPARED / STILL NOT APPROVED. PREPARED /
+STILL NOT APPROVED is not an approval state.
+
+No SDK install, dependency manifest change, lockfile change, credential use,
+live API call, WIF runtime, token exchange, route behavior switch, API client
+change, SSE/frontend work, SQL, migration, Supabase work, or generated state is
+approved or added. **OpenAI SDK dependency decision remains NOT APPROVED /
+DENIED.** Fake provider remains the default. Slice 7M-E should collect named
+reviewer sign-offs only.
 
 ---
 

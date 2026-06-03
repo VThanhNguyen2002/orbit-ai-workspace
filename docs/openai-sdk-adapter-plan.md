@@ -76,7 +76,9 @@ This slice explicitly excludes:
 - Live harness path: **CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST** (Slice
   7L-G — 0 of 8 named reviewer approvals found).
 - OpenAI SDK dependency: **NOT APPROVED / DENIED** (Slice 7M-C — all 12
-  gates MISSING). Record: `docs/openai-sdk-dependency-approval-record.md`.
+  gates MISSING; Slice 7M-D — all 12 gates PREPARED / STILL NOT APPROVED).
+  Record: `docs/openai-sdk-dependency-approval-record.md`.
+  Prerequisites: `docs/openai-sdk-dependency-prerequisites.md`.
 - No live execution, credential use, SDK installation, or real API calls are
   approved.
 
@@ -281,10 +283,13 @@ Recommended follow-up slices:
   Record: `docs/openai-sdk-dependency-approval-record.md`.)*
 - **Slice 7M-D — Resolve OpenAI SDK dependency approval prerequisites.**
   Address each denial rationale item. Docs-only. No install.
+  *(Complete — all 12 gates PREPARED / STILL NOT APPROVED.
+  Record: `docs/openai-sdk-dependency-prerequisites.md`.)*
 - **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.**
   Only after Slice 7M-D resolves all items and named reviewers sign off.
 - **Slice 7M-F — Optional SDK dependency install.** Only after Slice 7M-E
   records explicit named approval for every gate.
+- **Slice 7M-G — Keep mocked adapter path dependency-free if approval denied.**
 - **Slice 7N — Opt-in live provider harness skeleton.** Only reachable after
   all 8 named reviewer approvals exist and a separate implementation slice is
   approved. Not authorized by this plan.
