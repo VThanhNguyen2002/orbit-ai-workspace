@@ -33,8 +33,8 @@ credentials, perform API calls, or change runtime behavior.
 | Live harness path | CLOSED / BLOCKED (0 of 8 named reviewer approvals) |
 
 Preparing prerequisites does not change the above decisions. All 12 gates
-remain MISSING until named reviewers provide explicit evidence-backed sign-offs
-in a future Slice 7M-E.
+remain MISSING until named reviewers provide explicit evidence-backed sign-offs.
+*(Update: Slice 7M-E re-evaluated this and found all evidence still missing. See `docs/openai-sdk-dependency-reevaluation-record.md`).*
 
 ---
 
@@ -244,18 +244,12 @@ call is authorized by this document.
 
 Recommended follow-up slices:
 
-- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Named
-  reviewers fill in the prerequisite checklists from sections 4–11, provide
-  explicit sign-offs, and update
-  `docs/openai-sdk-dependency-approval-record.md` with actual evidence. Only
-  if all 12 gates are explicitly approved may the dependency be installed.
+- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** *(Complete — all evidence missing. Record: `docs/openai-sdk-dependency-reevaluation-record.md`. Decision remains NOT APPROVED / DENIED.)*
 - **Slice 7M-F — Optional SDK dependency install.** Only reachable after Slice
-  7M-E records explicit named approval for every gate. Includes `pyproject.toml`
+  7M-H records explicit named approval for every gate. Includes `pyproject.toml`
   edit, lockfile regeneration, and CI verification.
-- **Slice 7M-G — Keep mocked SDK adapter path dependency-free if approval
-  remains denied.** Documents permanent or long-term strategy for maintaining
-  the mocked adapter boundary without installing the real SDK. Only needed if
-  Slice 7M-E denies approval again.
+- **Slice 7M-G — Keep mocked SDK adapter path dependency-free.** Documents permanent or long-term strategy for maintaining
+  the mocked adapter boundary without installing the real SDK. Recommended since Slice 7M-E denied approval again.
 
 Do not proceed to any of the above automatically.
 

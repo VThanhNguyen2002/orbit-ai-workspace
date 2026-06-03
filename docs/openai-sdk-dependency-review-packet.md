@@ -220,11 +220,10 @@ Recommended follow-up slices:
   plan. Docs-only. No install.
   *Complete — all 12 gates PREPARED / STILL NOT APPROVED.*
   Record: `docs/openai-sdk-dependency-prerequisites.md`.
-- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Only
-  reachable after Slice 7M-D resolves all prerequisite items and named reviewers
-  provide explicit sign-offs.
+- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.**
+  *Complete — all evidence missing. Record: `docs/openai-sdk-dependency-reevaluation-record.md`. Decision remains NOT APPROVED / DENIED.*
 - **Slice 7M-F — Optional SDK dependency install.** Only reachable after Slice
-  7M-E records explicit named approval for every gate.
+  7M-H records explicit named approval for every gate.
 - **Slice 7N — Opt-in live provider harness skeleton.** Only reachable after
   all 8 named reviewer approvals exist and a separate implementation slice is
   approved. Not authorized by this packet.

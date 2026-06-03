@@ -37,6 +37,8 @@ Because required approvals are missing or insufficient, the SDK dependency must
 remain denied. No placeholder document, checklist, or planning document
 constitutes approval.
 
+*Update: Slice 7M-E formally re-evaluated this decision based on prepared prerequisites and confirmed that all evidence is still missing. See `docs/openai-sdk-dependency-reevaluation-record.md`. The decision remains NOT APPROVED / DENIED.*
+
 ---
 
 ## 3. Evidence Reviewed
@@ -194,14 +196,12 @@ Recommended follow-up slices:
 - **Slice 7M-D — Resolve OpenAI SDK dependency approval prerequisites.**
   *(Complete — all 12 gates PREPARED / STILL NOT APPROVED.
   Record: `docs/openai-sdk-dependency-prerequisites.md`.)*
-- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Named
-  reviewers fill prerequisite checklists and provide explicit sign-offs. Update
-  this document with confirmed evidence.
+- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.**
+  *(Complete — all evidence missing. Record: `docs/openai-sdk-dependency-reevaluation-record.md`. Decision remains NOT APPROVED / DENIED.)*
 - **Slice 7M-F — Optional SDK dependency install.** Only reachable after Slice
-  7M-E records explicit named approval for every gate in section 4.
-- **Slice 7M-G — Keep mocked adapter path dependency-free if approval remains
-  denied.** Permanent or long-term dependency-free strategy if Slice 7M-E
-  denies approval again.
+  7M-H records explicit named approval for every gate in section 4.
+- **Slice 7M-G — Keep mocked adapter path dependency-free.** Permanent or long-term dependency-free strategy since Slice 7M-E
+  denied approval again.
 - **Slice 7N — Live harness skeleton.** Only reachable after all 8 live harness
   approvals exist and a separate implementation slice is approved. Live path
   remains CLOSED.

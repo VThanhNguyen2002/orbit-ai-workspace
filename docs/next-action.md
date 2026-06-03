@@ -2,23 +2,18 @@
 
 ## Objective
 
-Recommended next task: **Slice 7M-E — Re-evaluate SDK dependency approval with
-evidence**.
+Recommended next task: **Slice 7M-G — Keep mocked SDK adapter path dependency-free**.
 
-Slice 7M-D is complete. The OpenAI SDK dependency approval prerequisites
-document prepares required-action checklists for all 12 missing approval gates.
-All gates move from MISSING to PREPARED / STILL NOT APPROVED. Dependency
-decision remains NOT APPROVED / DENIED.
+Slice 7M-E is complete. The OpenAI SDK dependency approval re-evaluation
+concluded that explicit named approvals and concrete evidence are missing.
+The dependency decision remains NOT APPROVED / DENIED.
 
-## Slice 7M-D Result
+## Slice 7M-E Result
 
-Slice 7M-D adds:
+Slice 7M-E adds:
 
-- `docs/openai-sdk-dependency-prerequisites.md` — required-action checklists
-  for all 12 missing approval gates: dependency owner, security/privacy,
-  license, supply-chain, CI impact, rollback, no-default-live-run, external
-  review, pinned version, transitive dep review, vulnerability scan plan, and
-  update policy. All gates: **PREPARED / STILL NOT APPROVED**.
+- `docs/openai-sdk-dependency-reevaluation-record.md` — documents the missing
+  evidence for all 12 approval gates.
 
 No SDK install, dependency manifest change, lockfile change, credential,
 `.env` file, live API call, WIF runtime, token exchange, backend route change,
@@ -27,17 +22,13 @@ generated state was added.
 
 **OpenAI SDK dependency decision: NOT APPROVED / DENIED.**
 
-## Slice 7M-E Scope
+## Slice 7M-G Scope
 
-Re-evaluate SDK dependency approval with actual evidence:
+Keep the mocked SDK adapter path dependency-free:
 
-- Named reviewers fill in prerequisite checklists from
-  `docs/openai-sdk-dependency-prerequisites.md`.
-- Each reviewer provides explicit, dated, named sign-off.
-- `docs/openai-sdk-dependency-approval-record.md` is updated with confirmed
-  evidence.
-- Only if all 12 gates are explicitly approved may the dependency be installed.
-- If any gate remains denied, dependency remains NOT APPROVED.
+- Reaffirm the mocked SDK adapter boundary (implemented in Slice 7M-B).
+- Formally close the SDK installation path unless new explicit approvals are
+  provided in the future (Slice 7M-H).
 
 Docs-only. No SDK install, credential, live harness, or runtime change.
 
@@ -53,12 +44,11 @@ must be satisfied before any SDK install is authorized.
 
 ## Definition Of Done
 
-- Named reviewers provide evidence-backed sign-offs for each gate.
-- `docs/openai-sdk-dependency-approval-record.md` reflects the final decision.
+- The mocked SDK adapter path is confirmed as dependency-free.
 - No SDK install, dependency manifest change, lockfile change, credential,
   `.env` file, live API call, WIF runtime, token exchange, live harness, route
   behavior change, API client change, SSE/frontend work, SQL, migration,
   Supabase work, or generated state is added.
 - Fake provider remains the default.
 
-Do NOT proceed to Slice 7M-E automatically.
+Do NOT proceed to Slice 7M-F or 7M-G automatically.

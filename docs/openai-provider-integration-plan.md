@@ -275,9 +275,9 @@ Recommended follow-up slices:
 - **Slice 7M-D — Resolve OpenAI SDK dependency approval prerequisites.** Docs-only.
   *(Complete — all 12 gates PREPARED / STILL NOT APPROVED.
   Record: `docs/openai-sdk-dependency-prerequisites.md`.)*
-- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** Only after 7M-D complete and named reviewers sign off.
-- **Slice 7M-F — Optional SDK dependency install.** Only if 7M-E grants approval.
-- **Slice 7M-G — Keep mocked adapter path dependency-free if approval denied.**
+- **Slice 7M-E — Re-evaluate SDK dependency approval with evidence.** *(Complete — all evidence missing. Record: `docs/openai-sdk-dependency-reevaluation-record.md`. Decision remains NOT APPROVED / DENIED.)*
+- **Slice 7M-F — Optional SDK dependency install.** Only if 7M-H grants approval.
+- **Slice 7M-G — Keep mocked adapter path dependency-free.** Recommended since approval denied.
 - **Slice 7N — Opt-in live provider harness skeleton.** *(Reachable only after all 8 approvals exist.)*
 
 Do not proceed from planning to runtime provider calls without explicit approval
@@ -548,12 +548,27 @@ Slice 7M-D adds the docs-only
 The document prepares required-action checklists for all 12 missing approval
 gates. All gates move from MISSING to PREPARED / STILL NOT APPROVED.
 
-PREPARED / STILL NOT APPROVED is not an approval state. Dependency decision
 remains **NOT APPROVED / DENIED**. No SDK install, dependency manifest change,
 lockfile change, credential use, live API call, WIF runtime, token exchange,
 route behavior switch, API client change, SSE/frontend work, SQL, migration,
 Supabase work, or generated state is approved or added. Fake provider remains
-the default. Slice 7M-E should collect named reviewer sign-offs only.
+the default.
+
+### Slice 7M-E Update — 2026-06-03
+
+Slice 7M-E adds the docs-only
+[OpenAI SDK dependency re-evaluation record](openai-sdk-dependency-reevaluation-record.md).
+The record formally re-evaluates the dependency decision against the prepared
+checklists. All 12 approval gates remain MISSING since no named reviewer has
+provided explicit, concrete sign-offs or evidence.
+
+Decision remains **NOT APPROVED / DENIED**. No SDK install, dependency manifest change,
+lockfile change, credential use, live API call, WIF runtime, token exchange,
+route behavior switch, API client change, SSE/frontend work, SQL, migration,
+Supabase work, or generated state is approved or added. Fake provider remains
+the default.
+
+Slice 7M-G should document keeping the mocked adapter path dependency-free.
 
 Slice 7M-C adds the docs-only
 [OpenAI SDK dependency approval record](openai-sdk-dependency-approval-record.md).

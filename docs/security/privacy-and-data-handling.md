@@ -286,6 +286,15 @@ STILL NOT APPROVED is not an approval state. Dependency decision remains **NOT
 APPROVED / DENIED**. No install, manifest change, runtime import, credential use,
 or live API call is approved. Fake provider remains the default.
 
+Slice 7M-E adds the docs-only
+[OpenAI SDK dependency re-evaluation record](../openai-sdk-dependency-reevaluation-record.md).
+The record formally re-evaluates the dependency decision. All 12 approval gates
+remain MISSING since no named reviewer has provided concrete sign-offs or evidence.
+Decision remains **NOT APPROVED / DENIED**. No SDK install, dependency manifest
+change, lockfile change, credential use, live API call, WIF runtime, token exchange,
+or generated state is approved or added. Fake provider remains the default.
+Slice 7M-G should document keeping the mocked adapter path dependency-free.
+
 
 ### Backend API Keys
 
