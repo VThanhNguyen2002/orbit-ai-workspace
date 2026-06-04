@@ -344,7 +344,8 @@ opt-in environment variable and never run in default CI.
 | **7M-L** | Provider boundary cleanup/refactor implementation |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 | **8A** | Backend AI summary history with fake provider only |
-| **8B** | Summary history API client contract/client integration |
+| **8B** | Summary history API client contract/client integration *(Complete — client method and tests added)* |
+| **8C** | Summary history UI/API consumption planning or backend persistence planning |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -743,6 +744,27 @@ SQL, migration, Supabase work, live harness, `.gitleaksignore` broadening, or
 generated Supabase state is approved or added. OpenAI SDK dependency remains
 **NOT APPROVED / DENIED**. Slice 8B should add summary history API client
 contract/client integration only.
+
+### Slice 8B Update — 2026-06-04
+
+Slice 8B adds API client support for the backend summary history endpoint from
+Slice 8A. `client.ai.listNoteSummaries(note_id)` calls
+`GET /v1/ai/notes/{note_id}/summaries`, URL-encodes the note id, preserves the
+existing success/error envelope behavior, and validates returned history data
+with the shared snake_case summary list contract.
+
+Focused API client tests cover the request path, valid history parsing, safe
+404 error mapping, and rejection of camelCase summary history fields. No
+shared contract shape change was needed because `ListSummariesResponse` already
+exists.
+
+No backend route behavior change, frontend UI, SSE streaming, persistence,
+database, SQL, migration, Supabase work, Docker work, OpenAI SDK dependency,
+credential, `.env` file, live API call, WIF runtime, live provider route
+wiring, `.gitleaksignore` broadening, or generated Supabase state is approved
+or added. OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Slice 8C
+should plan either summary history UI/API consumption or backend persistence,
+depending on product priority.
 
 ---
 

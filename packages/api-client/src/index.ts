@@ -3,6 +3,7 @@ import {
   ApiSuccessEnvelopeSchema,
   CreateNoteRequestSchema,
   DeleteNoteRequestSchema,
+  ListSummariesDataSchema,
   SummarySchema,
   UpdateNoteRequestSchema,
   type ApiErrorCode,
@@ -14,6 +15,7 @@ import {
   type JsonValue,
   type ListNotesRequest,
   type ListNotesResponse,
+  type ListSummariesResponse,
   type Note,
   type NoteContentType,
   type PaginationMeta,
@@ -41,6 +43,7 @@ export type VersionData = {
 
 export type ListNotesData = ListNotesResponse["data"];
 export type ListNotesQuery = Partial<ListNotesRequest>;
+export type ListSummariesData = ListSummariesResponse["data"];
 
 export type NotesApi = {
   list: (query?: ListNotesQuery) => Promise<ApiSuccessResponse<ListNotesData>>;
@@ -62,6 +65,9 @@ export type NotesApi = {
  */
 export type AiApi = {
   summarizeNote: (note_id: string) => Promise<ApiSuccessResponse<Summary>>;
+  listNoteSummaries: (
+    note_id: string,
+  ) => Promise<ApiSuccessResponse<ListSummariesData>>;
 };
 
 export type QueryValue =
@@ -168,6 +174,7 @@ export class SynapseApiClient {
     };
     this.ai = {
       summarizeNote: (note_id) => this.doSummarizeNote(note_id),
+      listNoteSummaries: (note_id) => this.listNoteSummaries(note_id),
     };
   }
 
@@ -277,6 +284,14 @@ export class SynapseApiClient {
     return this.request(`/ai/notes/${encodeURIComponent(note_id)}/summarize`, {
       method: "POST",
       parseData: parseSummaryData,
+    });
+  }
+
+  private listNoteSummaries(
+    note_id: string,
+  ): Promise<ApiSuccessResponse<ListSummariesData>> {
+    return this.request(`/ai/notes/${encodeURIComponent(note_id)}/summaries`, {
+      parseData: parseListSummariesData,
     });
   }
 
@@ -664,6 +679,20 @@ function parseSummaryData(data: unknown): Summary {
       200,
       data,
       `Summary response data did not match contract: ${result.error.message}`,
+    );
+  }
+
+  return result.data;
+}
+
+function parseListSummariesData(data: unknown): ListSummariesData {
+  const result = ListSummariesDataSchema.safeParse(data);
+
+  if (!result.success) {
+    throw new ApiInvalidResponseError(
+      200,
+      data,
+      `List summaries response data did not match contract: ${result.error.message}`,
     );
   }
 

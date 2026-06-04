@@ -346,6 +346,13 @@ credentials, live provider output, SQL-backed persistence, Supabase state, or
 production data. Missing, deleted, and cross-user notes continue to return safe
 404 responses before history is exposed.
 
+Slice 8B adds API client access to the summary history endpoint. The client
+validates the existing snake_case summary list response contract and preserves
+the shared error-envelope behavior; it does not add prompt text, provider
+diagnostics, raw provider payloads, credentials, live provider behavior,
+frontend rendering, persistence, SQL-backed storage, Supabase state, or
+production data handling.
+
 
 ### Backend API Keys
 

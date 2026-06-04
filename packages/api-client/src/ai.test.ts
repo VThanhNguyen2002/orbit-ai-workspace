@@ -242,6 +242,103 @@ describe("@synapse/api-client ai", () => {
     ).rejects.toBeInstanceOf(ApiInvalidResponseError);
   });
 
+  it("gets summary history from the correct encoded path", async () => {
+    const requests: CapturedRequest[] = [];
+    const client = createApiClient({
+      baseUrl: "https://api.example.test/v1",
+      fetch: captureFetch(
+        requests,
+        jsonResponse(200, {
+          data: { items: [summary] },
+          meta: successMeta,
+        }),
+      ),
+    });
+
+    await client.ai.listNoteSummaries("note/with/slashes");
+
+    expect(requests[0]).toEqual({
+      input:
+        "https://api.example.test/v1/ai/notes/note%2Fwith%2Fslashes/summaries",
+      init: {
+        headers: {
+          Accept: "application/json",
+        },
+        method: "GET",
+      },
+    });
+  });
+
+  it("returns validated snake_case summary history data and meta", async () => {
+    const client = createApiClient({
+      baseUrl: "https://api.example.test/v1",
+      fetch: captureFetch(
+        [],
+        jsonResponse(200, {
+          data: { items: [summary] },
+          meta: successMeta,
+        }),
+      ),
+    });
+
+    await expect(
+      client.ai.listNoteSummaries(summary.source_id),
+    ).resolves.toEqual({
+      data: { items: [summary] },
+      meta: successMeta,
+    });
+  });
+
+  it("maps 404 summary history responses to ApiClientError", async () => {
+    const client = createApiClient({
+      baseUrl: "https://api.example.test/v1",
+      fetch: captureFetch(
+        [],
+        jsonResponse(404, {
+          error: {
+            code: "NOT_FOUND",
+            message: "Note not found",
+            details: [{ field: "note_id", message: "note_not_found" }],
+          },
+          meta: { request_id: "req_history_missing" },
+        }),
+      ),
+    });
+
+    await expect(
+      client.ai.listNoteSummaries("no-such-note"),
+    ).rejects.toMatchObject({
+      name: "ApiClientError",
+      code: "NOT_FOUND",
+      requestId: "req_history_missing",
+      status: 404,
+    } satisfies Partial<ApiClientError>);
+  });
+
+  it("rejects camelCase fields in summary history data", async () => {
+    const client = createApiClient({
+      baseUrl: "https://api.example.test/v1",
+      fetch: captureFetch(
+        [],
+        jsonResponse(200, {
+          data: {
+            items: [
+              {
+                ...summary,
+                actionItems: summary.action_items,
+              },
+            ],
+          },
+          meta: successMeta,
+        }),
+      ),
+    });
+
+    await expect(
+      client.ai.listNoteSummaries(summary.source_id),
+    ).rejects.toBeInstanceOf(ApiInvalidResponseError);
+  });
+
   // SSE streaming is intentionally not tested here — deferred to Slice 7E.
   it("does not include any SSE or streaming behavior", () => {
     const client = createApiClient({ baseUrl: "https://api.example.test/v1" });
