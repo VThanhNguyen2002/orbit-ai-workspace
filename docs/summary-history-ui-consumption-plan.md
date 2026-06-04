@@ -109,9 +109,10 @@ We evaluate three candidate approaches for introducing this consumption path:
 > **We recommend Option A.** Keeping the implementation fake-provider-only and memory-only provides high demo value while avoiding database complexity.
 
 ### Implementation Risk & Precondition mitigation
-Because `apps/mobile` is currently uninitialized, proceeding directly with full screen implementation carries bootstrap risks. We recommend splitting **Slice 8D** into two sub-slices:
-*   **Slice 8D-A (Inspect/Init structure)**: Set up the minimal directory/file boilerplate needed to render a basic screen in `apps/mobile` using React Native Web/Expo Router, ensuring build and lint pipelines remain green.
-*   **Slice 8D-B (Summary history consumption)**: Implement the UI component, wire the hook/service layer to `@synapse/api-client`, and implement the user interactions.
+Because `apps/mobile` is currently uninitialized, proceeding directly with full screen implementation carries bootstrap risks. Slice 8D is split into small approval-safe steps:
+*   **Slice 8D-A (Inspect mobile structure)**: Confirmed that `apps/mobile` is still a placeholder with no `src`, router, rendered UI, API access layer, hook layer, or mobile test setup.
+*   **Slice 8D-B (Dependency-free mobile structure)**: Add plain TypeScript source structure, an app-level API boundary, summary-history API adapter, deterministic view-state mapping, and a non-rendering placeholder module without package manifest or dependency changes.
+*   **Slice 8D-C (Minimal screen/component decision)**: Implement a rendered screen/component only if existing dependencies support it without package changes; otherwise create a separate Expo/mobile initialization approval plan.
 
 ---
 
@@ -141,7 +142,21 @@ All security and privacy policies defined in `docs/security/privacy-and-data-han
 
 ---
 
-## 9. Test Strategy for Future Implementation
+## 9. Slice 8D-B Result
+
+Slice 8D-B adds a dependency-free mobile source structure for future summary history UI consumption:
+
+*   **`apps/mobile/tsconfig.json`** enables direct TypeScript verification for plain mobile source files.
+*   **`apps/mobile/src/api/synapseClient.ts`** centralizes API client construction at the app boundary.
+*   **`apps/mobile/src/features/notes/summaryHistoryApi.ts`** wraps `client.ai.listNoteSummaries(note_id)` behind an injected feature API dependency and re-validates the shared summary history data shape.
+*   **`apps/mobile/src/features/notes/summaryHistoryViewState.ts`** maps API data and errors into UI-safe `idle`, `loading`, `empty`, `success`, and `error` states.
+*   **`apps/mobile/src/features/notes/noteSummaryHistoryPlaceholder.ts`** documents the future screen regions without rendering React, React Native, or Expo UI.
+
+This slice intentionally does not add dependencies, edit package manifests, edit lockfiles, initialize Expo, render a React Native screen, store secrets, introduce provider-specific UI data, add prompt/raw note logging, or change backend/runtime provider behavior.
+
+---
+
+## 10. Test Strategy for Future Implementation
 
 *   **API Client**: Already fully covered by unit tests in `packages/api-client/src/ai.test.ts`.
 *   **UI Components**: Implement lightweight state/component tests using `react-test-renderer` or `@testing-library/react-native` only if the mobile package testing infrastructure is initialized.
@@ -150,26 +165,28 @@ All security and privacy policies defined in `docs/security/privacy-and-data-han
 
 ---
 
-## 10. Future Slices Roadmap
+## 11. Future Slices Roadmap
 
 We propose the following roadmap for upcoming iterations:
 
 ```mermaid
 graph TD
     8C[Slice 8C: Consumption Planning] --> 8DA[Slice 8D-A: Init Mobile Screen Structure]
-    8DA --> 8DB[Slice 8D-B: Summary History UI Consumption]
-    8DB --> 8E[Slice 8E: Notes Detail UI Demo Polish]
+    8DA --> 8DB[Slice 8D-B: Dependency-Free Mobile Structure]
+    8DB --> 8DC[Slice 8D-C: Minimal Screen/Component Decision]
+    8DC --> 8E[Slice 8E: Notes Detail UI Demo Polish]
     8E --> 8F[Slice 8F: Re-evaluate Backend Persistence]
 ```
 
 *   **Slice 8D-A** — Inspect/init minimal mobile screen structure.
-*   **Slice 8D-B** — Implement summary history UI consumption with memory-only states.
+*   **Slice 8D-B** — Add dependency-free mobile API/view-state structure for summary history consumption.
+*   **Slice 8D-C** — Implement a minimal rendered summary history screen/component only if existing dependencies support it without package changes; otherwise prepare an Expo/mobile initialization approval plan.
 *   **Slice 8E** — Notes detail page layout polish.
 *   **Slice 8F** — Re-evaluate if summary persistence in the database is warranted.
 
 ---
 
-## 11. Definition of Done
+## 12. Definition of Done
 
 This slice is complete when:
 1.  `docs/summary-history-ui-consumption-plan.md` is created and committed to `main`.

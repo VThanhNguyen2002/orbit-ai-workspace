@@ -361,6 +361,14 @@ diagnostics, raw provider payloads, credentials, live provider behavior,
 frontend rendering, persistence, SQL-backed storage, Supabase state, or
 production data handling.
 
+Slice 8D-B adds dependency-free mobile source structure for future summary
+history consumption. Mobile feature modules now use an injected app-level API
+boundary and map summary history responses into UI-safe state messages for
+loading, empty, success, and error cases. The mobile structure does not render
+provider-specific details, raw diagnostics, prompt text, raw note content,
+credentials, token-like examples, live provider payloads, SQL-backed state, or
+Supabase assumptions.
+
 
 ### Backend API Keys
 

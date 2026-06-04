@@ -775,6 +775,28 @@ Slice 8C adds the docs-only [Summary History UI/API Consumption Plan](summary-hi
 
 No runtime code, tests, package/lockfile configurations, credentials, environment variables, Supabase/database state, real LLM calls, or SDK dependencies were added. The fake provider remains the default, and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
 
+### Slice 8D-B Update — 2026-06-04
+
+Slice 8D-B adds a dependency-free mobile TypeScript structure for future summary
+history UI consumption. `apps/mobile` now has a direct TypeScript project,
+plain source exports, an app-level API client construction boundary, an
+injected summary-history API adapter that calls `client.ai.listNoteSummaries`,
+deterministic view-state mapping for `idle`, `loading`, `empty`, `success`, and
+`error` states, plus a non-rendering placeholder module that documents future
+screen regions.
+
+This is not a rendered React Native or Expo UI implementation. No dependency,
+package manifest, lockfile, Expo initialization, React/JSX component, mobile
+test dependency, backend route behavior, SSE streaming, persistence, database,
+SQL, migration, Supabase work, Docker work, credential, `.env` file, live API
+call, WIF runtime, live provider route wiring, `.gitleaksignore` broadening, or
+generated Supabase state is approved or added. The fake provider remains the
+default, and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8D-C: implement a minimal summary history
+screen/component only if existing dependencies support it without package
+changes; otherwise prepare a separate Expo/mobile initialization approval plan.
+
 ---
 
 ## 14. Definition Of Done (This Slice)
