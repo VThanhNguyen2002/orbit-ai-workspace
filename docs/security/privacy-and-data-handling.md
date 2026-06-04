@@ -149,11 +149,12 @@ or wired by this boundary.
 
 ### UI Summary Consumption Boundaries
 
-Slice 8C adds planning constraints for UI summarization consumption:
+Slice 8C and 8D-D add planning constraints for UI summarization consumption:
 - **No Provider Exposure**: UI components and clients must remain completely vendor-agnostic. No references to specific external providers (like OpenAI or Gemini) should exist in client screens or display components. UI state is driven solely by standard contracts (e.g., `provider`, `model`, `content`).
 - **Access Layer Boundary**: UI screens must never call raw `fetch` or directly instantiate client networks. They must interface through an app-level API access layer or state hooks (e.g., a hook wrapping `@synapse/api-client`).
 - **No Diagnostic Exposure**: Raw LLM output payloads, token counts, system prompts, or internal diagnostic metrics must never be displayed in the client interface or saved to local device logs.
 - **Transience Acknowledgment**: Because summaries are currently memory-only and transient on the dev backend, the UI must gracefully handle and alert the user that history resets when the backend server restarts.
+- **Environment Config Isolation**: The future Expo/React Native mobile app shell must isolate public endpoints (such as `MOBILE_API_BASE_URL`) from sensitive backend credentials. Bundling secret variables, API keys, or private parameters in compile-time static assets or client-side environment files is strictly prohibited.
 
 ### OpenAI Provider Credential Planning
 

@@ -2,47 +2,27 @@
 
 ## Objective
 
-Recommended next task: **Slice 8D-C — Minimal summary history screen/component
-decision**.
+Recommended next task: **Slice 8D-E — Approve or deny minimal Expo app shell initialization**.
 
-Implement a rendered summary history screen/component only if existing
-dependencies support it without package manifest or lockfile changes. If they
-do not, create a separate Expo/mobile initialization approval plan before any
-rendered UI work.
+Review and act on the [Mobile Expo Initialization Approval Plan](mobile-expo-initialization-approval-plan.md). This task is docs-only; it involves obtaining explicit named reviewer or developer sign-off/denial for the proposed package.json and pnpm-lock.yaml modifications before any dependency installation or script additions can take place.
 
-Slice 8D-B is complete. Do not proceed to OpenAI live provider work, Supabase
-live runtime, Docker, RLS, WIF runtime, SDK dependency installation, credential
-use, package/dependency changes, rendered frontend implementation, or
-persistence work unless those paths are explicitly reopened or selected for the
-next approved slice.
+Slice 8D-D is complete. Do not install dependencies, edit package manifests, run Expo, run React Native, or write/execute runtime mobile UI components in this slice.
 
-## Slice 8D-B Result
+## Slice 8D-D Result
 
-Slice 8D-B adds a dependency-free mobile summary history structure:
+Slice 8D-D adds the docs-only Expo/React Native Initialization Approval Plan:
 
-- Added `apps/mobile/tsconfig.json` for direct TypeScript verification.
-- Added `apps/mobile/src` exports for future mobile source code.
-- Added an app-level API client construction boundary in `apps/mobile/src/api/synapseClient.ts`.
-- Added `summaryHistoryApi` as an injected feature adapter around `client.ai.listNoteSummaries(note_id)`.
-- Added deterministic summary history view-state mapping for `idle`, `loading`, `empty`, `success`, and `error`.
-- Added a non-rendering note summary history placeholder module for future screen regions.
+- Created `docs/mobile-expo-initialization-approval-plan.md` outlining structure, options, risks, CI impacts, security boundaries, and approval gates.
+- Updated `docs/security/privacy-and-data-handling.md` to establish environment config isolation rules.
+- Updated roadmaps in `docs/ai-summarization-implementation-plan.md` to map future 8D sub-slices.
 
-No rendered React Native or Expo UI was added. No dependencies, package
-manifests, lockfiles, credentials, environment variables, Supabase/database
-state, real LLM calls, SDK dependencies, SQL/migrations, Docker work, live
-provider wiring, WIF runtime, or `.gitleaksignore` broadening were added. The
-fake provider remains the default, and the OpenAI SDK dependency remains **NOT
-APPROVED / DENIED**.
+No package manifest changes, lockfile modifications, dependency installations, runtime/React Native/Expo files, backend changes, or credentials were added. The fake provider remains default, the OpenAI SDK remains **NOT APPROVED / DENIED**, and Expo initialization remains **NOT APPROVED YET**.
 
-## Slice 8D-C Gate
+## Slice 8D-E Gate
 
-- If existing dependencies support a rendered component without manifest or
-  lockfile changes, implement the smallest summary history screen/component
-  that consumes the 8D-B API/view-state boundary.
-- If rendered UI requires Expo, React Native, React, JSX tooling, testing
-  packages, or any package/lockfile change, stop and prepare a mobile
-  initialization approval plan instead.
-- Keep backend behavior unchanged: fake-provider-only and memory-only.
+- Await explicit sign-off on all 7 approval gates specified in the approval plan (dependency review, lockfile check, CI footprint impact, VM resource constraints, security boundaries, rollback plan, named reviewers).
+- If approved, proceed to Slice 8D-F (Initialize minimal Expo app shell).
+- If denied or delayed, return to backend/product work (Option D).
 
 ## Live Provider And Supabase Status
 
@@ -53,7 +33,6 @@ APPROVED / DENIED**.
 
 ## Definition Of Done
 
-- Execute Slice 8D-C only after confirming the dependency/package gate.
-- Keep backend behavior unchanged (fake-provider-only and memory-only).
-- No live provider, SDK dependency, credential, `.env`, SQL/migration, Supabase generated state, Docker, package/lockfile change, or rendered frontend implementation beyond the approved scope is introduced.
-- Verification and security checks pass for any approved changes.
+- Execute Slice 8D-E as a docs-only approval/denial record.
+- No live provider, SDK dependency, credential, `.env`, SQL/migration, Supabase generated state, Docker, package/lockfile change, or rendered frontend implementation is introduced.
+- Verification and security checks pass.

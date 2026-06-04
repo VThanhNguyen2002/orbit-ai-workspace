@@ -346,8 +346,13 @@ opt-in environment variable and never run in default CI.
 | **8A** | Backend AI summary history with fake provider only |
 | **8B** | Summary history API client contract/client integration *(Complete — client method and tests added)* |
 | **8C** | Summary history UI/API consumption planning or backend persistence planning *(Complete — consumption plan added)* |
-| **8D-A** | Inspect/init minimal mobile screen structure |
-| **8D-B** | Summary history UI consumption |
+| **8D-A** | Inspect/init minimal mobile screen structure *(Complete)* |
+| **8D-B** | Summary history UI consumption *(Complete)* |
+| **8D-C** | Minimal screen/component decision *(Complete)* |
+| **8D-D** | Expo/React Native Initialization Approval Plan *(Complete)* |
+| **8D-E** | Approve or deny minimal Expo app shell initialization |
+| **8D-F** | Initialize minimal Expo app shell if approved |
+| **8D-G** | Render summary history screen using existing view-state |
 | **8E** | Notes detail UI demo polish |
 
 ### Slice 7E Update — 2026-06-01
@@ -793,9 +798,13 @@ call, WIF runtime, live provider route wiring, `.gitleaksignore` broadening, or
 generated Supabase state is approved or added. The fake provider remains the
 default, and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
 
-Next recommended work is Slice 8D-C: implement a minimal summary history
-screen/component only if existing dependencies support it without package
-changes; otherwise prepare a separate Expo/mobile initialization approval plan.
+### Slice 8D-D Update — 2026-06-04
+
+Slice 8D-D adds the docs-only [Mobile Expo Initialization Approval Plan](mobile-expo-initialization-approval-plan.md). The plan defines the baseline mobile structures, compares initialization options (A, B, C, D), recommends a minimal single-screen entrypoint layout without router, addresses CI/script and VM resource limits, structures security boundaries, and documents required approval gates (dependency, lockfile, CI impact, VM resource, security, rollback, and named reviewer sign-offs).
+
+No package manifest changes, lockfile modifications, dependency installations, runtime/React Native/Expo files, backend changes, or credentials were added. The fake provider remains default, the OpenAI SDK remains **NOT APPROVED / DENIED**, and Expo initialization remains **NOT APPROVED YET**.
+
+Next recommended work is Slice 8D-E: Approve or deny minimal Expo app shell initialization.
 
 ---
 
