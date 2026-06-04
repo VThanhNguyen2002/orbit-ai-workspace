@@ -113,7 +113,8 @@ Because `apps/mobile` is currently uninitialized, proceeding directly with full 
 *   **Slice 8D-A (Inspect mobile structure)**: Confirmed that `apps/mobile` is still a placeholder with no `src`, router, rendered UI, API access layer, hook layer, or mobile test setup.
 *   **Slice 8D-B (Dependency-free mobile structure)**: Add plain TypeScript source structure, an app-level API boundary, summary-history API adapter, deterministic view-state mapping, and a non-rendering placeholder module without package manifest or dependency changes.
 *   **Slice 8D-C (Minimal screen/component decision)**: Create the Expo/React Native initialization approval plan (`docs/mobile-expo-initialization-approval-plan.md`) due to missing runtime packages.
-*   **Slice 8D-D (Initialization Approval Plan)**: Present the detailed initialization plan and obtain feedback on the smallest safe runtime footprint.
+*   **Slice 8D-D (Initialization Approval Plan)**: Present the detailed initialization plan and obtain feedback on the smallest safe runtime footprint *(Complete)*.
+*   **Slice 8D-E (Approve/Deny Expo Shell Initialization)**: Recorded approval decision. Expo/React Native initialization is **DEFERRED** due to missing dependency/lockfile/CI/VM resource approvals.
 
 ---
 
@@ -177,19 +178,15 @@ graph TD
     8DB --> 8DC[Slice 8D-C: Minimal Screen/Component Decision]
     8DC --> 8DD[Slice 8D-D: Expo Initialization Approval Plan]
     8DD --> 8DE[Slice 8D-E: Approve/Deny Expo Shell Initialization]
-    8DE --> 8DF[Slice 8D-F: Initialize Minimal Expo App Shell]
-    8DF --> 8DG[Slice 8D-G: Render Summary History Screen]
-    8DG --> 8E[Slice 8E: Notes Detail UI Demo Polish]
+    8DE --> 8E[Slice 8E: Backend/Product Demo Polish]
 ```
 
 *   **Slice 8D-A** — Inspect/init minimal mobile screen structure.
 *   **Slice 8D-B** — Add dependency-free mobile API/view-state structure for summary history consumption.
 *   **Slice 8D-C** — Minimal screen/component decision.
 *   **Slice 8D-D** — Expo/React Native Initialization Approval Plan.
-*   **Slice 8D-E** — Approve or deny minimal Expo app shell initialization.
-*   **Slice 8D-F** — Initialize minimal Expo app shell if approved.
-*   **Slice 8D-G** — Render summary history screen using existing view-state.
-*   **Slice 8E** — Notes detail page layout polish.
+*   **Slice 8D-E** — Approve or deny minimal Expo app shell initialization *(Complete — decision DEFERRED)*.
+*   **Slice 8E** — Backend/product demo polish using existing fake-provider flow.
 
 ---
 

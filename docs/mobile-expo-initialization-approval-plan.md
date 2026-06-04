@@ -3,9 +3,9 @@
 ## 1. Decision Status
 
 > [!WARNING]
-> *   **Expo/React Native initialization**: `NOT APPROVED YET`
-> *   **Package/lockfile changes**: `NOT APPROVED YET`
-> *   **Rendered UI implementation**: `BLOCKED UNTIL 8D-E DECISION`
+> *   **Expo/React Native initialization**: `DEFERRED` (See [mobile-expo-initialization-approval-record.md](mobile-expo-initialization-approval-record.md))
+> *   **Package/lockfile changes**: `NOT APPROVED`
+> *   **Rendered UI implementation**: `BLOCKED / DEFERRED`
 
 ---
 

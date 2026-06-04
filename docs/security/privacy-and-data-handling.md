@@ -370,6 +370,8 @@ provider-specific details, raw diagnostics, prompt text, raw note content,
 credentials, token-like examples, live provider payloads, SQL-backed state, or
 Supabase assumptions.
 
+Slice 8D-E formally defers Expo/React Native initialization. It ensures no package manifests, lockfiles, or dependencies are modified, and no runtime mobile UI or Expo files are introduced. The environment config isolation rules established in the UI summary consumption boundaries are preserved.
+
 
 ### Backend API Keys
 

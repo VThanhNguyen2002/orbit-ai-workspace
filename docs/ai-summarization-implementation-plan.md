@@ -350,10 +350,8 @@ opt-in environment variable and never run in default CI.
 | **8D-B** | Summary history UI consumption *(Complete)* |
 | **8D-C** | Minimal screen/component decision *(Complete)* |
 | **8D-D** | Expo/React Native Initialization Approval Plan *(Complete)* |
-| **8D-E** | Approve or deny minimal Expo app shell initialization |
-| **8D-F** | Initialize minimal Expo app shell if approved |
-| **8D-G** | Render summary history screen using existing view-state |
-| **8E** | Notes detail UI demo polish |
+| **8D-E** | Approve or deny minimal Expo app shell initialization *(Complete — decision DEFERRED)* |
+| **8E** | Backend/product demo polish using existing fake-provider flow |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -805,6 +803,14 @@ Slice 8D-D adds the docs-only [Mobile Expo Initialization Approval Plan](mobile-
 No package manifest changes, lockfile modifications, dependency installations, runtime/React Native/Expo files, backend changes, or credentials were added. The fake provider remains default, the OpenAI SDK remains **NOT APPROVED / DENIED**, and Expo initialization remains **NOT APPROVED YET**.
 
 Next recommended work is Slice 8D-E: Approve or deny minimal Expo app shell initialization.
+
+### Slice 8D-E Update — 2026-06-04
+
+Slice 8D-E records the formal decision on minimal Expo app shell initialization in [Mobile Expo Initialization Approval Record](mobile-expo-initialization-approval-record.md). Because required dependency, lockfile, CI, and VM resource approvals are currently missing, the decision is **DEFERRED**.
+
+No package manifests, lockfiles, or dependencies were modified, and no runtime mobile UI or Expo files were introduced. The fake provider remains the default, and the OpenAI SDK remains **NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8E: Backend/product demo polish using existing fake-provider flow.
 
 ---
 
