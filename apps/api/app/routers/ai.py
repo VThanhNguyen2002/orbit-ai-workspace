@@ -1,4 +1,4 @@
-"""AI routes — POST /v1/ai/notes/{note_id}/summarize.
+"""AI routes for note summarization and fake-provider summary history.
 
 Note: SSE streaming is deferred to a future slice. This slice returns a
 standard JSON success envelope with the full summary result.
@@ -52,3 +52,25 @@ def summarize_note(
         raise summarization_input_too_long_error(exc) from exc
 
     return success_envelope(request, result.as_dict())
+
+
+@router.get("/notes/{note_id}/summaries")
+def list_note_summaries(
+    note_id: str,
+    request: Request,
+    service: Annotated[SummarizationService, Depends(get_summarization_service)],
+    auth_context: Annotated[AuthContext, Depends(get_auth_context)],
+):
+    """List in-memory fake summary history for a user-owned note."""
+    try:
+        summaries = service.list_note_summaries(
+            user_id=auth_context.user_id,
+            note_id=note_id,
+        )
+    except NoteNotFoundError as exc:
+        raise note_not_found_error() from exc
+
+    return success_envelope(
+        request,
+        {"items": [summary.as_dict() for summary in summaries]},
+    )

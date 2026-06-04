@@ -343,6 +343,8 @@ opt-in environment variable and never run in default CI.
 | **7M-K** | Redaction and diagnostics audit for AI provider boundary *(Complete — Record: `docs/openai-provider-redaction-diagnostics-audit.md`)* |
 | **7M-L** | Provider boundary cleanup/refactor implementation |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
+| **8A** | Backend AI summary history with fake provider only |
+| **8B** | Summary history API client contract/client integration |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -719,6 +721,28 @@ No SDK install, dependency manifest change, lockfile change, credential use,
 API client change, SSE/frontend work, SQL, migration, Supabase work, live
 harness, `.gitleaksignore` broadening, or generated state is approved or
 added. OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
+
+### Slice 8A Update — 2026-06-03
+
+Slice 8A adds backend-only summary history for the fake summarization flow.
+Successful fake `POST /v1/ai/notes/{note_id}/summarize` responses are recorded
+in an in-memory summary history store, and `GET /v1/ai/notes/{note_id}/summaries`
+returns the current user's recorded summaries for that owned note.
+
+History is memory-only for local demos and tests. It stores only provider-safe
+summary fields that are already returned by the summarize route; it does not
+store prompt text, raw provider payloads, diagnostics, credentials, or live
+provider data. Missing, deleted, or cross-user notes keep the existing safe 404
+behavior.
+
+The shared contracts now include a snake_case `ListSummariesResponse` envelope
+for the history list endpoint. No OpenAI SDK install, dependency manifest
+change, lockfile change, credential use, `.env` file, live API call, WIF
+runtime, token exchange, route/client live OpenAI behavior, SSE/frontend work,
+SQL, migration, Supabase work, live harness, `.gitleaksignore` broadening, or
+generated Supabase state is approved or added. OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**. Slice 8B should add summary history API client
+contract/client integration only.
 
 ---
 

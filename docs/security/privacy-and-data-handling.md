@@ -338,6 +338,14 @@ keeps fake provider defaults unchanged, and adds no SDK dependency, credential,
 `.env` file, live call, route/client change, SQL, migration, Supabase state,
 `.gitleaksignore` broadening, or live harness.
 
+Slice 8A adds memory-only fake summary history for backend demos and tests.
+The history store records only generated summary fields already returned by the
+fake summarization route and exposes them through a user-owned note history
+endpoint. It does not store prompt text, raw provider payloads, diagnostics,
+credentials, live provider output, SQL-backed persistence, Supabase state, or
+production data. Missing, deleted, and cross-user notes continue to return safe
+404 responses before history is exposed.
+
 
 ### Backend API Keys
 

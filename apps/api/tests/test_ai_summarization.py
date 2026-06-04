@@ -12,14 +12,17 @@ from fastapi.testclient import TestClient
 
 from app.core.auth import AuthContext, get_auth_context
 from app.repositories.notes_memory import get_memory_notes_repository
+from app.services.ai_summarization import get_summary_history_repository
 from tests.helpers.notes_assertions import create_note as _create_note
 
 
 @pytest.fixture(autouse=True)
 def reset_notes_repository() -> Generator[None, None, None]:
     get_memory_notes_repository().clear()
+    get_summary_history_repository().clear()
     yield
     get_memory_notes_repository().clear()
+    get_summary_history_repository().clear()
 
 
 @pytest.fixture
@@ -160,6 +163,7 @@ def test_summarization_service_builds_provider_prompt_from_note_fields(
     service = SummarizationService(
         note_service=get_note_service(),
         provider=provider,
+        summary_history_repository=get_summary_history_repository(),
         settings=Settings(ai_summarization_enabled=True),
     )
 
@@ -206,6 +210,133 @@ def test_action_items_use_snake_case(ai_client: TestClient) -> None:
     for item in items:
         assert "text" in item
         assert "priority" in item
+
+
+# ---------------------------------------------------------------------------
+# In-memory fake summary history
+# ---------------------------------------------------------------------------
+
+
+def test_summarize_note_records_fake_summary_history(ai_client: TestClient) -> None:
+    note = _create_note(
+        ai_client,
+        title="History source note",
+        content="Synthetic history source content.",
+    )
+
+    summarize_response = ai_client.post(
+        f"/v1/ai/notes/{note['id']}/summarize",
+        headers={"x-request-id": "req_ai_history_create"},
+    )
+    history_response = ai_client.get(
+        f"/v1/ai/notes/{note['id']}/summaries",
+        headers={"x-request-id": "req_ai_history_list"},
+    )
+
+    assert summarize_response.status_code == 200
+    assert history_response.status_code == 200
+    summary = summarize_response.json()["data"]
+    history_body = history_response.json()
+    assert history_body["meta"] == {"request_id": "req_ai_history_list"}
+    assert history_body["data"] == {"items": [summary]}
+    assert history_body["data"]["items"][0]["provider"] == "fake"
+    assert history_body["data"]["items"][0]["model"] == "fake-model-v1"
+
+
+def test_repeated_fake_summaries_append_to_history(ai_client: TestClient) -> None:
+    note = _create_note(ai_client, title="Repeated history", content="Synthetic content.")
+
+    first = ai_client.post(f"/v1/ai/notes/{note['id']}/summarize").json()["data"]
+    second = ai_client.post(f"/v1/ai/notes/{note['id']}/summarize").json()["data"]
+    history_response = ai_client.get(f"/v1/ai/notes/{note['id']}/summaries")
+
+    assert history_response.status_code == 200
+    items = history_response.json()["data"]["items"]
+    assert items == [first, second]
+    assert items[0]["id"] != items[1]["id"]
+
+
+def test_summary_history_returns_empty_list_for_owned_note_without_summaries(
+    ai_client: TestClient,
+) -> None:
+    note = _create_note(ai_client, title="No summary yet", content="Synthetic content.")
+
+    response = ai_client.get(
+        f"/v1/ai/notes/{note['id']}/summaries",
+        headers={"x-request-id": "req_ai_history_empty"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "data": {"items": []},
+        "meta": {"request_id": "req_ai_history_empty"},
+    }
+
+
+def test_summary_history_missing_note_returns_404(ai_client: TestClient) -> None:
+    response = ai_client.get(
+        "/v1/ai/notes/no-such-note/summaries",
+        headers={"x-request-id": "req_ai_history_missing"},
+    )
+
+    assert response.status_code == 404
+    body = response.json()
+    assert body["error"]["code"] == "NOT_FOUND"
+    detail_messages = [d["message"] for d in body["error"]["details"]]
+    assert "note_not_found" in detail_messages
+    assert "no-such-note" not in response.text
+
+
+def test_summary_history_cross_user_note_returns_404(ai_client: TestClient) -> None:
+    ai_client.app.dependency_overrides[get_auth_context] = lambda: AuthContext(
+        user_id="user_a",
+        auth_mode="dev",
+    )
+    note = _create_note(ai_client)
+    ai_client.post(f"/v1/ai/notes/{note['id']}/summarize")
+
+    ai_client.app.dependency_overrides[get_auth_context] = lambda: AuthContext(
+        user_id="user_b",
+        auth_mode="dev",
+    )
+    response = ai_client.get(
+        f"/v1/ai/notes/{note['id']}/summaries",
+        headers={"x-request-id": "req_ai_history_cross_user"},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "NOT_FOUND"
+    assert "This note covers key decisions" not in response.text
+
+
+def test_summary_history_does_not_store_prompt_or_diagnostics(
+    ai_client: TestClient,
+) -> None:
+    private_title = "Private history prompt title"
+    private_content = "Private history prompt content must not be stored."
+    note = _create_note(
+        ai_client,
+        title=private_title,
+        content=private_content,
+    )
+
+    ai_client.post(f"/v1/ai/notes/{note['id']}/summarize")
+    response = ai_client.get(f"/v1/ai/notes/{note['id']}/summaries")
+
+    assert response.status_code == 200
+    body_text = response.text
+    for forbidden in (
+        private_title,
+        private_content,
+        "Summarize the following note",
+        "raw_response",
+        "provider_payload",
+        "sdk_response",
+        "OPENAI_API_KEY",
+        "Bearer ",
+        "sk-",
+    ):
+        assert forbidden not in body_text
 
 
 # ---------------------------------------------------------------------------
@@ -312,6 +443,7 @@ def test_summarize_over_limit_content_returns_400(ai_client: TestClient) -> None
         return SummarizationService(
             note_service=get_note_service(),
             provider=ProviderShouldNotBeCalled(),
+            summary_history_repository=get_summary_history_repository(),
             settings=tight_settings,
         )
 

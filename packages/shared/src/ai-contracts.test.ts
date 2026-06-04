@@ -4,6 +4,7 @@ import {
   AiStreamDoneEventSchema,
   AiStreamEventSchema,
   GetSummaryResponseSchema,
+  ListSummariesResponseSchema,
   SemanticSearchRequestSchema,
   SemanticSearchResponseSchema,
 } from "./index";
@@ -197,6 +198,59 @@ describe("AI contract schemas", () => {
         data: { ...validSummary, content: "" },
         meta: { request_id },
       });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe("ListSummariesResponse contract", () => {
+    const validSummary = {
+      id: note_id,
+      user_id,
+      source_id: note_id,
+      source_type: "note",
+      content: "This note discusses planning priorities and next steps.",
+      action_items: [{ text: "Send follow-up email", priority: "high" }],
+      provider: "fake",
+      model: "fake-model-v1",
+      created_at: timestamp,
+    };
+
+    it("parses a valid ListSummariesResponse snake_case envelope", () => {
+      const input = {
+        data: {
+          items: [validSummary],
+        },
+        meta: { request_id },
+      };
+
+      expect(ListSummariesResponseSchema.parse(input)).toEqual(input);
+    });
+
+    it("parses an empty ListSummariesResponse", () => {
+      const input = {
+        data: {
+          items: [],
+        },
+        meta: { request_id },
+      };
+
+      expect(ListSummariesResponseSchema.parse(input)).toEqual(input);
+    });
+
+    it("rejects camelCase ListSummariesResponse fields", () => {
+      const result = ListSummariesResponseSchema.safeParse({
+        data: {
+          items: [
+            {
+              ...validSummary,
+              sourceId: note_id,
+              source_id: undefined,
+            },
+          ],
+        },
+        meta: { requestId: request_id },
+      });
+
       expect(result.success).toBe(false);
     });
   });

@@ -66,6 +66,58 @@ class AiSummaryResult:
 
 
 # ---------------------------------------------------------------------------
+# Summary history repository (memory-only for fake/demo flow)
+# ---------------------------------------------------------------------------
+
+
+class SummaryHistoryRepository(Protocol):
+    def record(self, summary: AiSummaryResult) -> None: ...
+
+    def list_for_note(self, *, user_id: str, note_id: str) -> list[AiSummaryResult]: ...
+
+
+class InMemorySummaryHistoryRepository:
+    """Memory-only summary history store for local fake-provider demos/tests."""
+
+    def __init__(self) -> None:
+        self._summaries: dict[tuple[str, str], list[AiSummaryResult]] = {}
+
+    def clear(self) -> None:
+        self._summaries.clear()
+
+    def record(self, summary: AiSummaryResult) -> None:
+        key = (summary.user_id, summary.source_id)
+        self._summaries.setdefault(key, []).append(_copy_summary(summary))
+
+    def list_for_note(self, *, user_id: str, note_id: str) -> list[AiSummaryResult]:
+        return [
+            _copy_summary(summary)
+            for summary in self._summaries.get((user_id, note_id), [])
+        ]
+
+
+_summary_history_repository = InMemorySummaryHistoryRepository()
+
+
+def get_summary_history_repository() -> InMemorySummaryHistoryRepository:
+    return _summary_history_repository
+
+
+def _copy_summary(summary: AiSummaryResult) -> AiSummaryResult:
+    return AiSummaryResult(
+        id=summary.id,
+        user_id=summary.user_id,
+        source_id=summary.source_id,
+        source_type=summary.source_type,
+        content=summary.content,
+        action_items=list(summary.action_items),
+        provider=summary.provider,
+        model=summary.model,
+        created_at=summary.created_at,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Provider protocol
 # ---------------------------------------------------------------------------
 
@@ -178,10 +230,12 @@ class SummarizationService:
         self,
         note_service: NoteService,
         provider: SummarizationProvider,
+        summary_history_repository: SummaryHistoryRepository,
         settings: Settings,
     ) -> None:
         self._note_service = note_service
         self._provider = provider
+        self._summary_history_repository = summary_history_repository
         self._settings = settings
 
     def summarize_note(self, *, user_id: str, note_id: str) -> AiSummaryResult:
@@ -205,7 +259,7 @@ class SummarizationService:
         result = self._provider.summarize(source_id=note.id, prompt=prompt)
 
         # Inject auth user_id — provider must not know the calling user
-        return AiSummaryResult(
+        summary = AiSummaryResult(
             id=result.id,
             user_id=user_id,
             source_id=result.source_id,
@@ -215,6 +269,18 @@ class SummarizationService:
             provider=result.provider,
             model=result.model,
             created_at=result.created_at,
+        )
+        if summary.provider == "fake":
+            self._summary_history_repository.record(summary)
+
+        return summary
+
+    def list_note_summaries(self, *, user_id: str, note_id: str) -> list[AiSummaryResult]:
+        # Preserve the same missing/deleted/cross-user 404 behavior as summarization.
+        self._note_service.get_note(user_id=user_id, note_id=note_id)
+        return self._summary_history_repository.list_for_note(
+            user_id=user_id,
+            note_id=note_id,
         )
 
 
@@ -230,6 +296,7 @@ def get_summarization_service() -> SummarizationService:
     return SummarizationService(
         note_service=note_service,
         provider=provider,
+        summary_history_repository=get_summary_history_repository(),
         settings=settings,
     )
 
