@@ -2,37 +2,38 @@
 
 ## Objective
 
-Recommended next task: **Slice 8E — Backend/product demo polish using existing fake-provider flow**.
+Recommended next task: **Slice 8F — Dependency-free demo walkthrough/runbook for the fake-provider note detail flow**.
 
-Polish the notes detail flow and summaries listing user experience. Because Expo/React Native initialization is deferred (Slice 8D-E), all demo validation must leverage the existing backend-only fake-provider flow and plain TypeScript view-state structures.
+Create a concise demo runbook that shows the backend-only product flow now supported by Slice 8E:
 
-Do not install mobile dependencies, modify workspace lockfiles, or implement live provider integrations in this slice.
+1. Create or fetch a note through the existing notes endpoints.
+2. List empty summary history for that note.
+3. Generate one or more fake summaries.
+4. List generated summaries newest first.
+5. Confirm the response/log surfaces avoid prompt text, raw diagnostics, raw note content, placeholder key names, bearer-like values, and token-like strings.
 
-## Slice 8D-E Result
+Keep the work dependency-free and backend/fake-provider-only.
 
-Slice 8D-E recorded the decision status of the minimal Expo app shell initialization:
-- Created `docs/mobile-expo-initialization-approval-record.md` recording decision status as **DEFERRED**.
-- Documented rationales and deferred constraints.
-- Updated `docs/security/privacy-and-data-handling.md` to reference the deferred state.
-- Updated roads/slices roadmap in `docs/ai-summarization-implementation-plan.md` and `docs/summary-history-ui-consumption-plan.md`.
+## Slice 8E Result
 
-No package manifests, lockfiles, or dependencies were modified, and no runtime mobile UI or Expo files were introduced. The fake provider remains the default, and the OpenAI SDK remains **NOT APPROVED / DENIED**.
+Slice 8E completed backend/product demo polish using the existing fake-provider flow:
 
-## Slice 8E Gate
+- Summary history now lists generated fake summaries newest first.
+- Backend tests cover note detail fetch, empty history, repeated fake summary generation, newest-first listing, and AI surface/log redaction.
+- `apps/mobile/src/features/notes/summaryHistoryApi.ts` can list summaries and request fake summary generation through the injected API boundary.
+- `apps/mobile/src/features/notes/summaryHistoryViewState.ts` models `summarizing`, append, dedupe, newest-first ordering, and safe error states without rendered UI.
+- `docs/backend-product-demo-polish-record.md` records the Slice 8E result.
 
-- Verify notes detail page data and mock summaries can be listed correctly via backend endpoints.
-- Ensure all diagnostics, logs, and public surfaces redact prompts, content, and placeholder tokens.
-- No live provider, SDK dependency, credential, `.env`, SQL/migration, Supabase state, or package/lockfile changes are introduced.
+## Slice 8F Gate
 
-## Live Provider And Supabase Status
-
-- Fake provider remains the default.
-- OpenAI live harness remains **CLOSED / BLOCKED UNTIL NAMED APPROVALS EXIST**.
-- OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
-- Supabase/Docker/live RLS work remains out of scope unless explicitly approved.
+- Do not install dependencies, modify package manifests, or modify lockfiles.
+- Do not initialize Expo, React Native runtime UI, routers, or native files.
+- Do not introduce a live provider, OpenAI SDK, credentials, `.env`, WIF runtime, SSE streaming, SQL, migrations, Supabase state, Docker work, or generated state.
+- Use only the existing fake-provider endpoints and memory-only backend state.
 
 ## Definition Of Done
 
-- Execute Slice 8E as a backend/product demo polish slice.
-- No live provider, SDK dependency, credential, `.env`, SQL/migration, Supabase generated state, Docker, package/lockfile change, or rendered mobile UI is introduced.
-- Verification and security checks pass.
+- The runbook documents the exact backend demo sequence and expected response shapes.
+- The runbook names the memory-only reset limitation.
+- The runbook includes verification commands that remain safe for local/CI use.
+- Security/privacy constraints remain unchanged and fast checks pass.

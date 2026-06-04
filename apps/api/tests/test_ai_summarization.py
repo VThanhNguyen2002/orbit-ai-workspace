@@ -243,7 +243,7 @@ def test_summarize_note_records_fake_summary_history(ai_client: TestClient) -> N
     assert history_body["data"]["items"][0]["model"] == "fake-model-v1"
 
 
-def test_repeated_fake_summaries_append_to_history(ai_client: TestClient) -> None:
+def test_repeated_fake_summaries_list_newest_first(ai_client: TestClient) -> None:
     note = _create_note(ai_client, title="Repeated history", content="Synthetic content.")
 
     first = ai_client.post(f"/v1/ai/notes/{note['id']}/summarize").json()["data"]
@@ -252,8 +252,83 @@ def test_repeated_fake_summaries_append_to_history(ai_client: TestClient) -> Non
 
     assert history_response.status_code == 200
     items = history_response.json()["data"]["items"]
-    assert items == [first, second]
+    assert items == [second, first]
     assert items[0]["id"] != items[1]["id"]
+
+
+def test_note_detail_demo_flow_lists_fake_summaries_without_sensitive_ai_leaks(
+    ai_client: TestClient,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    private_title = "Private launch retrospective"
+    private_content = (
+        "Internal decision notes with OPENAI_API_KEY, sk-demo-placeholder-token, "
+        "and Bearer demo-placeholder-token examples."
+    )
+    note = _create_note(
+        ai_client,
+        title=private_title,
+        content=private_content,
+    )
+
+    detail_response = ai_client.get(
+        f"/v1/notes/{note['id']}",
+        headers={"x-request-id": "req_demo_note_detail"},
+    )
+    empty_history_response = ai_client.get(
+        f"/v1/ai/notes/{note['id']}/summaries",
+        headers={"x-request-id": "req_demo_history_empty"},
+    )
+    first_summary_response = ai_client.post(
+        f"/v1/ai/notes/{note['id']}/summarize",
+        headers={"x-request-id": "req_demo_summary_first"},
+    )
+    second_summary_response = ai_client.post(
+        f"/v1/ai/notes/{note['id']}/summarize",
+        headers={"x-request-id": "req_demo_summary_second"},
+    )
+    history_response = ai_client.get(
+        f"/v1/ai/notes/{note['id']}/summaries",
+        headers={"x-request-id": "req_demo_history_full"},
+    )
+
+    assert detail_response.status_code == 200
+    assert detail_response.json()["data"] == note
+    assert empty_history_response.status_code == 200
+    assert empty_history_response.json()["data"] == {"items": []}
+    assert first_summary_response.status_code == 200
+    assert second_summary_response.status_code == 200
+    assert history_response.status_code == 200
+
+    first_summary = first_summary_response.json()["data"]
+    second_summary = second_summary_response.json()["data"]
+    history_items = history_response.json()["data"]["items"]
+    assert history_items == [second_summary, first_summary]
+    assert {summary["source_id"] for summary in history_items} == {note["id"]}
+    assert {summary["provider"] for summary in history_items} == {"fake"}
+    assert {summary["model"] for summary in history_items} == {"fake-model-v1"}
+
+    ai_surface_text = "\n".join(
+        [
+            empty_history_response.text,
+            first_summary_response.text,
+            second_summary_response.text,
+            history_response.text,
+            caplog.text,
+        ]
+    )
+    for forbidden in (
+        private_title,
+        private_content,
+        "Summarize the following note",
+        "raw_response",
+        "provider_payload",
+        "sdk_response",
+        "OPENAI_API_KEY",
+        "Bearer ",
+        "sk-",
+    ):
+        assert forbidden not in ai_surface_text
 
 
 def test_summary_history_returns_empty_list_for_owned_note_without_summaries(

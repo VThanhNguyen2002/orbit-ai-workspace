@@ -6,6 +6,7 @@ import type {
 
 export const SUMMARY_HISTORY_EMPTY_MESSAGE = "No summaries generated yet.";
 export const SUMMARY_HISTORY_LOADING_MESSAGE = "Loading summary history.";
+export const SUMMARY_HISTORY_SUMMARIZING_MESSAGE = "Generating summary.";
 export const SUMMARY_HISTORY_MEMORY_NOTICE =
   "Summary history is temporary in this demo and may clear when the development server restarts.";
 export const SUMMARY_HISTORY_UNAVAILABLE_MESSAGE =
@@ -17,6 +18,7 @@ export const SUMMARY_HISTORY_INVALID_RESPONSE_MESSAGE =
 export type SummaryHistoryStatus =
   | "idle"
   | "loading"
+  | "summarizing"
   | "empty"
   | "success"
   | "error";
@@ -45,6 +47,7 @@ export type SummaryHistoryViewState = {
   readonly message: string;
   readonly memoryNotice: string;
   readonly isLoading: boolean;
+  readonly isSummarizing: boolean;
   readonly canRetry: boolean;
   readonly errorReason: SummaryHistoryErrorReason | null;
 };
@@ -59,6 +62,7 @@ export function createIdleSummaryHistoryViewState(
     message: "",
     memoryNotice: SUMMARY_HISTORY_MEMORY_NOTICE,
     isLoading: false,
+    isSummarizing: false,
     canRetry: false,
     errorReason: null,
   };
@@ -74,6 +78,26 @@ export function createLoadingSummaryHistoryViewState(
     message: SUMMARY_HISTORY_LOADING_MESSAGE,
     memoryNotice: SUMMARY_HISTORY_MEMORY_NOTICE,
     isLoading: true,
+    isSummarizing: false,
+    canRetry: false,
+    errorReason: null,
+  };
+}
+
+export function createSummarizingSummaryHistoryViewState(
+  noteId: string,
+  currentState: SummaryHistoryViewState = createIdleSummaryHistoryViewState(
+    noteId,
+  ),
+): SummaryHistoryViewState {
+  return {
+    status: "summarizing",
+    noteId,
+    items: currentState.items,
+    message: SUMMARY_HISTORY_SUMMARIZING_MESSAGE,
+    memoryNotice: SUMMARY_HISTORY_MEMORY_NOTICE,
+    isLoading: false,
+    isSummarizing: true,
     canRetry: false,
     errorReason: null,
   };
@@ -95,6 +119,7 @@ export function mapSummaryHistoryDataToViewState(
       message: SUMMARY_HISTORY_EMPTY_MESSAGE,
       memoryNotice: SUMMARY_HISTORY_MEMORY_NOTICE,
       isLoading: false,
+      isSummarizing: false,
       canRetry: false,
       errorReason: null,
     };
@@ -107,6 +132,30 @@ export function mapSummaryHistoryDataToViewState(
     message: summaryCountMessage(items.length),
     memoryNotice: SUMMARY_HISTORY_MEMORY_NOTICE,
     isLoading: false,
+    isSummarizing: false,
+    canRetry: false,
+    errorReason: null,
+  };
+}
+
+export function appendSummaryHistoryItemToViewState(
+  noteId: string,
+  currentState: SummaryHistoryViewState,
+  summary: SummaryHistoryItem,
+): SummaryHistoryViewState {
+  const items = mergeSummaryHistoryItems([
+    ...currentState.items,
+    toSummaryHistoryListItem(summary),
+  ]);
+
+  return {
+    status: "success",
+    noteId,
+    items,
+    message: summaryCountMessage(items.length),
+    memoryNotice: SUMMARY_HISTORY_MEMORY_NOTICE,
+    isLoading: false,
+    isSummarizing: false,
     canRetry: false,
     errorReason: null,
   };
@@ -156,6 +205,21 @@ export async function loadSummaryHistoryViewState(
   }
 }
 
+export async function summarizeNoteAndMapSummaryHistoryViewState(
+  api: Pick<SummaryHistoryApi, "summarizeForNote">,
+  noteId: string,
+  currentState: SummaryHistoryViewState = createIdleSummaryHistoryViewState(
+    noteId,
+  ),
+): Promise<SummaryHistoryViewState> {
+  try {
+    const summary = await api.summarizeForNote(noteId);
+    return appendSummaryHistoryItemToViewState(noteId, currentState, summary);
+  } catch (error) {
+    return mapSummaryHistoryErrorToViewState(noteId, error);
+  }
+}
+
 function createErrorSummaryHistoryViewState(
   noteId: string,
   errorReason: SummaryHistoryErrorReason,
@@ -169,6 +233,7 @@ function createErrorSummaryHistoryViewState(
     message,
     memoryNotice: SUMMARY_HISTORY_MEMORY_NOTICE,
     isLoading: false,
+    isSummarizing: false,
     canRetry,
     errorReason,
   };
@@ -194,6 +259,27 @@ function sortSummariesNewestFirst(
   return [...summaries].sort((left, right) => {
     const createdAtDifference =
       toTimestamp(right.created_at) - toTimestamp(left.created_at);
+
+    if (createdAtDifference !== 0) {
+      return createdAtDifference;
+    }
+
+    return right.id.localeCompare(left.id);
+  });
+}
+
+function mergeSummaryHistoryItems(
+  items: readonly SummaryHistoryListItem[],
+): SummaryHistoryListItem[] {
+  const itemsById = new Map<string, SummaryHistoryListItem>();
+
+  for (const item of items) {
+    itemsById.set(item.id, item);
+  }
+
+  return [...itemsById.values()].sort((left, right) => {
+    const createdAtDifference =
+      toTimestamp(right.createdAt) - toTimestamp(left.createdAt);
 
     if (createdAtDifference !== 0) {
       return createdAtDifference;

@@ -92,7 +92,7 @@ class InMemorySummaryHistoryRepository:
     def list_for_note(self, *, user_id: str, note_id: str) -> list[AiSummaryResult]:
         return [
             _copy_summary(summary)
-            for summary in self._summaries.get((user_id, note_id), [])
+            for summary in reversed(self._summaries.get((user_id, note_id), []))
         ]
 
 

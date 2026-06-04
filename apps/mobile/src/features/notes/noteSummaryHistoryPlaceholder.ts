@@ -7,12 +7,12 @@ import {
 export const NOTE_SUMMARY_HISTORY_PLACEHOLDER_REGIONS = [
   "summary-history-status",
   "summary-history-list",
-  "summary-history-actions",
+  "summary-history-generate-action",
   "summary-history-reset-notice",
 ] as const;
 
 export const NOTE_SUMMARY_HISTORY_PLACEHOLDER_NON_GOALS = [
-  "No rendered mobile UI in Slice 8D-B.",
+  "No rendered mobile UI while Expo initialization is deferred.",
   "No direct network calls from future screen modules.",
   "No credential, prompt, diagnostic, or provider-specific display data.",
 ] as const;

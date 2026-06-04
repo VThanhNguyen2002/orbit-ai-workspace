@@ -341,7 +341,7 @@ opt-in environment variable and never run in default CI.
 | **7M-I** | Provider boundary cleanup/refactor planning *(Complete — Record: `docs/openai-provider-boundary-cleanup-plan.md`)* |
 | **7M-J** | Dependency-free adapter hardening tests *(Complete — stricter SDK-like response validation and redaction/no-network/no-env tests)* |
 | **7M-K** | Redaction and diagnostics audit for AI provider boundary *(Complete — Record: `docs/openai-provider-redaction-diagnostics-audit.md`)* |
-| **7M-L** | Provider boundary cleanup/refactor implementation |
+| **7M-L** | Provider boundary cleanup/refactor implementation *(Complete — request-owned sensitive-term cleanup)* |
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 | **8A** | Backend AI summary history with fake provider only |
 | **8B** | Summary history API client contract/client integration *(Complete — client method and tests added)* |
@@ -351,7 +351,8 @@ opt-in environment variable and never run in default CI.
 | **8D-C** | Minimal screen/component decision *(Complete)* |
 | **8D-D** | Expo/React Native Initialization Approval Plan *(Complete)* |
 | **8D-E** | Approve or deny minimal Expo app shell initialization *(Complete — decision DEFERRED)* |
-| **8E** | Backend/product demo polish using existing fake-provider flow |
+| **8E** | Backend/product demo polish using existing fake-provider flow *(Complete — newest-first backend history and dependency-free generate state)* |
+| **8F** | Dependency-free demo walkthrough/runbook for the fake-provider note detail flow |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -811,6 +812,36 @@ Slice 8D-E records the formal decision on minimal Expo app shell initialization 
 No package manifests, lockfiles, or dependencies were modified, and no runtime mobile UI or Expo files were introduced. The fake provider remains the default, and the OpenAI SDK remains **NOT APPROVED / DENIED**.
 
 Next recommended work is Slice 8E: Backend/product demo polish using existing fake-provider flow.
+
+### Slice 8E Update — 2026-06-04
+
+Slice 8E adds backend/product demo polish for the fake-provider note detail
+flow. Memory-only summary history now lists generated fake summaries newest
+first, matching the planned note detail consumption order.
+
+The dependency-free mobile boundary now supports fake summary generation through
+`summarizeForNote(noteId)` and maps summary generation into plain TypeScript
+view states: `summarizing`, append, dedupe, newest-first sort, and safe error
+states. This remains a non-rendering structure while Expo initialization is
+deferred.
+
+Focused backend tests cover the product demo sequence: fetch note detail, list
+empty summary history, generate two fake summaries, and list generated
+summaries newest first. The same test verifies AI summary/history surfaces and
+captured logs do not expose prompt text, raw diagnostics, raw note content,
+placeholder key names, bearer-like values, or `sk-` token-like strings.
+
+See [Backend Product Demo Polish Record](backend-product-demo-polish-record.md).
+
+No package manifest change, lockfile change, dependency install, Expo runtime,
+rendered mobile UI, live provider, OpenAI SDK, credential, `.env` file, WIF
+runtime, live API call, SSE streaming, SQL, migration, Supabase state, Docker
+work, `.gitleaksignore` broadening, or generated state is approved or added.
+The fake provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8F: dependency-free demo walkthrough/runbook for
+the fake-provider note detail flow.
 
 ---
 

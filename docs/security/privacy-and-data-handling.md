@@ -372,6 +372,16 @@ Supabase assumptions.
 
 Slice 8D-E formally defers Expo/React Native initialization. It ensures no package manifests, lockfiles, or dependencies are modified, and no runtime mobile UI or Expo files are introduced. The environment config isolation rules established in the UI summary consumption boundaries are preserved.
 
+Slice 8E polishes the fake-provider note detail demo without changing storage
+or provider boundaries. Backend tests now cover note detail fetch, empty
+summary history, repeated fake summary generation, newest-first history
+listing, and AI summary/history surface plus log redaction. Authorized note
+detail responses still return the user's note content by design, but AI
+summary/history responses and captured logs must not echo prompt text, raw
+diagnostics, raw note content, placeholder key names, bearer-like values, or
+`sk-` token-like strings. The dependency-free mobile view-state layer continues
+to expose only generated summary content and action-item text, not provider
+diagnostics, prompts, credentials, raw note content, or live-provider payloads.
 
 ### Backend API Keys
 

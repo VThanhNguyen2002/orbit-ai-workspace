@@ -24,9 +24,10 @@ This plan explicitly excludes:
 The project baseline contains the following completed structures:
 
 *   **`POST /v1/ai/notes/{note_id}/summarize`**: Backend endpoint that generates a fake-provider summary and appends it to an in-memory history map keyed by user and note.
-*   **`GET /v1/ai/notes/{note_id}/summaries`**: Backend endpoint that lists all in-memory summaries recorded for the authenticated user's note.
+*   **`GET /v1/ai/notes/{note_id}/summaries`**: Backend endpoint that lists all in-memory summaries recorded for the authenticated user's note, newest first for note-detail consumption.
 *   **`client.ai.listNoteSummaries(note_id)`**: A fully typed API client integration in `packages/api-client` to fetch summary history.
 *   **`client.ai.summarizeNote(note_id)`**: An API client integration to request a new note summary.
+*   **Dependency-free mobile API/view-state boundary**: `apps/mobile` can list summaries, request fake summary generation, model summarizing state, append generated summaries, dedupe by summary id, and preserve newest-first display order without rendering Expo or React Native UI.
 *   **Shared Contract `ListSummariesResponse`**: Reusable Zod-validated TypeScript contracts in `packages/shared`.
 *   **Memory-Only State**: The backend service uses a process-local memory store that resets when the API server restarts.
 
@@ -64,7 +65,7 @@ sequenceDiagram
 2.  **View History**: If summaries exist, they are displayed chronologically (newest first). If none exist, a friendly "No summaries generated yet" empty state is shown.
 3.  **Trigger Summarization**: The user taps a "Summarize Note" button.
 4.  **Loading State**: The button disables and a loading spinner appears.
-5.  **Append to List**: Once the API client call completes, the newly returned summary is appended to the UI list.
+5.  **Append to List**: Once the API client call completes, the newly returned summary is appended to the UI list and displayed newest first.
 6.  **Repeated summaries**: Tapping the button again appends another mock summary to the history.
 7.  **Reset Limitation**: A notice explains that summary history is **memory-only** and will clear if the backend server restarts.
 
@@ -179,6 +180,7 @@ graph TD
     8DC --> 8DD[Slice 8D-D: Expo Initialization Approval Plan]
     8DD --> 8DE[Slice 8D-E: Approve/Deny Expo Shell Initialization]
     8DE --> 8E[Slice 8E: Backend/Product Demo Polish]
+    8E --> 8F[Slice 8F: Demo Walkthrough/Runbook]
 ```
 
 *   **Slice 8D-A** — Inspect/init minimal mobile screen structure.
@@ -186,16 +188,43 @@ graph TD
 *   **Slice 8D-C** — Minimal screen/component decision.
 *   **Slice 8D-D** — Expo/React Native Initialization Approval Plan.
 *   **Slice 8D-E** — Approve or deny minimal Expo app shell initialization *(Complete — decision DEFERRED)*.
-*   **Slice 8E** — Backend/product demo polish using existing fake-provider flow.
+*   **Slice 8E** — Backend/product demo polish using existing fake-provider flow *(Complete — backend and dependency-free view-state polish added)*.
+*   **Slice 8F** — Dependency-free demo walkthrough/runbook for the fake-provider note detail flow.
 
 ---
 
-## 12. Definition of Done
+## 12. Slice 8E Result
 
-This slice is complete when:
+Slice 8E adds backend/product demo polish while preserving the deferred Expo decision:
+
+*   **Backend ordering**: `GET /v1/ai/notes/{note_id}/summaries` now returns memory-only fake summaries newest first.
+*   **Demo-flow verification**: Backend tests cover note detail fetch, empty summary history, repeated fake summary generation, newest-first summary listing, and AI surface/log redaction.
+*   **Dependency-free mobile generation boundary**: `apps/mobile/src/features/notes/summaryHistoryApi.ts` now exposes `summarizeForNote(noteId)` through the injected API adapter.
+*   **Dependency-free mobile view state**: `apps/mobile/src/features/notes/summaryHistoryViewState.ts` now models `summarizing`, append/dedupe behavior, newest-first sorting, and safe error mapping for generated summaries.
+*   **Record**: See [Backend Product Demo Polish Record](backend-product-demo-polish-record.md).
+
+No package manifests, lockfiles, dependency installs, Expo runtime files, rendered mobile UI, live provider work, credentials, `.env`, SQL, migrations, Supabase state, Docker work, or generated state were added.
+
+---
+
+## 13. Historical Definition of Done (Slice 8D-D)
+
+Slice 8D-D was complete when:
 1.  `docs/mobile-expo-initialization-approval-plan.md` is created and committed to `main`.
 2.  `docs/summary-history-ui-consumption-plan.md` is updated to link to this plan.
 3.  `docs/ai-summarization-implementation-plan.md` is updated to reflect Slice 8D-D planning status.
 4.  `docs/security/privacy-and-data-handling.md` is updated to address environment config constraints.
 5.  `docs/next-action.md` is updated to recommend Slice 8D-E.
 6.  All fast checks pass cleanly without error.
+
+---
+
+## 14. Definition of Done (Slice 8E)
+
+Slice 8E is complete when:
+1.  Backend summary history lists fake summaries newest first.
+2.  Backend tests cover the note detail demo sequence and AI surface/log redaction.
+3.  The dependency-free mobile API boundary supports both listing and generating fake summaries.
+4.  The dependency-free mobile view-state layer models summarizing, append, dedupe, newest-first ordering, and safe error states.
+5.  No dependency, lockfile, rendered UI, live provider, credential, `.env`, SQL, migration, Supabase state, Docker, or generated state is added.
+6.  Targeted backend and TypeScript checks pass.
