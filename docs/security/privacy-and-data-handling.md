@@ -147,6 +147,14 @@ OpenAI-style API keys, Supabase key names, and raw auth header values. The fake
 provider remains the only runtime provider; no live provider secret is required
 or wired by this boundary.
 
+### UI Summary Consumption Boundaries
+
+Slice 8C adds planning constraints for UI summarization consumption:
+- **No Provider Exposure**: UI components and clients must remain completely vendor-agnostic. No references to specific external providers (like OpenAI or Gemini) should exist in client screens or display components. UI state is driven solely by standard contracts (e.g., `provider`, `model`, `content`).
+- **Access Layer Boundary**: UI screens must never call raw `fetch` or directly instantiate client networks. They must interface through an app-level API access layer or state hooks (e.g., a hook wrapping `@synapse/api-client`).
+- **No Diagnostic Exposure**: Raw LLM output payloads, token counts, system prompts, or internal diagnostic metrics must never be displayed in the client interface or saved to local device logs.
+- **Transience Acknowledgment**: Because summaries are currently memory-only and transient on the dev backend, the UI must gracefully handle and alert the user that history resets when the backend server restarts.
+
 ### OpenAI Provider Credential Planning
 
 Slice 7F keeps OpenAI provider integration docs-only. Future provider runtime

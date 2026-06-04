@@ -345,7 +345,10 @@ opt-in environment variable and never run in default CI.
 | **7N** | Opt-in live provider harness skeleton — only after all 8 approvals exist |
 | **8A** | Backend AI summary history with fake provider only |
 | **8B** | Summary history API client contract/client integration *(Complete — client method and tests added)* |
-| **8C** | Summary history UI/API consumption planning or backend persistence planning |
+| **8C** | Summary history UI/API consumption planning or backend persistence planning *(Complete — consumption plan added)* |
+| **8D-A** | Inspect/init minimal mobile screen structure |
+| **8D-B** | Summary history UI consumption |
+| **8E** | Notes detail UI demo polish |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -765,6 +768,12 @@ wiring, `.gitleaksignore` broadening, or generated Supabase state is approved
 or added. OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Slice 8C
 should plan either summary history UI/API consumption or backend persistence,
 depending on product priority.
+
+### Slice 8C Update — 2026-06-04
+
+Slice 8C adds the docs-only [Summary History UI/API Consumption Plan](summary-history-ui-consumption-plan.md). The plan maps out the UI/API boundaries, demo goals, memory-only UX requirements (empty/loading/error/reset states), security constraints, candidate options, and testing strategy for UI integration. It identifies a potential split of Slice 8D into Slice 8D-A (Inspect/init minimal mobile screen structure) and Slice 8D-B (Summary history UI consumption) due to the uninitialized mobile app state.
+
+No runtime code, tests, package/lockfile configurations, credentials, environment variables, Supabase/database state, real LLM calls, or SDK dependencies were added. The fake provider remains the default, and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
 
 ---
 
