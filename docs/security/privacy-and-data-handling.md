@@ -383,6 +383,17 @@ diagnostics, raw note content, placeholder key names, bearer-like values, or
 to expose only generated summary content and action-item text, not provider
 diagnostics, prompts, credentials, raw note content, or live-provider payloads.
 
+Slice 8F records the API-level fake-provider demo runbook. The runbook keeps
+the demo in local/test memory-backed state, requires no provider credential,
+uses no live provider, and explicitly names the memory-only reset limitation for
+summary history. It documents the expected note-detail, summarize, and
+summary-history response surfaces while preserving the rule that AI
+summary/history responses and logs must not expose raw note content, prompt
+text, raw provider diagnostics, provider credential key names, bearer-like
+values, or token-like substrings. No package dependency, OpenAI SDK, `.env`
+file, SQL, migration, Supabase state, Docker work, generated state, live
+provider runtime, or rendered mobile UI is approved by this runbook.
+
 ### Backend API Keys
 
 Secret names are documented without example values:

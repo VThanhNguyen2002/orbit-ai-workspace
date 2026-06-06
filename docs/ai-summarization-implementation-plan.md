@@ -352,7 +352,8 @@ opt-in environment variable and never run in default CI.
 | **8D-D** | Expo/React Native Initialization Approval Plan *(Complete)* |
 | **8D-E** | Approve or deny minimal Expo app shell initialization *(Complete — decision DEFERRED)* |
 | **8E** | Backend/product demo polish using existing fake-provider flow *(Complete — newest-first backend history and dependency-free generate state)* |
-| **8F** | Dependency-free demo walkthrough/runbook for the fake-provider note detail flow |
+| **8F** | Dependency-free demo walkthrough/runbook for the fake-provider note detail flow *(Complete — API-level runbook recorded)* |
+| **8G** | Rendered mobile demo unblock decision packet — docs-only approval/evidence pass |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -840,8 +841,29 @@ work, `.gitleaksignore` broadening, or generated state is approved or added.
 The fake provider remains the default, and the OpenAI SDK dependency remains
 **NOT APPROVED / DENIED**.
 
-Next recommended work is Slice 8F: dependency-free demo walkthrough/runbook for
-the fake-provider note detail flow.
+At the end of Slice 8E, the recommended next work was Slice 8F:
+dependency-free demo walkthrough/runbook for the fake-provider note detail
+flow.
+
+### Slice 8F Update — 2026-06-06
+
+Slice 8F adds an API-level fake-provider demo runbook to
+[Backend Product Demo Polish Record](backend-product-demo-polish-record.md).
+The runbook documents the local/test demo fixture, note-detail load, empty
+summary history, fake summary generation, repeated generation, newest-first
+history listing, memory-only reset limitation, and safe verification commands.
+
+No API behavior, backend service code, API client code, mobile view-state code,
+tests, package manifests, lockfiles, dependencies, Expo/React Native runtime,
+rendered mobile UI, live provider, OpenAI SDK, credential, `.env` file, WIF
+runtime, live API call, SSE streaming, SQL, migration, Supabase state, Docker
+work, `.gitleaksignore` broadening, or generated state is approved or added.
+The fake provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8G: a docs-only rendered mobile demo unblock
+decision packet that revisits the deferred Expo/React Native approval gates
+without initializing runtime UI unless explicit approvals exist.
 
 ---
 

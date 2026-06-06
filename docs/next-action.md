@@ -2,38 +2,46 @@
 
 ## Objective
 
-Recommended next task: **Slice 8F — Dependency-free demo walkthrough/runbook for the fake-provider note detail flow**.
+Recommended next task: **Slice 8G — Rendered mobile demo unblock decision packet**.
 
-Create a concise demo runbook that shows the backend-only product flow now supported by Slice 8E:
+Create a docs-only approval/evidence packet that decides whether the project can
+move from API-level fake-provider demo readiness toward a rendered mobile demo.
+This should revisit the deferred Expo/React Native initialization gates without
+initializing runtime UI unless explicit approvals already exist.
 
-1. Create or fetch a note through the existing notes endpoints.
-2. List empty summary history for that note.
-3. Generate one or more fake summaries.
-4. List generated summaries newest first.
-5. Confirm the response/log surfaces avoid prompt text, raw diagnostics, raw note content, placeholder key names, bearer-like values, and token-like strings.
+Suggested inspection targets:
 
-Keep the work dependency-free and backend/fake-provider-only.
+1. `docs/mobile-expo-initialization-approval-plan.md`
+2. `docs/mobile-expo-initialization-approval-record.md`
+3. `docs/summary-history-ui-consumption-plan.md`
+4. `docs/backend-product-demo-polish-record.md`
+5. `apps/mobile/src/features/notes/*`
 
-## Slice 8E Result
+Keep the work dependency-free and decision-focused. If approval evidence is
+still missing, record the blocker clearly and leave rendered mobile UI deferred.
 
-Slice 8E completed backend/product demo polish using the existing fake-provider flow:
+## Slice 8F Result
 
-- Summary history now lists generated fake summaries newest first.
-- Backend tests cover note detail fetch, empty history, repeated fake summary generation, newest-first listing, and AI surface/log redaction.
-- `apps/mobile/src/features/notes/summaryHistoryApi.ts` can list summaries and request fake summary generation through the injected API boundary.
-- `apps/mobile/src/features/notes/summaryHistoryViewState.ts` models `summarizing`, append, dedupe, newest-first ordering, and safe error states without rendered UI.
-- `docs/backend-product-demo-polish-record.md` records the Slice 8E result.
+Slice 8F completed the dependency-free API-level demo runbook for the existing
+fake-provider flow:
 
-## Slice 8F Gate
+- `docs/backend-product-demo-polish-record.md` now documents the exact API demo sequence: create a demo note, load note detail, list empty summary history, generate fake summaries, and list generated summaries newest first.
+- The runbook names the memory-only summary-history reset limitation.
+- The runbook points to the existing backend test that verifies the full demo sequence and AI surface/log leak checks.
+- No API behavior, backend service code, API client code, mobile view-state code, tests, package manifests, lockfiles, dependencies, Expo runtime, rendered mobile UI, live provider, OpenAI SDK, credentials, `.env`, WIF runtime, SQL, migrations, Supabase state, Docker work, or generated state was added.
+
+## Slice 8G Gate
 
 - Do not install dependencies, modify package manifests, or modify lockfiles.
-- Do not initialize Expo, React Native runtime UI, routers, or native files.
+- Do not initialize Expo, React Native runtime UI, routers, or native files unless the packet finds explicit approvals for all required gates and the slice scope is updated accordingly.
 - Do not introduce a live provider, OpenAI SDK, credentials, `.env`, WIF runtime, SSE streaming, SQL, migrations, Supabase state, Docker work, or generated state.
 - Use only the existing fake-provider endpoints and memory-only backend state.
+- Do not change API behavior, mobile runtime behavior, or rendered UI in a docs-only decision packet.
 
 ## Definition Of Done
 
-- The runbook documents the exact backend demo sequence and expected response shapes.
-- The runbook names the memory-only reset limitation.
-- The runbook includes verification commands that remain safe for local/CI use.
+- The packet states whether rendered mobile demo initialization is approved, deferred, or blocked.
+- Missing approval evidence is listed as concrete prerequisites.
+- If still deferred or blocked, the next safe product step is named.
+- Fake-provider-only demo constraints remain unchanged.
 - Security/privacy constraints remain unchanged and fast checks pass.
