@@ -8,6 +8,7 @@ Slice 8E is **COMPLETE** as a dependency-free backend/product demo polish slice.
 Slice 8F is **COMPLETE** as a docs-only API-level demo runbook slice.
 Slice 8G is **COMPLETE** as a docs-only rendered mobile demo unblock decision packet. Decision: **DEFER** rendered mobile UI. See [`docs/rendered-mobile-demo-unblock-decision-packet.md`](rendered-mobile-demo-unblock-decision-packet.md).
 Slice 8H is **COMPLETE** as a docs-only Note CRUD / fake summary API walkthrough hardening slice. See [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md).
+Slice 8I is **COMPLETE** as a docs-only API demo evidence matrix / gap review slice. See [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md#3-evidence-matrix).
 
 ## Scope Completed
 
@@ -285,6 +286,92 @@ gitleaks detect --source=. --redact
 ```
 
 Expected security posture for Slice 8H:
+
+- no package manifests or lockfiles changed
+- no dependency installed
+- no OpenAI SDK dependency approved or added
+- no provider credentials or `.env` files added
+- no live provider runtime or network behavior introduced
+- no Supabase, Docker, SQL, migrations, or generated state added
+- no rendered mobile UI, Expo runtime, router, or native files added
+- no real credential examples added
+- `.gitleaksignore` remains exact-fingerprint only
+
+## Slice 8I API Demo Evidence Matrix / Gap Review
+
+Date: 2026-06-06
+
+### Review Result
+
+Slice 8I reviewed the current API-level demo walkthrough against the backend
+routes, fake summary service, backend tests, shared AI contracts and schema
+registry, API client, and dependency-free mobile summary-history foundation.
+
+Selected option: **Docs-only evidence matrix.**
+
+No backend, API client, shared contract, or mobile view-state mismatch was
+found. The existing tests cover the portfolio/demo-critical paths, so adding
+more code or tests would be over-engineering for this slice.
+
+### Evidence Summary
+
+- Note CRUD create/list/get/update/delete behavior is covered by backend route
+  tests, integration contract tests, repository tests, and API-client tests.
+- Versioned update/delete conflicts are covered in backend and API-client
+  tests.
+- Cross-user note and summary-history access returns safe 404s.
+- Fake summary generation returns the shared `Summary` shape and is validated
+  by backend, API-client, and shared-contract tests.
+- Repeated fake summaries append to memory history and list newest first.
+- AI summary/history surfaces and captured logs are tested for prompt,
+  diagnostic, credential, and note-content leakage.
+- Mobile summary-history modules consume the same shared summary contracts,
+  perform local newest-first sorting and id-dedupe, and remain non-rendering.
+- Summary history remains memory-only demo/test state.
+
+### Explicit Non-Changes
+
+- No package manifests, lockfiles, or dependency installs.
+- No Expo, React Native runtime, rendered mobile UI, router, native files, or
+  mobile package changes.
+- No OpenAI SDK, live provider, provider credential, `.env`, WIF runtime, SSE
+  streaming, SQL, migration, Supabase state, Docker, or generated state.
+- No API behavior, backend service code, API client code, shared contract code,
+  mobile view-state code, or tests changed.
+- No durable summary persistence; summary history remains memory-only for
+  fake-provider demos and resets with the backend process.
+
+### Verification Commands
+
+Full safe verification:
+
+```bash
+pnpm install --frozen-lockfile
+
+cd apps/api
+python3 -m ruff check .
+python3 -m pytest
+cd ../..
+
+pnpm --filter @synapse/api-client test
+pnpm --filter @synapse/shared contracts:check
+pnpm --filter mobile lint
+pnpm --filter mobile exec tsc --noEmit -p tsconfig.json
+
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+Security posture checks:
+
+```bash
+git ls-files -- ".env" ".env.*" "*.sql" "supabase/migrations/*"
+gitleaks detect --source=. --redact
+```
+
+Expected security posture for Slice 8I:
 
 - no package manifests or lockfiles changed
 - no dependency installed

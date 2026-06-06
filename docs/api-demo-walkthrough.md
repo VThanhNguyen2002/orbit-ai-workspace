@@ -47,7 +47,44 @@ covered:
 | API client summarize/history methods | `packages/api-client/src/ai.test.ts` |
 | Shared Note contracts | `packages/shared/src/notes-contracts.test.ts` |
 
-## 3. Note CRUD Sequence
+## 3. Evidence Matrix
+
+Slice 8I reviewed the walkthrough against the current backend, shared
+contracts, API client, and dependency-free mobile summary-history foundation.
+No API or client mismatch was found. The evidence is sufficient for a
+portfolio/API demo, so no code or test changes were added.
+
+| Demo claim | Evidence | Status |
+|---|---|---|
+| Note CRUD walkthrough matches backend behavior | `apps/api/app/routers/notes.py`, `apps/api/tests/test_notes.py`, `apps/api/tests/test_notes_integration_verification.py` | Covered |
+| Versioned update/delete and conflict handling are demonstrable | `apps/api/tests/test_notes.py`, `apps/api/tests/test_notes_integration_verification.py`, `packages/api-client/src/notes.test.ts` | Covered |
+| Cross-user note access is hidden as safe 404s | `apps/api/tests/test_notes.py`, `apps/api/tests/test_notes_repository.py` | Covered |
+| Fake summarize endpoint returns a validated `Summary` envelope | `apps/api/app/routers/ai.py`, `apps/api/tests/test_ai_summarization.py`, `packages/api-client/src/ai.test.ts`, `packages/shared/src/ai-contracts.test.ts` | Covered |
+| Empty summary history is available for an owned note | `apps/api/tests/test_ai_summarization.py`, `packages/shared/src/ai-contracts.test.ts` | Covered |
+| Repeated fake summaries append and list newest first | `apps/api/app/services/ai_summarization.py`, `apps/api/tests/test_ai_summarization.py` | Covered |
+| Summary history cross-user access returns safe 404 | `apps/api/tests/test_ai_summarization.py`, `packages/api-client/src/ai.test.ts` | Covered |
+| Shared summary contracts are strict snake_case | `packages/shared/src/ai/index.ts`, `packages/shared/src/schema-registry.ts`, `packages/shared/src/ai-contracts.test.ts` | Covered |
+| API client can consume summarize and history endpoints | `packages/api-client/src/index.ts`, `packages/api-client/src/ai.test.ts` | Covered |
+| Mobile foundation consumes shared summary data without rendering UI | `apps/mobile/src/features/notes/summaryHistoryApi.ts`, `apps/mobile/src/features/notes/summaryHistoryViewState.ts`, `apps/mobile/src/features/notes/noteSummaryHistoryPlaceholder.ts` | Covered by typecheck/docs |
+| AI summary/history surfaces avoid prompt, raw diagnostic, credential, and note-content leakage | `apps/api/tests/test_ai_summarization.py`, `docs/security/privacy-and-data-handling.md` | Covered |
+| Summary history is memory-only demo state | `apps/api/app/services/ai_summarization.py`, this walkthrough, `docs/security/privacy-and-data-handling.md` | Covered |
+| Rendered mobile UI and live provider work remain deferred | `docs/rendered-mobile-demo-unblock-decision-packet.md`, `docs/next-action.md` | Covered |
+
+### Gap Review Answers
+
+1. The walkthrough matches actual backend and API-client behavior.
+2. All API demo steps are backed by backend, API-client, or shared-contract
+   tests.
+3. No mismatch was found between backend response shape, shared contracts, API
+   client parsing, and mobile view-state input types.
+4. Note CRUD, summarize, list history, newest-first order, and cross-user/404
+   behavior are covered enough for a dependency-free demo.
+5. No new security/logging gap was found; AI surfaces have focused leak tests.
+6. No API client gap blocks demo consumption.
+7. Additional code would be over-engineering for Slice 8I; the useful hardening
+   is this consolidated evidence matrix.
+
+## 4. Note CRUD Sequence
 
 ### Create a Note
 
@@ -153,7 +190,7 @@ Expected result:
 For the summary demo, use a non-deleted note. Create a second note if this
 delete step was already performed.
 
-## 4. Fake Summary Sequence
+## 5. Fake Summary Sequence
 
 ### List Empty History
 
@@ -216,7 +253,7 @@ view-state helper dedupes by summary `id` when merging a generated summary into
 an existing local list, then sorts newest first. The API itself should still be
 verified as newest-first append behavior.
 
-## 5. Unauthorized and Cross-User Behavior
+## 6. Unauthorized and Cross-User Behavior
 
 The demo should show safe ownership behavior without exposing whether another
 user's note exists:
@@ -231,7 +268,7 @@ user's note exists:
 Do not use real credential examples in the walkthrough. Use the repository's
 test fixtures or local dev auth mode when demonstrating these paths.
 
-## 6. Safety Checks
+## 7. Safety Checks
 
 Summary and summary-history responses, error responses, and captured backend
 logs must not expose:
@@ -248,7 +285,7 @@ Authorized note detail responses may include note content because that is the
 purpose of `GET /v1/notes/{note_id}`. The non-leak requirement applies to AI
 summary/history surfaces and diagnostics.
 
-## 7. API Client Walkthrough Surface
+## 8. API Client Walkthrough Surface
 
 The same flow is available through `@synapse/api-client`:
 
@@ -263,7 +300,7 @@ The same flow is available through `@synapse/api-client`:
 The client validates success/error envelopes and shared response contracts. It
 preserves snake_case field names and URL-encodes note ids in path segments.
 
-## 8. Verification
+## 9. Verification
 
 Focused verification for this walkthrough:
 

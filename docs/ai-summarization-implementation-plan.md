@@ -356,7 +356,8 @@ opt-in environment variable and never run in default CI.
 | **8F** | Dependency-free demo walkthrough/runbook for the fake-provider note detail flow *(Complete — API-level runbook recorded)* |
 | **8G** | Rendered mobile demo unblock decision packet — docs-only approval/evidence pass *(Complete — decision DEFERRED, 10/12 gates missing, recommended Option B: backend/product polish)* |
 | **8H** | Note CRUD / summary demo API walkthrough hardening — dependency-free, no lockfile changes *(Complete — docs-only walkthrough recorded)* |
-| **8I** | Dependency-free API demo evidence hardening or API client gap review — no package/runtime changes |
+| **8I** | Dependency-free API demo evidence hardening or API client gap review — no package/runtime changes *(Complete — docs-only evidence matrix recorded)* |
+| **8J** | Next dependency-free product slice or approval-gated rendered demo decision |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -916,6 +917,34 @@ and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
 
 Next recommended work is Slice 8I: dependency-free API demo evidence hardening
 or a narrow API client gap review, still with no package/runtime changes.
+
+### Slice 8I Update — 2026-06-06
+
+Slice 8I adds a docs-only evidence matrix to the
+[API Demo Walkthrough](api-demo-walkthrough.md#3-evidence-matrix). The review
+checked the walkthrough against the backend notes and AI routes, fake summary
+history service, backend tests, shared AI contracts and schema registry, API
+client methods/tests, and dependency-free mobile summary-history foundation.
+
+Decision: **docs-only evidence matrix.** No backend, shared contract, API
+client, or mobile view-state mismatch was found. Existing tests already cover
+the portfolio/demo-critical paths: Note CRUD, versioned update/delete
+conflicts, fake summarize, empty and populated summary history, repeated
+newest-first history, cross-user safe 404 behavior, strict snake_case
+contracts, API-client consumption, and AI surface leak checks.
+
+No API behavior, backend code, API client code, shared contract code, mobile
+view-state code, tests, package manifests, lockfiles, dependencies, Expo/React
+Native runtime, rendered mobile UI, live provider, OpenAI SDK, credential,
+`.env` file, WIF runtime, live API call, SSE streaming, SQL, migration,
+Supabase state, Docker work, `.gitleaksignore` broadening, or generated state
+is approved or added. Summary history remains memory-only demo state, the fake
+provider remains the default, and the OpenAI SDK dependency remains **NOT
+APPROVED / DENIED**.
+
+Next recommended work is Slice 8J: choose the next dependency-free product
+slice, or revisit rendered demo approvals only if the missing gates are
+explicitly satisfied.
 
 ---
 

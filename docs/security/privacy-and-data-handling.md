@@ -416,6 +416,17 @@ provider call, SQL, migration, Supabase state, Docker work, WIF runtime,
 rendered mobile UI, package manifest change, lockfile change, dependency
 install, or `.gitleaksignore` broadening is approved or added.
 
+Slice 8I adds a docs-only evidence matrix to the
+[API Demo Walkthrough](../api-demo-walkthrough.md#3-evidence-matrix). The
+review found no new backend, shared contract, API client, or mobile view-state
+security mismatch. Existing AI summary/history tests cover prompt, diagnostic,
+credential, and note-content non-exposure for AI surfaces, while authorized
+Note CRUD detail responses still intentionally return note content. The matrix
+does not approve OpenAI SDK installation, provider credentials, `.env` files,
+live provider calls, SQL, migrations, Supabase state, Docker work, WIF runtime,
+rendered mobile UI, package manifest changes, lockfile changes, dependency
+installs, production persistence, or `.gitleaksignore` broadening.
+
 ### Backend API Keys
 
 Secret names are documented without example values:
