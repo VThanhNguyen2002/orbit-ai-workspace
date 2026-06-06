@@ -140,7 +140,8 @@ data: {"event": "error", "data": {"code": "provider_unavailable", "message": "..
 
 - Method: `POST` (summarization is a write + compute operation).
 - Content-Type response: `text/event-stream`.
-- Auth: `Authorization: Bearer <user-jwt>` required.
+- Auth: backend authentication required; credential examples are intentionally
+  omitted from this plan.
 - 404 if `note_id` does not belong to authenticated user (no 403 — prevent enumeration).
 - 400 if content exceeds `max_content_length` policy.
 - 503 if provider unavailable.
@@ -354,7 +355,8 @@ opt-in environment variable and never run in default CI.
 | **8E** | Backend/product demo polish using existing fake-provider flow *(Complete — newest-first backend history and dependency-free generate state)* |
 | **8F** | Dependency-free demo walkthrough/runbook for the fake-provider note detail flow *(Complete — API-level runbook recorded)* |
 | **8G** | Rendered mobile demo unblock decision packet — docs-only approval/evidence pass *(Complete — decision DEFERRED, 10/12 gates missing, recommended Option B: backend/product polish)* |
-| **8H** | Note CRUD / summary demo API walkthrough hardening — dependency-free, no lockfile changes |
+| **8H** | Note CRUD / summary demo API walkthrough hardening — dependency-free, no lockfile changes *(Complete — docs-only walkthrough recorded)* |
+| **8I** | Dependency-free API demo evidence hardening or API client gap review — no package/runtime changes |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -893,6 +895,27 @@ runtime, live API call, SSE streaming, SQL, migration, Supabase state, Docker
 work, `.gitleaksignore` broadening, or generated state is approved or added.
 The fake provider remains the default, and the OpenAI SDK dependency remains
 **NOT APPROVED / DENIED**.
+
+### Slice 8H Update — 2026-06-06
+
+Slice 8H adds the docs-only
+[API Demo Walkthrough](api-demo-walkthrough.md). The walkthrough combines the
+existing Note CRUD sequence with the fake-provider summary flow for a reviewer
+or CV demo: create/list/get/update/delete note, summarize a non-deleted note,
+list empty and populated summary history, repeat summarization to verify
+append/newest-first behavior, name the mobile view-state id-dedupe boundary,
+and show unauthorized/cross-user safe 404 behavior.
+
+No API behavior, backend code, API client code, mobile view-state code, tests,
+package manifests, lockfiles, dependencies, Expo/React Native runtime, rendered
+mobile UI, live provider, OpenAI SDK, credential, `.env` file, WIF runtime,
+live API call, SSE streaming, SQL, migration, Supabase state, Docker work,
+`.gitleaksignore` broadening, or generated state is approved or added. Summary
+history remains memory-only demo state, the fake provider remains the default,
+and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8I: dependency-free API demo evidence hardening
+or a narrow API client gap review, still with no package/runtime changes.
 
 ---
 

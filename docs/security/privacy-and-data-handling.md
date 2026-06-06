@@ -404,6 +404,18 @@ credential, `.env` file, live API call, SQL, migration, Supabase state, Docker
 work, `.gitleaksignore` broadening, or generated state is approved or added
 by the decision packet.
 
+Slice 8H adds the docs-only
+[API Demo Walkthrough](../api-demo-walkthrough.md). The walkthrough keeps the
+demo API-level and fake-provider-only: Note CRUD responses may show authorized
+note content by design, while AI summary/history responses, error surfaces, and
+captured logs must not expose raw note title/content, prompt text, raw provider
+diagnostics, provider credential values, auth header values, or token-like
+substrings. Summary history remains memory-only demo state and is not
+production persistence. No OpenAI SDK, provider credential, `.env` file, live
+provider call, SQL, migration, Supabase state, Docker work, WIF runtime,
+rendered mobile UI, package manifest change, lockfile change, dependency
+install, or `.gitleaksignore` broadening is approved or added.
+
 ### Backend API Keys
 
 Secret names are documented without example values:

@@ -7,6 +7,7 @@ Date: 2026-06-04
 Slice 8E is **COMPLETE** as a dependency-free backend/product demo polish slice.
 Slice 8F is **COMPLETE** as a docs-only API-level demo runbook slice.
 Slice 8G is **COMPLETE** as a docs-only rendered mobile demo unblock decision packet. Decision: **DEFER** rendered mobile UI. See [`docs/rendered-mobile-demo-unblock-decision-packet.md`](rendered-mobile-demo-unblock-decision-packet.md).
+Slice 8H is **COMPLETE** as a docs-only Note CRUD / fake summary API walkthrough hardening slice. See [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md).
 
 ## Scope Completed
 
@@ -192,4 +193,105 @@ Expected security posture for Slice 8F:
 - no live provider runtime or network behavior introduced
 - no Supabase, Docker, SQL, migrations, or generated state added
 - no rendered mobile UI, Expo runtime, router, or native files added
+- `.gitleaksignore` remains exact-fingerprint only
+
+## Slice 8H API-Level Demo Walkthrough Hardening
+
+Date: 2026-06-06
+
+### Demo Purpose
+
+Slice 8H produces a single reviewer-friendly API walkthrough that combines the
+existing Note CRUD flow with the fake-provider summary flow:
+[`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md).
+
+The walkthrough covers:
+
+- create, list, get, update, and soft-delete note behavior
+- versioned update/delete expectations and conflict handling
+- cross-user safe 404 behavior for notes and summary endpoints
+- fake summary generation
+- empty and populated summary history
+- repeated fake summaries appending to memory history
+- newest-first summary history listing
+- mobile view-state dedupe boundary by generated summary id
+- memory-only limitation for summary history
+- fake-provider-only and no-credential demo constraints
+
+### Selected Option
+
+**Docs-only walkthrough hardening.**
+
+No new tests or API/client code were needed because the critical demo paths are
+already covered by:
+
+- `apps/api/tests/test_notes.py`
+- `apps/api/tests/test_notes_integration_verification.py`
+- `apps/api/tests/test_ai_summarization.py`
+- `packages/api-client/src/notes.test.ts`
+- `packages/api-client/src/ai.test.ts`
+- `packages/shared/src/notes-contracts.test.ts`
+
+### Explicit Non-Changes
+
+- No package manifests, lockfiles, or dependency installs.
+- No Expo, React Native runtime, rendered mobile UI, router, native files, or
+  mobile package changes.
+- No OpenAI SDK, live provider, provider credential, `.env`, WIF runtime, SSE
+  streaming, SQL, migration, Supabase state, Docker, or generated state.
+- No API behavior, backend service code, API client code, mobile view-state
+  code, or tests changed.
+- No durable summary persistence; summary history remains memory-only for
+  fake-provider demos and resets with the backend process.
+
+### Verification Commands
+
+Focused verification for this docs-only walkthrough:
+
+```bash
+cd apps/api
+python3 -m pytest tests/test_notes.py tests/test_notes_integration_verification.py tests/test_ai_summarization.py -q
+cd ../..
+pnpm --filter @synapse/api-client test
+pnpm --filter @synapse/shared contracts:check
+```
+
+Full safe verification:
+
+```bash
+pnpm install --frozen-lockfile
+
+cd apps/api
+python3 -m ruff check .
+python3 -m pytest
+cd ../..
+
+pnpm --filter @synapse/api-client test
+pnpm --filter @synapse/shared contracts:check
+pnpm --filter mobile lint
+pnpm --filter mobile exec tsc --noEmit -p tsconfig.json
+
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+Security posture checks:
+
+```bash
+git ls-files -- ".env" ".env.*" "*.sql" "supabase/migrations/*"
+gitleaks detect --source=. --redact
+```
+
+Expected security posture for Slice 8H:
+
+- no package manifests or lockfiles changed
+- no dependency installed
+- no OpenAI SDK dependency approved or added
+- no provider credentials or `.env` files added
+- no live provider runtime or network behavior introduced
+- no Supabase, Docker, SQL, migrations, or generated state added
+- no rendered mobile UI, Expo runtime, router, or native files added
+- no real credential examples added
 - `.gitleaksignore` remains exact-fingerprint only
