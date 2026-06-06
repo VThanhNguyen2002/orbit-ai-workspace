@@ -394,6 +394,16 @@ values, or token-like substrings. No package dependency, OpenAI SDK, `.env`
 file, SQL, migration, Supabase state, Docker work, generated state, live
 provider runtime, or rendered mobile UI is approved by this runbook.
 
+Slice 8G formally evaluates rendered mobile demo unblocking in a docs-only
+decision packet. The packet confirms that environment config isolation rules
+from Slice 8D-D (no secrets, no credentials, no live-provider keys in the
+mobile bundle) remain in force. Rendered mobile initialization remains
+**BLOCKED / DEFERRED**: 10 of 12 required approval gates are MISSING or ABSENT.
+No package manifest, lockfile, Expo runtime, rendered mobile UI, OpenAI SDK,
+credential, `.env` file, live API call, SQL, migration, Supabase state, Docker
+work, `.gitleaksignore` broadening, or generated state is approved or added
+by the decision packet.
+
 ### Backend API Keys
 
 Secret names are documented without example values:

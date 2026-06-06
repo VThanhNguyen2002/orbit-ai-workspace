@@ -189,7 +189,9 @@ graph TD
 *   **Slice 8D-D** — Expo/React Native Initialization Approval Plan.
 *   **Slice 8D-E** — Approve or deny minimal Expo app shell initialization *(Complete — decision DEFERRED)*.
 *   **Slice 8E** — Backend/product demo polish using existing fake-provider flow *(Complete — backend and dependency-free view-state polish added)*.
-*   **Slice 8F** — Dependency-free demo walkthrough/runbook for the fake-provider note detail flow.
+*   **Slice 8F** — Dependency-free demo walkthrough/runbook for the fake-provider note detail flow *(Complete — API-level runbook recorded)*.
+*   **Slice 8G** — Rendered mobile demo unblock decision packet *(Complete — decision DEFERRED, 10/12 gates missing, recommended Option B)*.
+*   **Slice 8H** — Note CRUD / summary demo API walkthrough hardening *(recommended next action)*.
 
 ---
 

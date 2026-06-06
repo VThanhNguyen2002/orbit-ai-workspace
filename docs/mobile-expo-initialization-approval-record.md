@@ -1,6 +1,17 @@
 # Mobile Expo Initialization Approval Record
 
-## Slice 8D-E
+## Slice 8G Re-Evaluation — 2026-06-06
+
+Slice 8G re-audited all approval gates in this record as part of the
+[Rendered Mobile Demo Unblock Decision Packet](rendered-mobile-demo-unblock-decision-packet.md).
+**No gate status has changed.** 10 of 12 gates remain MISSING or ABSENT;
+only the Security/Privacy gate is CONFIRMED. Decision remains **DEFERRED**.
+
+Recommended safe next work: Slice 8H — Note CRUD / summary demo API walkthrough hardening.
+
+---
+
+## 3. Slice 8D-E
 
 Date: 2026-06-04
 
@@ -100,7 +111,10 @@ Because initialization is deferred, the safe path is:
 ## 9. Future Slices
 
 Based on the DEFERRED decision, the recommended follow-up slices are:
-*   **Slice 8E** — Backend/product demo polish using existing fake-provider flow (recommended next action).
+*   **Slice 8E** — Backend/product demo polish using existing fake-provider flow *(Complete)*.
+*   **Slice 8F** — Dependency-free API-level demo runbook *(Complete)*.
+*   **Slice 8G** — Rendered mobile demo unblock decision packet *(Complete — decision DEFERRED, safe next: Slice 8H)*.
+*   **Slice 8H** — Note CRUD / summary demo API walkthrough hardening (recommended next action if deferred).
 *   **Slice 8D-F** — Mobile dependency approval packet (if mobile UI execution is explicitly requested next).
 
 ---

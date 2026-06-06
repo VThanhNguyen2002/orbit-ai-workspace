@@ -6,6 +6,7 @@ Date: 2026-06-04
 
 Slice 8E is **COMPLETE** as a dependency-free backend/product demo polish slice.
 Slice 8F is **COMPLETE** as a docs-only API-level demo runbook slice.
+Slice 8G is **COMPLETE** as a docs-only rendered mobile demo unblock decision packet. Decision: **DEFER** rendered mobile UI. See [`docs/rendered-mobile-demo-unblock-decision-packet.md`](rendered-mobile-demo-unblock-decision-packet.md).
 
 ## Scope Completed
 

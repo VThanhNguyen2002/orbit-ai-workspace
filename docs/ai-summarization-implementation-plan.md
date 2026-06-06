@@ -353,7 +353,8 @@ opt-in environment variable and never run in default CI.
 | **8D-E** | Approve or deny minimal Expo app shell initialization *(Complete — decision DEFERRED)* |
 | **8E** | Backend/product demo polish using existing fake-provider flow *(Complete — newest-first backend history and dependency-free generate state)* |
 | **8F** | Dependency-free demo walkthrough/runbook for the fake-provider note detail flow *(Complete — API-level runbook recorded)* |
-| **8G** | Rendered mobile demo unblock decision packet — docs-only approval/evidence pass |
+| **8G** | Rendered mobile demo unblock decision packet — docs-only approval/evidence pass *(Complete — decision DEFERRED, 10/12 gates missing, recommended Option B: backend/product polish)* |
+| **8H** | Note CRUD / summary demo API walkthrough hardening — dependency-free, no lockfile changes |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -864,6 +865,34 @@ The fake provider remains the default, and the OpenAI SDK dependency remains
 Next recommended work is Slice 8G: a docs-only rendered mobile demo unblock
 decision packet that revisits the deferred Expo/React Native approval gates
 without initializing runtime UI unless explicit approvals exist.
+
+### Slice 8G Update — 2026-06-06
+
+Slice 8G adds the docs-only
+[Rendered Mobile Demo Unblock Decision Packet](rendered-mobile-demo-unblock-decision-packet.md).
+The packet re-audits all 12 approval gates from the Expo initialization record,
+evaluates 4 candidate paths (Option A: minimal Expo shell now; Option B: defer
++ backend/product work; Option C: static mockups; Option D: web-only shell
+without new packages), and issues a formal recommendation.
+
+**Decision: DEFER rendered mobile UI (Option B).** 10 of 12 required approval
+gates remain MISSING or ABSENT; only the Security/Privacy gate is CONFIRMED.
+Rendered mobile work remains BLOCKED until the user explicitly provides
+approvals for dependency/package, lockfile, CI impact, VM resource, rollback
+plan, reviewer sign-off, Expo SDK version, React/React Native version,
+no-emulator/default-CI proof, package size/build impact review, and local dev
+command plan gates.
+
+Safe next work is Slice 8H: Note CRUD / summary demo API walkthrough
+hardening — dependency-free, no lockfile changes, no rendered UI.
+
+No API behavior, backend code, API client code, mobile view-state code,
+tests, package manifests, lockfiles, dependencies, Expo/React Native runtime,
+rendered mobile UI, live provider, OpenAI SDK, credential, `.env` file, WIF
+runtime, live API call, SSE streaming, SQL, migration, Supabase state, Docker
+work, `.gitleaksignore` broadening, or generated state is approved or added.
+The fake provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
 
 ---
 
