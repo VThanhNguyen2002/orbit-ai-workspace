@@ -1039,6 +1039,33 @@ Native initialization remains **BLOCKED/DEFERRED**.
 Next recommended work is Slice 8N: CV / portfolio narrative doc, mobile
 view-state orchestrator unit tests, or demo curl script.
 
+### Slice 8N-B Update — 2026-06-07
+
+Slice 8N-B adds dependency-free unit coverage for the existing mobile
+TypeScript note view-state foundations. The tests cover note list idle,
+loading, empty, success ordering, UI-safe error mapping, and injected load
+orchestration; note detail idle, loading, success mapping, not-found,
+invalid-response, unavailable, diagnostic redaction, and injected load
+orchestration; summary history loading, summarizing, empty, newest-first
+success mapping, append/dedupe behavior, UI-safe errors, memory-only notice,
+and injected list/summarize orchestration. Adapter tests confirm mobile uses
+the injected API-client methods and validates returned note/summary data with
+shared schemas.
+
+Existing test infrastructure was sufficient without package or lockfile
+changes by running the workspace's existing Vitest binary with the repository
+root as the test root. Mobile still has no Expo/React Native runtime and no
+rendered UI. No package manifest change, lockfile change, dependency install,
+OpenAI SDK, credential, `.env` file, live provider call, WIF runtime, SQL,
+migration, Supabase state, Docker work, production persistence,
+`.gitleaksignore` broadening, JSX/TSX, or generated state is approved or
+added. Summary history remains memory-only demo state, the fake provider
+remains the default, and the OpenAI SDK dependency remains **NOT APPROVED /
+DENIED**. Expo/React Native initialization remains **BLOCKED/DEFERRED**.
+
+Next recommended work is Slice 8O: a narrow dependency-free demo script or
+portfolio/CV narrative doc, still with no package/runtime changes.
+
 ---
 
 ## 14. Definition Of Done (This Slice)

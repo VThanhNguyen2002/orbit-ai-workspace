@@ -453,6 +453,18 @@ manifests, lockfiles, dependencies, rendered mobile UI, OpenAI SDK, credential,
 `.env` file, SQL, migration, Supabase state, Docker work, or live provider is
 approved or added.
 
+Slice 8N-B adds dependency-free mobile view-state unit tests using existing
+workspace Vitest tooling only. The tests assert that mobile note list, note
+detail, and summary history error states expose only coarse constant messages,
+not raw backend diagnostics, prompt text, provider payloads, auth headers,
+credentials, or token-like values. Summary-history tests also verify that the
+memory-only notice remains present and that mobile list items continue to omit
+provider/model details. Adapter tests confirm injected API-client methods and
+shared schema validation without raw `fetch`, new dependencies, Expo/React
+Native runtime, rendered UI, OpenAI SDK, provider credentials, `.env` files,
+SQL, migrations, Supabase state, Docker work, WIF runtime, or production
+persistence.
+
 ### Backend API Keys
 
 Secret names are documented without example values:
