@@ -8,7 +8,8 @@ Slice 8E is **COMPLETE** as a dependency-free backend/product demo polish slice.
 Slice 8F is **COMPLETE** as a docs-only API-level demo runbook slice.
 Slice 8G is **COMPLETE** as a docs-only rendered mobile demo unblock decision packet. Decision: **DEFER** rendered mobile UI. See [`docs/rendered-mobile-demo-unblock-decision-packet.md`](rendered-mobile-demo-unblock-decision-packet.md).
 Slice 8H is **COMPLETE** as a docs-only Note CRUD / fake summary API walkthrough hardening slice. See [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md).
-Slice 8I is **COMPLETE** as a docs-only API demo evidence matrix / gap review slice. See [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md#3-evidence-matrix).
+Slice 8I is **COMPLETE** as a docs-only API demo evidence matrix / gap review slice. See [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md#4-evidence-matrix).
+Slice 8O is **COMPLETE** as a dependency-free local API demo script slice. See [`scripts/demo-api.sh`](../scripts/demo-api.sh).
 
 ## Scope Completed
 
@@ -17,6 +18,9 @@ Slice 8I is **COMPLETE** as a docs-only API demo evidence matrix / gap review sl
 - The dependency-free mobile view-state layer now models `summarizing`, append, dedupe, newest-first sorting, and safe error states without rendering React Native or Expo UI.
 - Backend tests cover the demo endpoint sequence: get note detail, list empty summary history, generate two fake summaries, and list generated summaries newest first.
 - Backend tests also assert that AI summary/history surfaces and captured logs do not expose prompt text, raw diagnostics, note content, placeholder key names, bearer-like values, or `sk-` token-like strings.
+- `scripts/demo-api.sh` now exercises the local fake-provider demo flow with
+  health, note create/list/detail, empty history, two fake summaries, and
+  newest-first history verification.
 
 ## Explicit Non-Changes
 
@@ -24,6 +28,54 @@ Slice 8I is **COMPLETE** as a docs-only API demo evidence matrix / gap review sl
 - No Expo, React Native runtime, rendered mobile UI, router, or native files.
 - No OpenAI SDK, live provider, credential, `.env`, WIF runtime, SSE streaming, SQL, migration, Supabase state, Docker, or generated state.
 - No durable summary persistence; summary history remains memory-only for fake-provider demos and resets with the backend process.
+
+## Slice 8O Dependency-Free Local API Demo Script
+
+Date: 2026-06-07
+
+### Demo Purpose
+
+Slice 8O adds `scripts/demo-api.sh`, a reviewer-friendly local script for the
+current API demo. It exercises the existing memory-backed Note CRUD and
+fake-provider summary flow without live credentials, Supabase, Docker, OpenAI,
+Expo, package changes, or new dependencies.
+
+### Script Behavior
+
+The script defaults to `http://127.0.0.1:8000`, refuses non-local base URLs,
+and uses only `bash`, `curl`, and `python3`. It does not start the backend,
+create `.env` files, send auth headers, or call any live provider. It expects
+the backend to be running with:
+
+```bash
+cd apps/api
+SYNAPSE_AI_SUMMARIZATION_ENABLED=true uvicorn app.main:app --reload
+```
+
+It then performs a health check, creates a synthetic local-demo note, lists
+notes, loads note detail, lists empty summary history, generates two fake
+summaries, and verifies that final history contains the second summary before
+the first.
+
+### Safety Notes
+
+The script relies on the backend's default local `dev` auth mode, so no
+credential or auth-header example is needed. If the backend is unreachable, AI
+summarization is disabled, or local dev auth is not active, it stops with fixed
+guidance. Output is intentionally concise and does not print prompt text, raw
+provider diagnostics, auth values, or raw note content.
+
+### Verification Commands
+
+```bash
+bash -n scripts/demo-api.sh
+```
+
+Optional local run, only after starting the backend as shown above:
+
+```bash
+scripts/demo-api.sh
+```
 
 ## Verification
 

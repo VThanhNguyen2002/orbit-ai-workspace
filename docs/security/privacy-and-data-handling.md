@@ -465,6 +465,13 @@ Native runtime, rendered UI, OpenAI SDK, provider credentials, `.env` files,
 SQL, migrations, Supabase state, Docker work, WIF runtime, or production
 persistence.
 
+Slice 8O adds `scripts/demo-api.sh` for local API walkthroughs. The script is
+restricted to localhost-style base URLs, sends no auth header, uses no provider
+credential, creates no `.env` file, starts no Docker/Supabase/Expo process, and
+makes no live provider call. It prints only concise IDs/counts for the synthetic
+demo flow and avoids prompt text, raw provider diagnostics, auth values, and raw
+note content. Summary history remains memory-only demo state.
+
 ### Backend API Keys
 
 Secret names are documented without example values:

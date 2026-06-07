@@ -125,6 +125,12 @@ cd apps/api
 SYNAPSE_AI_SUMMARIZATION_ENABLED=true uvicorn app.main:app --reload
 ```
 
+Then, from the repository root in a second terminal:
+
+```bash
+scripts/demo-api.sh
+```
+
 No Supabase, Docker, OpenAI API key, or `.env` file required.
 
 ---

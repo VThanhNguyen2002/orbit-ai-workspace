@@ -1,8 +1,8 @@
 # API Demo Walkthrough
 
-Slice: **8H**
-Date: 2026-06-06
-Status: **DOCS-ONLY - Complete**
+Slice: **8H / 8O**
+Date: 2026-06-06; updated 2026-06-07
+Status: **Complete — docs plus dependency-free local demo script**
 
 This walkthrough combines the existing Note CRUD API and fake-provider AI
 summary flow into one reviewer-friendly API demo. It uses only the current
@@ -30,7 +30,56 @@ Summary history is memory-only demo state. It is cleared when the backend
 process or test fixture resets and must not be presented as production
 persistence.
 
-## 2. Existing Coverage
+## 2. Scripted Local Demo
+
+Slice 8O adds a dependency-free local script for the current fake-provider
+flow:
+
+```bash
+scripts/demo-api.sh
+```
+
+The script defaults to `http://127.0.0.1:8000` and refuses non-local base URLs.
+It uses only `bash`, `curl`, and `python3`, sends no auth header, creates no
+`.env` file, starts no Docker/Supabase/Expo process, and makes no live provider
+call. It expects the backend to be running locally with the default dev auth
+mode and AI summarization enabled:
+
+```bash
+cd apps/api
+SYNAPSE_AI_SUMMARIZATION_ENABLED=true uvicorn app.main:app --reload
+```
+
+In a second terminal from the repository root:
+
+```bash
+scripts/demo-api.sh
+```
+
+Optional local-only override:
+
+```bash
+SYNAPSE_DEMO_API_BASE_URL=http://localhost:8000 scripts/demo-api.sh
+```
+
+The script performs:
+
+- health check
+- synthetic note create
+- note list
+- note detail
+- empty summary history list
+- fake summarize
+- summary history list
+- fake summarize again
+- final summary history list with newest-first append verification
+
+If the backend is not running, it fails clearly. If AI summarization is disabled
+or the backend is not in local dev auth mode, it stops with fixed guidance. The
+script prints concise IDs/counts only; it does not print provider diagnostics,
+prompt text, auth values, or raw note content.
+
+## 3. Existing Coverage
 
 The walkthrough is docs-only because the critical demo paths are already
 covered:
@@ -47,7 +96,7 @@ covered:
 | API client summarize/history methods | `packages/api-client/src/ai.test.ts` |
 | Shared Note contracts | `packages/shared/src/notes-contracts.test.ts` |
 
-## 3. Evidence Matrix
+## 4. Evidence Matrix
 
 Slice 8I reviewed the walkthrough against the current backend, shared
 contracts, API client, and dependency-free mobile summary-history foundation.
@@ -106,7 +155,7 @@ lockfile changes, production persistence, SQL, migrations, Supabase state,
 Docker work, OpenAI SDK usage, live provider wiring, credentials, or `.env`
 files.
 
-## 4. Note CRUD Sequence
+## 5. Note CRUD Sequence
 
 ### Create a Note
 
@@ -212,7 +261,7 @@ Expected result:
 For the summary demo, use a non-deleted note. Create a second note if this
 delete step was already performed.
 
-## 5. Fake Summary Sequence
+## 6. Fake Summary Sequence
 
 ### List Empty History
 
@@ -275,7 +324,7 @@ view-state helper dedupes by summary `id` when merging a generated summary into
 an existing local list, then sorts newest first. The API itself should still be
 verified as newest-first append behavior.
 
-## 6. Unauthorized and Cross-User Behavior
+## 7. Unauthorized and Cross-User Behavior
 
 The demo should show safe ownership behavior without exposing whether another
 user's note exists:
@@ -290,7 +339,7 @@ user's note exists:
 Do not use real credential examples in the walkthrough. Use the repository's
 test fixtures or local dev auth mode when demonstrating these paths.
 
-## 7. Safety Checks
+## 8. Safety Checks
 
 Summary and summary-history responses, error responses, and captured backend
 logs must not expose:
@@ -307,7 +356,7 @@ Authorized note detail responses may include note content because that is the
 purpose of `GET /v1/notes/{note_id}`. The non-leak requirement applies to AI
 summary/history surfaces and diagnostics.
 
-## 8. API Client Walkthrough Surface
+## 9. API Client Walkthrough Surface
 
 The same flow is available through `@synapse/api-client`:
 
@@ -322,7 +371,7 @@ The same flow is available through `@synapse/api-client`:
 The client validates success/error envelopes and shared response contracts. It
 preserves snake_case field names and URL-encodes note ids in path segments.
 
-## 9. Mobile View-State Surface
+## 10. Mobile View-State Surface
 
 The dependency-free mobile export surface now includes:
 
@@ -340,7 +389,7 @@ The dependency-free mobile export surface now includes:
 These modules are plain `.ts` and are intended as future screen-ready state
 plumbing, not rendered mobile UI.
 
-## 10. Verification
+## 11. Verification
 
 Focused verification for this walkthrough:
 
@@ -350,6 +399,12 @@ python3 -m pytest tests/test_notes.py tests/test_notes_integration_verification.
 cd ../..
 pnpm --filter @synapse/api-client test
 pnpm --filter @synapse/shared contracts:check
+```
+
+Script check:
+
+```bash
+bash -n scripts/demo-api.sh
 ```
 
 Broader safe verification:
