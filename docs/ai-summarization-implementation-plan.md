@@ -360,7 +360,8 @@ opt-in environment variable and never run in default CI.
 | **8J** | Next dependency-free product slice or approval-gated rendered demo decision |
 | **8K** | Dependency-free mobile note list/detail view-state foundations *(Complete — noteListApi, noteDetailApi, noteListViewState, noteDetailViewState, placeholder metadata)* |
 | **8L** | Mobile note + summary view-state walkthrough/readiness review *(Complete — READY verdict; all three modules coherent, safe, screen-ready; Expo/RN remains BLOCKED/DEFERRED)* |
-| **8M** | README / CV / demo narrative polish — dependency-free, no code or lockfile changes |
+| **8M** | README / CV / demo narrative polish *(Complete — README rewritten with accurate capability table, explicit deferrals, architecture overview, quality gates, and security stance)* |
+| **8N** | CV / portfolio narrative doc, mobile view-state orchestrator unit tests, or demo curl script |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -1008,6 +1009,35 @@ Native initialization remains **BLOCKED/DEFERRED** (12/12 approval gates still
 missing).
 
 Next recommended work is Slice 8M: README / CV / demo narrative polish.
+
+### Slice 8M Update — 2026-06-07
+
+Slice 8M replaces the overclaiming `README.md` with an accurate,
+GitHub-reviewer-and-interviewer-ready project description.
+
+The previous README claimed offline-first sync, Supabase runtime, OpenAI
+integration, Expo app, deployed production app, and Lighthouse 90+ scores —
+none of which are currently implemented. The new README accurately describes:
+the FastAPI in-memory backend, fake-provider AI summarization, dependency-free
+mobile TypeScript view-state foundation, shared Zod contract registry, typed
+API client, and CI/security quality gates. An explicit deferred/not-implemented
+table covers rendered mobile UI, OpenAI SDK, live AI, Supabase, database
+persistence, offline sync, and web frontend. Architecture section shows the
+backend → API client → mobile view-state data flow. Quality gate commands are
+verified against the actual toolchain (pytest, ruff, pnpm lint/typecheck/test,
+tsc --noEmit, contracts:check, gitleaks). Environment requirements note no
+Docker, no Supabase CLI, no Expo CLI needed.
+
+No runtime code, tests, package manifests, lockfiles, dependencies, Expo/React
+Native runtime, rendered mobile UI, OpenAI SDK, credential, `.env` file, WIF
+runtime, SSE streaming, SQL, migration, Supabase state, Docker work,
+`.gitleaksignore` broadening, or generated state is approved or added. Summary
+history remains memory-only demo state, the fake provider remains the default,
+and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Expo/React
+Native initialization remains **BLOCKED/DEFERRED**.
+
+Next recommended work is Slice 8N: CV / portfolio narrative doc, mobile
+view-state orchestrator unit tests, or demo curl script.
 
 ---
 

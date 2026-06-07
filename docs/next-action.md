@@ -2,15 +2,11 @@
 
 ## Objective
 
-Recommended next task: **Slice 8M — README / CV / demo narrative polish**.
+Recommended next task: **Slice 8N — CV / portfolio narrative polish** or
+**Slice 8N — additional test coverage for mobile view-state orchestrators**.
 
-The mobile view-state foundation is complete and reviewed. The next
-highest-leverage work is top-of-repo narrative polish: a recruiter-facing
-`README.md`, a CV-aligned project description, and/or a one-page portfolio
-summary. Dependency-free, no code, no lockfile changes.
-
-See [`docs/mobile-viewstate-readiness-review.md`](mobile-viewstate-readiness-review.md)
-for the Slice 8L review findings and readiness verdict.
+The README and demo narrative are now accurate and GitHub-reviewer-ready
+(Slice 8M complete). See below for the next candidate tasks.
 
 See
 [`docs/rendered-mobile-demo-unblock-decision-packet.md`](rendered-mobile-demo-unblock-decision-packet.md)
@@ -18,37 +14,60 @@ for the rendered mobile gate status. See
 [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md) for the API-level demo
 script and mobile view-state surface.
 
-## Slice 8L Result
+## Slice 8M Result
 
-Slice 8L is a read-only review of the dependency-free mobile note + summary
-view-state foundation. Verdict: **READY as a portfolio/product architecture layer.**
+Slice 8M replaces the overclaiming README with an accurate, GitHub-reviewer-
+and-interviewer-ready project description.
 
-Key findings:
+Changes:
 
-- Note list, note detail, and summary history view-state modules follow a
-  consistent `createIdle*/createLoading*/map*DataToViewState/map*ErrorToViewState/load*ViewState`
-  pattern.
-- Adapter boundaries use `Pick<>` narrowing — injection-pure, no raw fetch, no
-  provider internals.
-- Schema validation sits at the adapter layer; view-state mappers receive
-  typed domain data only.
-- Error states return only typed constant strings — no backend diagnostics,
-  auth headers, provider keys, or token-like values reachable from view-state.
-- `SUMMARY_HISTORY_MEMORY_NOTICE` is included in every summary history state
-  variant; a future screen cannot accidentally omit it.
-- Provider fields (`provider`, `model`) are intentionally omitted from
-  `SummaryHistoryListItem` — provider identity is hidden from mobile consumers.
-- Only minor gap: `toErrorRecord` helper duplicated 3× (4 lines each). Deferred
-  to when a fourth module forces consolidation.
-- No Expo/React Native overclaiming: placeholder `NON_GOALS` arrays and the
-  `tsconfig.json` `"include"` pattern prevent accidental rendered-UI drift.
-- Expo/React Native initialization remains BLOCKED/DEFERRED (12/12 approval
-  gates still missing).
+- `README.md` — fully rewritten:
+  - Project summary as personal/non-commercial engineering project
+  - Current implemented capabilities table (backend, AI, API client, mobile
+    view-state, CI, security checks)
+  - Explicit deferred/not-implemented table (rendered mobile, OpenAI SDK, live
+    AI, Supabase, database persistence, offline sync, web frontend)
+  - Accurate monorepo structure reflecting actual state
+  - Architecture diagram (backend → API client → mobile view-state)
+  - Demo walkthrough link and startup command
+  - Quality gate commands (accurate for current toolchain)
+  - Security stance summary
+  - Documentation index
+  - Accurate tech stack (FakeProvider, no SDK, no Supabase runtime)
+  - Accurate environment requirements (no Docker, no Supabase CLI, no Expo CLI)
+- `docs/ai-summarization-implementation-plan.md` — Slice 8M entry added
+- `docs/next-action.md` — updated to Slice 8M result and next candidates
 
-Slice 8L result record:
-[`docs/mobile-viewstate-readiness-review.md`](mobile-viewstate-readiness-review.md)
+Overclaim prevention notes:
 
-## Slice 8M Gate
+- Removed all claims of offline-first sync, Supabase runtime, OpenAI
+  integration, deployed app, completed mobile UI, Lighthouse scores.
+- Added explicit deferred table and memory-only summary history notice.
+- Explicitly stated no `.env`, no credentials, no Docker required.
+
+## Slice 8N Candidates
+
+### Option A — CV / portfolio narrative doc
+
+Write a `docs/portfolio-summary.md` that frames the project for a job
+application or CV, covering tech decisions, what was built vs. deferred, and
+honest capability claims. Dependency-free, docs-only.
+
+### Option B — Mobile view-state orchestrator unit tests
+
+Add Vitest unit tests for `loadNoteListViewState`, `loadNoteDetailViewState`,
+and `loadSummaryHistoryViewState` orchestrators in `apps/mobile`. These are the
+only mobile-side async functions without explicit test coverage. No new package
+or lockfile change — Vitest is already present in the workspace.
+
+### Option C — API demo walkthrough CLI script
+
+Write a shell script (`scripts/demo.sh`) that runs the Note CRUD + fake AI demo
+sequence using `curl` against a locally running backend. No new dependencies.
+
+Do not proceed to any Slice 8N option automatically.
+
+## Slice 8N Gate
 
 - Do not install dependencies, modify package manifests, or modify lockfiles.
 - Do not initialize Expo, React Native runtime UI, routers, native files, JSX,
@@ -56,15 +75,12 @@ Slice 8L result record:
 - Do not introduce a live provider, OpenAI SDK, credentials, `.env`, WIF
   runtime, SSE streaming, SQL, migrations, Supabase state, Docker work, or
   generated state.
-- Focus on top-level README, CV/portfolio narrative, and demo script polish.
 - If rendered mobile demo work is reconsidered, first satisfy the approval
   gates in `docs/rendered-mobile-demo-unblock-decision-packet.md`.
 
 ## Definition Of Done
 
-- `README.md` is updated or created with a recruiter/reviewer-facing project
-  description covering the tech stack, architecture highlights, and demo
-  instructions.
+- The README accurately reflects the current implemented state.
 - All targeted fast checks pass.
 - No dependency, lockfile, rendered UI, live provider, credential, SQL,
   migration, Supabase, Docker, or production persistence change is made.
