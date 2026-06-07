@@ -2,12 +2,11 @@
 
 ## Objective
 
-Recommended next task: **Slice 8P — Demo script validation / README walkthrough
-alignment**.
+Recommended next task: **Slice 8Q** — portfolio summary doc, additional API
+walkthrough polish, or next product slice.
 
-Slice 8O is complete: the repository now has a dependency-free local API demo
-script for the current fake-provider flow, plus matching README and demo docs.
-Do not proceed to Slice 8P automatically.
+Slice 8P is complete: docs are fully aligned with `scripts/demo-api.sh`
+behavior. No inconsistencies were found. Do not proceed automatically.
 
 See
 [`docs/rendered-mobile-demo-unblock-decision-packet.md`](rendered-mobile-demo-unblock-decision-packet.md)
@@ -15,52 +14,61 @@ for the rendered mobile gate status. See
 [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md) for the API-level demo
 script and mobile view-state surface.
 
-## Slice 8O Result
+## Slice 8P Result
 
-Slice 8O adds `scripts/demo-api.sh`, a local-only API walkthrough script that
-exercises the current backend fake-provider demo flow.
+Slice 8P is a docs-only alignment review of `scripts/demo-api.sh` against the
+README, API demo walkthrough, backend demo polish record, security doc, and
+next-action doc.
 
-Changes:
+**Selected option: A — docs alignment.** The only gap found was that
+`next-action.md` still referenced Slice 8P as the upcoming task rather than
+recording it as complete. All other docs were already aligned.
 
-- `scripts/demo-api.sh` — dependency-free `bash` script using `curl` and
-  `python3`; defaults to `http://127.0.0.1:8000`; refuses non-local URLs.
-- `README.md` — demo section now points to the script after local backend
-  startup.
-- `docs/api-demo-walkthrough.md` — scripted demo instructions, behavior, and
-  syntax check added.
-- `docs/backend-product-demo-polish-record.md` — Slice 8O result recorded.
-- `docs/security/privacy-and-data-handling.md` — script security boundary
-  recorded.
-- `docs/next-action.md` — updated to Slice 8O result and Slice 8P next task.
+**Alignment verdict: all docs aligned.**
 
-Script behavior:
+| Question | Result |
+|---|---|
+| README explains demo script accurately | ✅ Accurate — two-terminal startup, script invocation, "no credentials required" |
+| Walkthrough §2 matches script steps | ✅ Accurate — all 9 steps listed, `SYNAPSE_DEMO_API_BASE_URL` override documented |
+| Local backend assumptions clear | ✅ Clear in README, walkthrough §1, and script banner |
+| `SYNAPSE_AI_SUMMARIZATION_ENABLED=true` documented without `.env` | ✅ Shown as inline env var on uvicorn command everywhere |
+| Script local-only / non-local refusal documented | ✅ Walkthrough §2: "defaults to `http://127.0.0.1:8000` and refuses non-local base URLs" |
+| Fake-provider-only / memory-only limitations stated | ✅ README deferred table, walkthrough §1, script banner, security doc |
+| No overclaims found | ✅ No claim of OpenAI, Supabase, Docker, persisted storage, rendered mobile, deployed app |
+| Next recommended task appropriate | ✅ After this correction: Slice 8Q |
 
-- health check
-- synthetic note create
-- note list
-- note detail
-- empty summary history
-- fake summarize
-- summary history list
-- fake summarize again
-- final newest-first append verification
+**Fast checks:** gitleaks clean (109 commits), no `.env`/`.sql`/migration
+files, `bash -n scripts/demo-api.sh` syntax OK.
 
-Auth/demo assumptions:
+Changes in this slice:
 
-- Uses the backend's default local `dev` auth mode.
-- Sends no auth header and uses no credential example.
-- Requires the backend to be running locally with
-  `SYNAPSE_AI_SUMMARIZATION_ENABLED=true`.
-- Stops clearly if the backend is unreachable, AI is disabled, or local dev
-  auth is not active.
+- `docs/next-action.md` — updated to 8P complete, added 8Q candidates
+- `docs/ai-summarization-implementation-plan.md` — added 8N-B, 8O, 8P rows to
+  table; added 8O and 8P update sections
 
-## Slice 8P Candidate
+## Slice 8Q Candidates
 
-Validate the scripted walkthrough against a clean local backend start and align
-README/docs wording if the observed terminal transcript suggests clearer
-instructions. Keep this dependency-free and local-only.
+### Option A — Portfolio summary doc
 
-## Slice 8P Gate
+Write `docs/portfolio-summary.md` framing the project for a job application:
+tech decisions, what was built vs. deferred, honest capability claims, and
+suggested questions a technical interviewer might ask. Dependency-free,
+docs-only.
+
+### Option B — `scripts/demo-api.sh` output polish
+
+Review the script terminal output for clarity when run against a live local
+backend. Consider adding step counters or a summary line. Docs-only if the
+changes are cosmetic; script change allowed only if a factual mismatch is found.
+
+### Option C — Next product slice
+
+Identify and begin the next dependency-free backend, shared-contracts, or API
+client improvement that has clear reviewer value without package/runtime changes.
+
+Do not proceed to any Slice 8Q option automatically.
+
+## Slice 8Q Gate
 
 - Do not install dependencies, modify package manifests, or modify lockfiles.
 - Do not initialize Expo, React Native runtime UI, routers, native files, JSX,
@@ -68,14 +76,13 @@ instructions. Keep this dependency-free and local-only.
 - Do not introduce a live provider, OpenAI SDK, credentials, `.env`, WIF
   runtime, SSE streaming, SQL, migrations, Supabase state, Docker work, or
   generated state.
-- Do not call external network services from the demo script.
 - If rendered mobile demo work is reconsidered, first satisfy the approval
   gates in `docs/rendered-mobile-demo-unblock-decision-packet.md`.
 
 ## Definition Of Done
 
-- Demo script behavior and docs remain aligned.
-- All targeted checks pass.
+- Docs are aligned with actual script and demo behavior.
+- All targeted fast checks pass.
 - No dependency, lockfile, rendered UI, live provider, credential, SQL,
   migration, Supabase, Docker, or production persistence change is made.
 - Fake-provider-only demo constraints remain unchanged.

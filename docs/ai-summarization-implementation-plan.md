@@ -361,7 +361,10 @@ opt-in environment variable and never run in default CI.
 | **8K** | Dependency-free mobile note list/detail view-state foundations *(Complete — noteListApi, noteDetailApi, noteListViewState, noteDetailViewState, placeholder metadata)* |
 | **8L** | Mobile note + summary view-state walkthrough/readiness review *(Complete — READY verdict; all three modules coherent, safe, screen-ready; Expo/RN remains BLOCKED/DEFERRED)* |
 | **8M** | README / CV / demo narrative polish *(Complete — README rewritten with accurate capability table, explicit deferrals, architecture overview, quality gates, and security stance)* |
-| **8N** | CV / portfolio narrative doc, mobile view-state orchestrator unit tests, or demo curl script |
+| **8N-B** | Dependency-free mobile view-state unit tests *(Complete — note list, detail, summary history adapter and orchestrator coverage via workspace Vitest)* |
+| **8O** | Dependency-free local API demo script *(Complete — `scripts/demo-api.sh`; bash/curl/python3 only; refuses non-local URLs; health, note CRUD, two fake summaries, newest-first verification)* |
+| **8P** | Demo script validation / README walkthrough alignment *(Complete — all docs aligned; no inconsistencies found; next-action updated)* |
+| **8Q** | Portfolio summary doc, additional API walkthrough polish, or next product slice |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -1065,6 +1068,60 @@ DENIED**. Expo/React Native initialization remains **BLOCKED/DEFERRED**.
 
 Next recommended work is Slice 8O: a narrow dependency-free demo script or
 portfolio/CV narrative doc, still with no package/runtime changes.
+
+### Slice 8O Update — 2026-06-07
+
+Slice 8O adds `scripts/demo-api.sh`, a dependency-free local API demo script.
+The script defaults to `http://127.0.0.1:8000` and refuses non-local base URLs
+via a `case` guard. It uses only `bash`, `curl`, and `python3`. It sends no auth
+header, creates no `.env` file, starts no Docker/Supabase/Expo process, and
+makes no live provider call. It performs a health check, creates a synthetic
+note, lists notes, loads note detail, lists empty summary history, generates
+two fake summaries, and verifies that final summary history returns the second
+summary before the first (newest-first). Output prints only concise IDs/counts;
+no prompt text, provider diagnostics, auth values, or raw note content is
+printed. The README demo section and API demo walkthrough were updated to
+document the script. The backend demo polish record and security/privacy doc
+record the Slice 8O boundary.
+
+No runtime code, tests, package manifests, lockfiles, dependencies, Expo/React
+Native runtime, rendered mobile UI, OpenAI SDK, credential, `.env` file, WIF
+runtime, SSE streaming, SQL, migration, Supabase state, Docker work,
+`.gitleaksignore` broadening, or generated state is approved or added. Summary
+history remains memory-only demo state, the fake provider remains the default,
+and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8P: demo script validation and README walkthrough
+alignment.
+
+### Slice 8P Update — 2026-06-07
+
+Slice 8P is a docs-only alignment review of `scripts/demo-api.sh` against the
+README, API demo walkthrough, backend demo record, security doc, and next-action
+doc.
+
+Alignment verdict: **all docs aligned.** All 8 review questions answered cleanly:
+the script behavior matches the walkthrough §2 description; the README demo
+section accurately shows the two-terminal startup flow; `SYNAPSE_AI_SUMMARIZATION_ENABLED=true`
+is shown as an inline env var everywhere without implying a `.env` file; the
+script's local-only restriction is documented; fake-provider-only and memory-only
+limitations are clearly stated in all relevant documents; no overclaims of
+OpenAI, Supabase, Docker, persisted storage, rendered mobile, or deployed
+production were found. The only gap found was that `next-action.md` still
+referenced Slice 8P as upcoming rather than complete — corrected in this slice.
+
+Fast checks passed: gitleaks clean (109 commits), no `.env`/`.sql`/migration
+files, `bash -n scripts/demo-api.sh` syntax OK.
+
+No runtime code, tests, package manifests, lockfiles, dependencies, Expo/React
+Native runtime, rendered mobile UI, OpenAI SDK, credential, `.env` file, WIF
+runtime, SSE streaming, SQL, migration, Supabase state, Docker work,
+`.gitleaksignore` broadening, or generated state is approved or added. Summary
+history remains memory-only demo state, the fake provider remains the default,
+and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8Q: portfolio summary doc, additional API
+walkthrough polish, or next product slice.
 
 ---
 
