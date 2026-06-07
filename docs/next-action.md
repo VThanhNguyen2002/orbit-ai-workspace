@@ -2,11 +2,14 @@
 
 ## Objective
 
-Recommended next task: **Slice 8Q** — portfolio summary doc, additional API
-walkthrough polish, or next product slice.
+Slice 8Q-A is complete: Codex handoff notes written to
+[`docs/codex-handoff-notes.md`](codex-handoff-notes.md).
 
-Slice 8P is complete: docs are fully aligned with `scripts/demo-api.sh`
-behavior. No inconsistencies were found. Do not proceed automatically.
+Recommended next task: **Slice 8Q-B** (mobile API client boundary review, Codex)
+or **Slice 8Q-C** (refactor duplicated `toErrorRecord`, Codex)
+or **Slice 8Q-D** (portfolio/demo summary doc, AG if Codex quota unavailable).
+
+Do not proceed automatically. See handoff notes for full candidate breakdown.
 
 See
 [`docs/rendered-mobile-demo-unblock-decision-packet.md`](rendered-mobile-demo-unblock-decision-packet.md)

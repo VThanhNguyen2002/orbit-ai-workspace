@@ -364,7 +364,11 @@ opt-in environment variable and never run in default CI.
 | **8N-B** | Dependency-free mobile view-state unit tests *(Complete — note list, detail, summary history adapter and orchestrator coverage via workspace Vitest)* |
 | **8O** | Dependency-free local API demo script *(Complete — `scripts/demo-api.sh`; bash/curl/python3 only; refuses non-local URLs; health, note CRUD, two fake summaries, newest-first verification)* |
 | **8P** | Demo script validation / README walkthrough alignment *(Complete — all docs aligned; no inconsistencies found; next-action updated)* |
-| **8Q** | Portfolio summary doc, additional API walkthrough polish, or next product slice |
+| **8Q-A** | Codex handoff notes *(Complete — handoff notes documented)* |
+| **8Q-B** | Review mobile API client construction boundary |
+| **8Q-C** | Refactor duplicated mobile toErrorRecord helper |
+| **8Q-D** | Portfolio/demo summary doc |
+
 
 ### Slice 7E Update — 2026-06-01
 
@@ -1120,10 +1124,26 @@ runtime, SSE streaming, SQL, migration, Supabase state, Docker work,
 history remains memory-only demo state, the fake provider remains the default,
 and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**.
 
-Next recommended work is Slice 8Q: portfolio summary doc, additional API
-walkthrough polish, or next product slice.
+### Slice 8Q-A Update — 2026-06-07
+
+Slice 8Q-A adds Codex handoff notes for the next coding session in
+[`docs/codex-handoff-notes.md`](codex-handoff-notes.md).
+
+No API behavior, backend code, API client code, mobile view-state code, tests,
+package manifests, lockfiles, dependencies, Expo/React Native runtime, rendered
+mobile UI, live provider, OpenAI SDK, credential, `.env` file, WIF runtime,
+live API call, SSE streaming, SQL, migration, Supabase state, Docker work,
+`.gitleaksignore` broadening, or generated state was approved or added. The
+fake provider remains default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
+Next candidate slices are:
+- Slice 8Q-B: Review mobile API client construction boundary (Codex)
+- Slice 8Q-C: Refactor duplicated mobile toErrorRecord helper (Codex)
+- Slice 8Q-D: Portfolio/demo summary doc (AG)
 
 ---
+
 
 ## 14. Definition Of Done (This Slice)
 
