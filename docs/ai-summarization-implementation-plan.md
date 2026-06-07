@@ -946,6 +946,30 @@ Next recommended work is Slice 8J: choose the next dependency-free product
 slice, or revisit rendered demo approvals only if the missing gates are
 explicitly satisfied.
 
+### Slice 8K Update — 2026-06-07
+
+Slice 8K adds dependency-free mobile TypeScript view-state foundations for note
+list and note detail flows, following the existing summary-history pattern.
+`apps/mobile/src/features/notes/noteListApi.ts` and
+`apps/mobile/src/features/notes/noteDetailApi.ts` wrap the injected
+`@synapse/api-client` note list/get methods and validate returned data with
+shared note schemas. `noteListViewState.ts` maps idle, loading, empty, success,
+and UI-safe error states while preserving API item ordering. `noteDetailViewState.ts`
+maps idle, loading, success, and UI-safe error states, including safe
+`not_found` handling through the existing API-client 404 semantics.
+
+The mobile placeholder metadata names future note list/detail screen regions
+only; it adds no rendered UI. No package manifest change, lockfile change,
+dependency install, Expo/React Native runtime, JSX/TSX, OpenAI SDK, credential,
+`.env` file, live provider call, WIF runtime, SQL, migration, Supabase state,
+Docker work, production persistence, `.gitleaksignore` broadening, or generated
+state is approved or added. Summary history remains memory-only demo state, the
+fake provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
+Next recommended work is Slice 8L: Mobile note + summary view-state
+walkthrough/readiness review.
+
 ---
 
 ## 14. Definition Of Done (This Slice)

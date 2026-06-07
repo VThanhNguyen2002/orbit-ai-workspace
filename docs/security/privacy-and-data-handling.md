@@ -427,6 +427,20 @@ live provider calls, SQL, migrations, Supabase state, Docker work, WIF runtime,
 rendered mobile UI, package manifest changes, lockfile changes, dependency
 installs, production persistence, or `.gitleaksignore` broadening.
 
+Slice 8K adds dependency-free mobile note list/detail view-state foundations.
+The mobile adapters use injected API-client note list/get methods and shared
+schema validation; they do not call raw `fetch`, instantiate provider clients,
+or know live backend/provider implementation details. Successful note detail
+state may carry authorized note title/content because note detail display is
+the purpose of the Note CRUD surface. Error states remain coarse and UI-safe:
+not-found, invalid-response, and unavailable mappings do not expose backend
+diagnostics, auth headers, credentials, prompt text, provider payloads,
+token-like values, or raw error envelopes. No rendered mobile UI, Expo/React
+Native runtime, package manifest change, lockfile change, dependency install,
+OpenAI SDK, credential, `.env` file, SQL, migration, Supabase state, Docker
+work, production persistence, live provider wiring, WIF runtime, or
+`.gitleaksignore` broadening is approved or added.
+
 ### Backend API Keys
 
 Secret names are documented without example values:

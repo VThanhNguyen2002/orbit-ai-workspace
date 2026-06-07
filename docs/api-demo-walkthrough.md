@@ -65,6 +65,7 @@ portfolio/API demo, so no code or test changes were added.
 | Summary history cross-user access returns safe 404 | `apps/api/tests/test_ai_summarization.py`, `packages/api-client/src/ai.test.ts` | Covered |
 | Shared summary contracts are strict snake_case | `packages/shared/src/ai/index.ts`, `packages/shared/src/schema-registry.ts`, `packages/shared/src/ai-contracts.test.ts` | Covered |
 | API client can consume summarize and history endpoints | `packages/api-client/src/index.ts`, `packages/api-client/src/ai.test.ts` | Covered |
+| Mobile note list/detail foundation consumes validated Note CRUD data without rendered UI | `apps/mobile/src/features/notes/noteListApi.ts`, `apps/mobile/src/features/notes/noteDetailApi.ts`, `apps/mobile/src/features/notes/noteListViewState.ts`, `apps/mobile/src/features/notes/noteDetailViewState.ts`, `apps/mobile/src/features/notes/noteListPlaceholder.ts`, `apps/mobile/src/features/notes/noteDetailPlaceholder.ts` | Covered by mobile typecheck |
 | Mobile foundation consumes shared summary data without rendering UI | `apps/mobile/src/features/notes/summaryHistoryApi.ts`, `apps/mobile/src/features/notes/summaryHistoryViewState.ts`, `apps/mobile/src/features/notes/noteSummaryHistoryPlaceholder.ts` | Covered by typecheck/docs |
 | AI summary/history surfaces avoid prompt, raw diagnostic, credential, and note-content leakage | `apps/api/tests/test_ai_summarization.py`, `docs/security/privacy-and-data-handling.md` | Covered |
 | Summary history is memory-only demo state | `apps/api/app/services/ai_summarization.py`, this walkthrough, `docs/security/privacy-and-data-handling.md` | Covered |
@@ -83,6 +84,27 @@ portfolio/API demo, so no code or test changes were added.
 6. No API client gap blocks demo consumption.
 7. Additional code would be over-engineering for Slice 8I; the useful hardening
    is this consolidated evidence matrix.
+
+### Slice 8K Mobile Foundation Addendum
+
+Slice 8K adds dependency-free mobile TypeScript view-state foundations for note
+list and note detail flows. The adapters wrap the injected `@synapse/api-client`
+`notes.list` and `notes.get` methods, validate returned data with shared note
+schemas, and keep raw network access out of mobile feature modules.
+
+The list mapper preserves the API/client item ordering exactly as returned. It
+maps loading, empty, success, and coarse error states, including a bounded
+content preview for future list rows. The detail mapper carries authorized note
+content by design for successful owned-note detail views, while not-found,
+invalid-response, and unavailable states use UI-safe messages and do not expose
+backend diagnostics, auth headers, credentials, prompt text, provider details,
+or token-like values.
+
+The placeholder metadata names future note list/detail screen regions only. It
+does not add JSX, TSX, Expo, React Native, rendered UI, package changes,
+lockfile changes, production persistence, SQL, migrations, Supabase state,
+Docker work, OpenAI SDK usage, live provider wiring, credentials, or `.env`
+files.
 
 ## 4. Note CRUD Sequence
 
@@ -300,7 +322,25 @@ The same flow is available through `@synapse/api-client`:
 The client validates success/error envelopes and shared response contracts. It
 preserves snake_case field names and URL-encodes note ids in path segments.
 
-## 9. Verification
+## 9. Mobile View-State Surface
+
+The dependency-free mobile export surface now includes:
+
+- `createNoteListApi(client)`
+- `loadNoteListViewState(api, query)`
+- `mapNoteListDataToViewState(data)`
+- `mapNoteListErrorToViewState(error)`
+- `createNoteListPlaceholder(state)`
+- `createNoteDetailApi(client)`
+- `loadNoteDetailViewState(api, noteId)`
+- `mapNoteDetailDataToViewState(note)`
+- `mapNoteDetailErrorToViewState(noteId, error)`
+- `createNoteDetailPlaceholder(noteId, state)`
+
+These modules are plain `.ts` and are intended as future screen-ready state
+plumbing, not rendered mobile UI.
+
+## 10. Verification
 
 Focused verification for this walkthrough:
 
