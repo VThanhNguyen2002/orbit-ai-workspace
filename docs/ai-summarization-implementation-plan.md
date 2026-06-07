@@ -365,6 +365,7 @@ opt-in environment variable and never run in default CI.
 | **8O** | Dependency-free local API demo script *(Complete — `scripts/demo-api.sh`; bash/curl/python3 only; refuses non-local URLs; health, note CRUD, two fake summaries, newest-first verification)* |
 | **8P** | Demo script validation / README walkthrough alignment *(Complete — all docs aligned; no inconsistencies found; next-action updated)* |
 | **8Q-A** | Codex handoff notes *(Complete — handoff notes documented)* |
+| **8Q-B-SPEC** | Mobile API client boundary implementation packet *(Complete — implementation packet documented)* |
 | **8Q-B** | Review mobile API client construction boundary |
 | **8Q-C** | Refactor duplicated mobile toErrorRecord helper |
 | **8Q-D** | Portfolio/demo summary doc |
@@ -1141,6 +1142,19 @@ Next candidate slices are:
 - Slice 8Q-B: Review mobile API client construction boundary (Codex)
 - Slice 8Q-C: Refactor duplicated mobile toErrorRecord helper (Codex)
 - Slice 8Q-D: Portfolio/demo summary doc (AG)
+
+### Slice 8Q-B-SPEC Update — 2026-06-07
+
+Slice 8Q-B-SPEC prepares the mobile API client boundary implementation packet in
+[`docs/mobile-api-client-boundary-implementation-packet.md`](mobile-api-client-boundary-implementation-packet.md).
+This docs-only slice defines the choices (Options A, B, C) and exact prompts for Codex to safely execute the boundary review and tests in Slice 8Q-B.
+
+No runtime code, tests, package manifests, lockfiles, dependencies, Expo/React
+Native runtime, rendered mobile UI, live provider, OpenAI SDK, credential, `.env`
+file, WIF runtime, live API call, SSE streaming, SQL, migration, Supabase state,
+Docker work, `.gitleaksignore` broadening, or generated state was approved or
+added. The fake provider remains default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
 
 ---
 

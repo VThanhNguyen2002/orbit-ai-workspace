@@ -2,12 +2,10 @@
 
 ## Objective
 
-Slice 8Q-A is complete: Codex handoff notes written to
-[`docs/codex-handoff-notes.md`](codex-handoff-notes.md).
+Slice 8Q-B-SPEC is complete: Mobile API client boundary implementation packet written to
+[`docs/mobile-api-client-boundary-implementation-packet.md`](mobile-api-client-boundary-implementation-packet.md).
 
-Recommended next task: **Slice 8Q-B** (mobile API client boundary review, Codex)
-or **Slice 8Q-C** (refactor duplicated `toErrorRecord`, Codex)
-or **Slice 8Q-D** (portfolio/demo summary doc, AG if Codex quota unavailable).
+Recommended next task: **Slice 8Q-B** (mobile API client boundary review and hardening, Codex) using the prompt and rules in the packet.
 
 Do not proceed automatically. See handoff notes for full candidate breakdown.
 
@@ -16,6 +14,7 @@ See
 for the rendered mobile gate status. See
 [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md) for the API-level demo
 script and mobile view-state surface.
+
 
 ## Slice 8P Result
 

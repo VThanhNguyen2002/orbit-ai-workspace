@@ -8,12 +8,12 @@ _Generated: 2026-06-07. Do NOT proceed to coding automatically._
 
 | Field | Value |
 |---|---|
-| Latest commit | `802c88e` — `docs: align API demo script walkthrough` |
-| Latest green CI run | `27087899904` — completed success |
+| Latest commit | `bfbd897` — `docs: add Codex handoff notes` |
+| Latest green CI run | `27088155894` — completed success |
 | Worktree state | Clean (verified: `git status --short` empty) |
-| Gitleaks result | No leaks found (110 commits, 1.66 MB scanned) |
+| Gitleaks result | No leaks found |
 
-### Completed Slices (8A-R through 8P)
+### Completed Slices (8A-R through 8Q-A)
 
 | Slice | Summary |
 |---|---|
@@ -36,6 +36,8 @@ _Generated: 2026-06-07. Do NOT proceed to coding automatically._
 | 8N-B | Dependency-free mobile view-state unit tests (Vitest) |
 | 8O | Dependency-free local API demo script (`scripts/demo-api.sh`) |
 | 8P | Demo script validation / README walkthrough alignment — all docs aligned |
+| 8Q-A | Codex handoff notes — handoff notes documented |
+| 8Q-B-SPEC | Mobile API client boundary implementation packet for Codex (docs-only) |
 
 ### Current Product/Demo Capabilities
 
