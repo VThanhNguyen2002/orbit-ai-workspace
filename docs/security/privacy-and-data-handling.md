@@ -441,6 +441,18 @@ OpenAI SDK, credential, `.env` file, SQL, migration, Supabase state, Docker
 work, production persistence, live provider wiring, WIF runtime, or
 `.gitleaksignore` broadening is approved or added.
 
+Slice 8L is a read-only review of the dependency-free mobile note list, note
+detail, and summary history view-state foundations. Review confirms all three
+modules return only typed constant strings from their error mappers — no backend
+diagnostics, raw Zod error detail, auth headers, provider keys, or token-like
+values are reachable from view-state. `SummaryHistoryListItem` intentionally
+omits `provider` and `model` fields, keeping provider identity hidden from mobile
+consumers. `SUMMARY_HISTORY_MEMORY_NOTICE` is present in every summary history
+state variant, preventing accidental omission. No runtime code, tests, package
+manifests, lockfiles, dependencies, rendered mobile UI, OpenAI SDK, credential,
+`.env` file, SQL, migration, Supabase state, Docker work, or live provider is
+approved or added.
+
 ### Backend API Keys
 
 Secret names are documented without example values:

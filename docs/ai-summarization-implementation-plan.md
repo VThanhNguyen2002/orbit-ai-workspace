@@ -358,6 +358,9 @@ opt-in environment variable and never run in default CI.
 | **8H** | Note CRUD / summary demo API walkthrough hardening — dependency-free, no lockfile changes *(Complete — docs-only walkthrough recorded)* |
 | **8I** | Dependency-free API demo evidence hardening or API client gap review — no package/runtime changes *(Complete — docs-only evidence matrix recorded)* |
 | **8J** | Next dependency-free product slice or approval-gated rendered demo decision |
+| **8K** | Dependency-free mobile note list/detail view-state foundations *(Complete — noteListApi, noteDetailApi, noteListViewState, noteDetailViewState, placeholder metadata)* |
+| **8L** | Mobile note + summary view-state walkthrough/readiness review *(Complete — READY verdict; all three modules coherent, safe, screen-ready; Expo/RN remains BLOCKED/DEFERRED)* |
+| **8M** | README / CV / demo narrative polish — dependency-free, no code or lockfile changes |
 
 ### Slice 7E Update — 2026-06-01
 
@@ -969,6 +972,42 @@ fake provider remains the default, and the OpenAI SDK dependency remains
 
 Next recommended work is Slice 8L: Mobile note + summary view-state
 walkthrough/readiness review.
+
+### Slice 8L Update — 2026-06-07
+
+Slice 8L is a read-only review of the dependency-free mobile note list, note
+detail, and summary history view-state foundations. Verdict: **READY as a
+portfolio/product architecture layer.**
+
+All three modules follow the same `createIdle*/createLoading*/map*DataToViewState/
+map*ErrorToViewState/load*ViewState` pattern. Adapter boundaries use `Pick<>`
+narrowing against `NotesApi` and `AiApi`; no raw `fetch`, no provider internals,
+no concrete client imports appear in mobile feature modules. Schema validation
+sits at the adapter layer; view-state mappers receive already-typed domain data.
+Error states return only typed constant strings — no backend diagnostics, auth
+headers, provider keys, or token-like values reachable from view-state.
+
+`SUMMARY_HISTORY_MEMORY_NOTICE` is present in every `SummaryHistoryViewState`
+return value. `SummaryHistoryListItem` intentionally omits `provider` and
+`model` fields, keeping provider identity hidden from mobile consumers. No
+overclaiming of Expo or React Native is possible: placeholder `NON_GOALS` arrays
+and the `tsconfig.json` `"include": ["src/**/*.ts"]` restriction physically gate
+rendered-UI drift. Only minor gap found: `toErrorRecord` (4-line helper)
+duplicated across the three view-state modules — deferred to when a fourth module
+forces consolidation.
+
+Review record: [`docs/mobile-viewstate-readiness-review.md`](mobile-viewstate-readiness-review.md).
+
+No runtime code, tests, package manifests, lockfiles, dependencies, Expo/React
+Native runtime, rendered mobile UI, OpenAI SDK, credential, `.env` file, WIF
+runtime, SSE streaming, SQL, migration, Supabase state, Docker work,
+`.gitleaksignore` broadening, or generated state is approved or added. Summary
+history remains memory-only demo state, the fake provider remains the default,
+and the OpenAI SDK dependency remains **NOT APPROVED / DENIED**. Expo/React
+Native initialization remains **BLOCKED/DEFERRED** (12/12 approval gates still
+missing).
+
+Next recommended work is Slice 8M: README / CV / demo narrative polish.
 
 ---
 
