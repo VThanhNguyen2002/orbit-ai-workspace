@@ -1,8 +1,8 @@
-# Release / Readiness Checkpoint — Slices 8A–10A-R
+# Release / Readiness Checkpoint — Slices 8A–10B
 
 **Document type:** Release/readiness checkpoint (docs-only)
 **Created:** 2026-06-08
-**Author:** Slice 8U; updated by Slice 10A-R
+**Author:** Slice 8U; updated by Slice 10B
 
 ---
 
@@ -10,11 +10,11 @@
 
 | Field | Value |
 |---|---|
-| **Latest confirmed base commit** | `1e7d869` — `docs: polish portfolio release review` |
-| **Latest green CI** | Run `27129221678` — CI ✅ success (push to `main`) |
+| **Latest confirmed base commit** | `b8d038b` — `docs: defer notes search filter slice` |
+| **Latest green CI** | Run `27133707931` — CI ✅ success (push to `main`) |
 | **Current demo status** | 13-step `scripts/demo-api.sh` locally validated; backend server + script only, no external deps |
 | **Working tree** | Clean — no uncommitted changes |
-| **Readiness verdict** | **READY\_FOR\_PORTFOLIO\_REVIEW** · **READY\_FOR\_NEXT\_PRODUCT\_SLICE** |
+| **Readiness verdict** | **READY\_FOR\_PORTFOLIO\_REVIEW** (Feature work paused/frozen) |
 
 ---
 
@@ -95,6 +95,7 @@
 ### 2.11 README / Portfolio Docs
 
 - `README.md`: accurate capability table, explicit deferred table, architecture diagram, quality-gate instructions, security stance, documentation index.
+- `docs/project-intent-charter.md`: Project intent charter, IDSD alignment boundaries, non-goals, and stop rules.
 - `docs/portfolio-summary.md`: one-liner, capability table, 13-step demo flow, architecture value summary, security posture table, verifiable CV bullets, limitations.
 - `docs/api-demo-walkthrough.md`: step-by-step annotated demo.
 - `docs/next-action.md`: current recommended next task after each slice.
@@ -259,5 +260,5 @@ The following must **not** be claimed based on this repository's current state:
 ---
 
 *This document records the latest full readiness checkpoint confirmed at
-`1e7d869`, plus the Slice 10A-R docs-only defer decision. Update when the
+`b8d038b`, plus the Slice 10B intent-charter alignment. Update when the
 repository state changes materially.*

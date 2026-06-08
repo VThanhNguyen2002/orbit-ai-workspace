@@ -2,32 +2,17 @@
 
 ## Objective
 
-Slice 10A-R is complete: Notes search/filter was reviewed as a possible
-dependency-free product slice and deliberately deferred.
+Slice 10B is complete: The project intent charter has been added to establish IDSD alignment.
 
-The repository is **READY\_FOR\_PORTFOLIO\_REVIEW** (Option A) and **READY\_FOR\_NEXT\_PRODUCT\_SLICE**, with all security and dependency boundaries fully preserved.
+The repository is **READY_FOR_PORTFOLIO_REVIEW** with all feature work frozen.
 
-Do not proceed to the next slice automatically.
+Do not proceed to any feature/product slice automatically.
 
-## Slice 10A-R Result
+## Recommended Next Action
 
-*   **Decision**: Defer Notes search/filter implementation.
-*   **Reason**: Small demo gain; broad contract, backend, client, and test churn.
-*   **Record**: `docs/notes-search-filter-defer-record.md`.
-*   **Result**: Repo remains in portfolio/release review mode.
+*   **Pause feature work — use current repo for portfolio/review. Resume only with explicit product goal.**
 
-## Recommended Next Options
-
-Primary next task:
-
-*   **Pause feature work — use current repo for portfolio/review.**
-
-Still valid:
-
-*   **Slice 10B — Resume only after a new product goal is explicitly chosen.**
-*   **Supabase/RLS or rendered mobile UI planning**: Remain blocked and deferred until explicit approval gates are satisfied.
-
-## Standing Gates (unchanged)
+## Standing Gates
 
 *   No dependency or lockfile changes.
 *   No credentials, `.env`, OpenAI SDK, live provider, Supabase, Docker/RLS, SQL, or migrations.
