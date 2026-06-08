@@ -233,13 +233,52 @@ ensure_history_order "${final_history_file}" "${first_summary_id}" "${second_sum
 final_history_count="$(json_length "${final_history_file}" "data.items")"
 ok "summary history contains ${final_history_count} item(s), newest first"
 
+info "Updating note (correct version — expect 200)"
+update_file="${TMP_DIR}/update-note.json"
+update_payload="{\"title\":\"Updated demo planning note\",\"version\":${note_version}}"
+update_status="$(request PATCH "/notes/${note_id}" "${update_file}" "${update_payload}")"
+expect_status "Update note" "${update_status}" "200"
+note_updated_version="$(json_value "${update_file}" "data.version")"
+ok "note updated; new version ${note_updated_version}"
+
+info "Attempting update with stale version (expect 409 conflict)"
+conflict_file="${TMP_DIR}/update-note-conflict.json"
+conflict_payload="{\"title\":\"Stale update attempt\",\"version\":${note_version}}"
+conflict_status="$(request PATCH "/notes/${note_id}" "${conflict_file}" "${conflict_payload}")"
+if [[ "${conflict_status}" != "409" ]]; then
+  fail "Expected HTTP 409 for stale version; got ${conflict_status}."
+fi
+ok "conflict detected: HTTP 409 returned (stale version ${note_version} rejected; server is now at version ${note_updated_version})"
+
+info "Deleting note (correct version — expect 200)"
+delete_file="${TMP_DIR}/delete-note.json"
+delete_payload="{\"version\":${note_updated_version}}"
+delete_status="$(request DELETE "/notes/${note_id}" "${delete_file}" "${delete_payload}")"
+expect_status "Delete note" "${delete_status}" "200"
+delete_is_deleted="$(json_value "${delete_file}" "data.is_deleted")"
+delete_deleted_at="$(json_value "${delete_file}" "data.deleted_at")"
+if [[ "${delete_is_deleted}" != "True" ]]; then
+  fail "Expected is_deleted=True after delete; got ${delete_is_deleted}."
+fi
+ok "note soft-deleted; is_deleted=${delete_is_deleted}, deleted_at=${delete_deleted_at}"
+
+info "Confirming deleted note is hidden (expect 404)"
+gone_file="${TMP_DIR}/note-gone.json"
+gone_status="$(request GET "/notes/${note_id}" "${gone_file}")"
+if [[ "${gone_status}" != "404" ]]; then
+  fail "Expected HTTP 404 for deleted note; got ${gone_status}."
+fi
+ok "deleted note returns 404 — soft-delete isolation confirmed"
+
 cat <<EOF
 
 Demo complete.
 
-- Note CRUD route exercised: create, list, detail.
+- Note CRUD route exercised: create, list, detail, update, conflict (409), delete.
 - Fake-provider AI flow exercised: summarize twice, then list history.
 - Summary history append/newest-first behavior verified.
+- Versioned conflict detection verified: stale version rejected with HTTP 409.
+- Soft-delete isolation verified: deleted note returns 404 on subsequent GET.
 - No auth header, provider credential, .env file, Docker, Supabase, Expo, or
   live provider call was used.
 

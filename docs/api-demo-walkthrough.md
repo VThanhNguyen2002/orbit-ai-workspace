@@ -1,7 +1,7 @@
 # API Demo Walkthrough
 
-Slice: **8H / 8O**
-Date: 2026-06-06; updated 2026-06-07
+Slice: **8H / 8O / 8S**
+Date: 2026-06-06; updated 2026-06-08
 Status: **Complete — docs plus dependency-free local demo script**
 
 This walkthrough combines the existing Note CRUD API and fake-provider AI
@@ -73,6 +73,10 @@ The script performs:
 - summary history list
 - fake summarize again
 - final summary history list with newest-first append verification
+- note update (correct version → HTTP 200, version increment)
+- note update with stale version (conflict → HTTP 409 assertion)
+- note delete (correct version → HTTP 200, soft-delete)
+- deleted note GET (→ HTTP 404 isolation assertion)
 
 If the backend is not running, it fails clearly. If AI summarization is disabled
 or the backend is not in local dev auth mode, it stops with fixed guidance. The
@@ -356,7 +360,90 @@ Authorized note detail responses may include note content because that is the
 purpose of `GET /v1/notes/{note_id}`. The non-leak requirement applies to AI
 summary/history surfaces and diagnostics.
 
-## 9. API Client Walkthrough Surface
+## 9. Scripted Update / Conflict / Delete Steps (Slice 8S)
+
+The following steps are exercised by `scripts/demo-api.sh` after the summary
+history verification and do not require any additional setup.
+
+### Step 10 — Update Note (Correct Version)
+
+```http
+PATCH /v1/notes/{note_id}
+```
+
+```json
+{ "title": "Updated demo planning note", "version": 1 }
+```
+
+The script uses the version captured at create time.
+
+Expected result:
+
+- HTTP `200`
+- `data.title` reflects the updated value
+- `data.version` increments by one
+- `data.updated_at` advances
+
+The script captures the new version for use in subsequent steps.
+
+### Step 11 — Update Note (Stale Version → 409 Conflict)
+
+```http
+PATCH /v1/notes/{note_id}
+```
+
+```json
+{ "title": "Stale update attempt", "version": 1 }
+```
+
+The script reuses the original (now stale) version intentionally.
+
+Expected result:
+
+- HTTP `409`
+- error envelope with `code: "CONFLICT"`
+- `details[0].expected` contains the version the client sent
+- `details[0].actual` contains the current server version
+- `details[0].server_data` contains the current server note
+
+The script asserts that the status is exactly `409`; any other status fails the demo.
+
+### Step 12 — Delete Note (Correct Version)
+
+```http
+DELETE /v1/notes/{note_id}
+```
+
+```json
+{ "version": 2 }
+```
+
+The script uses the updated version captured from Step 10.
+
+Expected result:
+
+- HTTP `200`
+- `data.is_deleted` is `true`
+- `data.deleted_at` is set
+- `data.version` increments by one
+
+### Step 13 — Confirm Deleted Note Is Hidden (404)
+
+```http
+GET /v1/notes/{note_id}
+```
+
+Expected result:
+
+- HTTP `404`
+- The soft-deleted note is invisible to subsequent GET requests
+- Cross-user and soft-delete isolation uses the same 404 response; no `403` leaks ownership
+
+The script asserts exactly `404`; any other status fails the demo.
+
+---
+
+## 10. API Client Walkthrough Surface
 
 The same flow is available through `@synapse/api-client`:
 
@@ -371,7 +458,7 @@ The same flow is available through `@synapse/api-client`:
 The client validates success/error envelopes and shared response contracts. It
 preserves snake_case field names and URL-encodes note ids in path segments.
 
-## 10. Mobile View-State Surface
+## 11. Mobile View-State Surface
 
 The dependency-free mobile export surface now includes:
 
@@ -389,7 +476,7 @@ The dependency-free mobile export surface now includes:
 These modules are plain `.ts` and are intended as future screen-ready state
 plumbing, not rendered mobile UI.
 
-## 11. Verification
+## 12. Verification
 
 Focused verification for this walkthrough:
 
@@ -401,7 +488,7 @@ pnpm --filter @synapse/api-client test
 pnpm --filter @synapse/shared contracts:check
 ```
 
-Script check:
+Script syntax check (Slice 8S extended script):
 
 ```bash
 bash -n scripts/demo-api.sh
