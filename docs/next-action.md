@@ -2,7 +2,7 @@
 
 ## Objective
 
-Slice 10B is complete: The project intent charter has been added to establish IDSD alignment.
+Final documentation polish is complete: The API endpoint summary has been added to establish clear portfolio boundaries.
 
 The repository is **READY_FOR_PORTFOLIO_REVIEW** with all feature work frozen.
 

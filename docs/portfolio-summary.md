@@ -74,6 +74,7 @@ No Supabase, Docker, OpenAI API key, `.env` file, or package install required.
 ```
 
 Full step-by-step: [`docs/api-demo-walkthrough.md`](api-demo-walkthrough.md)
+Detailed endpoint list: [`docs/api-endpoint-summary.md`](api-endpoint-summary.md)
 
 ---
 

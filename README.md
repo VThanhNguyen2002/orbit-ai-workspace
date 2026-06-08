@@ -192,6 +192,7 @@ See [docs/security/privacy-and-data-handling.md](docs/security/privacy-and-data-
 | Document | Purpose |
 |---|---|
 | [Project Intent Charter](docs/project-intent-charter.md) | IDSD alignment boundaries, intent layers, non-goals, and stop rules |
+| [API Endpoint Summary](docs/api-endpoint-summary.md) | Implemented local/demo API endpoints, resume-safe summaries, and do-not-claim reminders |
 | [Release/Readiness Checkpoint](docs/release-readiness-checkpoint.md) | Slices 8A–8T summary, readiness verdict, do-not-claim list |
 | [Portfolio Summary](docs/portfolio-summary.md) | Project overview, demo flow, CV-safe bullets, limitations |
 | [API Demo Walkthrough](docs/api-demo-walkthrough.md) | Step-by-step Note CRUD + fake AI demo (13 steps) |

@@ -96,6 +96,7 @@
 
 - `README.md`: accurate capability table, explicit deferred table, architecture diagram, quality-gate instructions, security stance, documentation index.
 - `docs/project-intent-charter.md`: Project intent charter, IDSD alignment boundaries, non-goals, and stop rules.
+- `docs/api-endpoint-summary.md`: Implemented local/demo API endpoints, resume-safe summaries, and do-not-claim reminders.
 - `docs/portfolio-summary.md`: one-liner, capability table, 13-step demo flow, architecture value summary, security posture table, verifiable CV bullets, limitations.
 - `docs/api-demo-walkthrough.md`: step-by-step annotated demo.
 - `docs/next-action.md`: current recommended next task after each slice.
