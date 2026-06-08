@@ -366,7 +366,7 @@ opt-in environment variable and never run in default CI.
 | **8P** | Demo script validation / README walkthrough alignment *(Complete — all docs aligned; no inconsistencies found; next-action updated)* |
 | **8Q-A** | Codex handoff notes *(Complete — handoff notes documented)* |
 | **8Q-B-SPEC** | Mobile API client boundary implementation packet *(Complete — implementation packet documented)* |
-| **8Q-B** | Review mobile API client construction boundary |
+| **8Q-B** | Mobile API client boundary + mobile test infra *(Complete — `ai` + `notes` boundary; mobile tests run through workspace Vitest globals)* |
 | **8Q-C** | Refactor duplicated mobile toErrorRecord helper |
 | **8Q-D** | Portfolio/demo summary doc |
 
@@ -1139,7 +1139,6 @@ fake provider remains default, and the OpenAI SDK dependency remains
 **NOT APPROVED / DENIED**.
 
 Next candidate slices are:
-- Slice 8Q-B: Review mobile API client construction boundary (Codex)
 - Slice 8Q-C: Refactor duplicated mobile toErrorRecord helper (Codex)
 - Slice 8Q-D: Portfolio/demo summary doc (AG)
 
@@ -1155,6 +1154,26 @@ file, WIF runtime, live API call, SSE streaming, SQL, migration, Supabase state,
 Docker work, `.gitleaksignore` broadening, or generated state was approved or
 added. The fake provider remains default, and the OpenAI SDK dependency remains
 **NOT APPROVED / DENIED**.
+
+### Slice 8Q-B Update — 2026-06-08
+
+Slice 8Q-B fixes the mobile API client boundary and mobile test runner without
+adding dependencies or editing the lockfile. `MobileSynapseClient` now narrows
+`SynapseApiClient` to `Pick<SynapseApiClient, "ai" | "notes">`, matching the
+note list/detail adapters and the summary history adapter. `pnpm --filter
+mobile test` now runs the existing workspace Vitest install with `--globals`.
+Mobile tests intentionally keep `testGlobals.ts`; direct imports from `vitest`
+remain deferred until mobile owns, or is explicitly approved for, a Vitest
+dependency.
+
+The new mobile client test uses injected fake fetch responses only and proves
+one `createMobileSynapseClient()` composes with note list, note detail, and
+summary history adapters. No real network call, credential, provider SDK,
+`.env` file, SQL, migration, Supabase state, Docker work, Expo/React Native
+runtime, JSX/TSX, rendered UI, package dependency addition, lockfile change,
+or `.gitleaksignore` broadening is approved or added. Summary history remains
+memory-only demo state, the fake provider remains the default, and the OpenAI
+SDK dependency remains **NOT APPROVED / DENIED**.
 
 ---
 

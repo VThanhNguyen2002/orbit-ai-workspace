@@ -465,6 +465,16 @@ Native runtime, rendered UI, OpenAI SDK, provider credentials, `.env` files,
 SQL, migrations, Supabase state, Docker work, WIF runtime, or production
 persistence.
 
+Slice 8Q-B keeps mobile tests on the no-new-dependency path. `pnpm --filter
+mobile test` runs the existing workspace Vitest install with globals enabled,
+and mobile tests intentionally keep `testGlobals.ts` until mobile owns, or is
+explicitly approved for, a Vitest dependency. The new mobile client composition
+test uses injected fake fetch responses only; it makes no real network calls,
+uses no credentials or token examples, and introduces no OpenAI SDK, Supabase
+state, Docker/RLS/live-provider work, Expo/React Native runtime, JSX/TSX,
+rendered UI, SQL, migrations, dependency additions, lockfile changes, or
+`.gitleaksignore` changes.
+
 Slice 8O adds `scripts/demo-api.sh` for local API walkthroughs. The script is
 restricted to localhost-style base URLs, sends no auth header, uses no provider
 credential, creates no `.env` file, starts no Docker/Supabase/Expo process, and

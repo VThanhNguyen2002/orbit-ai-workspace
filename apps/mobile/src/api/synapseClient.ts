@@ -7,7 +7,7 @@ import {
 
 export const MOBILE_API_BASE_URL = DEFAULT_API_BASE_URL;
 
-export type MobileSynapseClient = Pick<SynapseApiClient, "ai">;
+export type MobileSynapseClient = Pick<SynapseApiClient, "ai" | "notes">;
 export type MobileSynapseClientConfig = ApiClientConfig;
 
 export function createMobileSynapseClient(

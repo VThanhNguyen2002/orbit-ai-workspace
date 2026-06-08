@@ -1,6 +1,6 @@
-# Codex Handoff Notes — Slice 8Q-A
+# Codex Handoff Notes — Slice 8Q-B
 
-_Generated: 2026-06-07. Do NOT proceed to coding automatically._
+_Generated: 2026-06-08. Do NOT proceed to coding automatically._
 
 ---
 
@@ -8,9 +8,9 @@ _Generated: 2026-06-07. Do NOT proceed to coding automatically._
 
 | Field | Value |
 |---|---|
-| Latest commit | `bfbd897` — `docs: add Codex handoff notes` |
-| Latest green CI run | `27088155894` — completed success |
-| Worktree state | Clean (verified: `git status --short` empty) |
+| Base commit before Slice 8Q-B | `d7d8dcd` — previous green `origin/main` |
+| Latest green CI run before Slice 8Q-B | `27088547279` — completed success |
+| Pre-slice worktree state | Clean (verified: `git status --short` empty before local edits) |
 | Gitleaks result | No leaks found |
 
 ### Completed Slices (8A-R through 8Q-A)
@@ -38,6 +38,7 @@ _Generated: 2026-06-07. Do NOT proceed to coding automatically._
 | 8P | Demo script validation / README walkthrough alignment — all docs aligned |
 | 8Q-A | Codex handoff notes — handoff notes documented |
 | 8Q-B-SPEC | Mobile API client boundary implementation packet for Codex (docs-only) |
+| 8Q-B | Mobile test script + API client boundary hardening |
 
 ### Current Product/Demo Capabilities
 
@@ -48,7 +49,7 @@ _Generated: 2026-06-07. Do NOT proceed to coding automatically._
 - **API client** (`packages/api-client`): Notes CRUD + `client.ai.summarizeNote()` + `client.ai.listNoteSummaries()`.
 - **Shared Zod contracts** (`packages/shared`): Notes, AI summarization wire contracts, summary schema, history envelope, schema registry.
 - **Mobile TypeScript** (`apps/mobile/src`): dependency-free note list/detail/summary view-state, injected API adapter, no Expo runtime.
-- **Mobile view-state tests**: Vitest unit coverage for note list, note detail, summary history adapter and orchestrator.
+- **Mobile tests**: Vitest unit coverage for note list, note detail, summary history adapter/orchestrator, and mobile client composition.
 - **README**: accurate capability table, explicit deferrals table, architecture overview, quality gates, security stance.
 
 ---
@@ -91,13 +92,15 @@ _Generated: 2026-06-07. Do NOT proceed to coding automatically._
 - `apps/mobile/src/features/notes/noteListViewState.ts` — idle/loading/success/error/empty states.
 - `apps/mobile/src/features/notes/noteDetailViewState.ts` — single note states.
 - `apps/mobile/src/features/notes/summaryHistoryViewState.ts` — summary history adapter + orchestrator.
-- `apps/mobile/src/api/synapseClient.ts` — `createMobileSynapseClient()` wraps `createApiClient`; `Pick<SynapseApiClient, "ai">` boundary; injectable config.
+- `apps/mobile/src/api/synapseClient.ts` — `createMobileSynapseClient()` wraps `createApiClient`; `Pick<SynapseApiClient, "ai" | "notes">` boundary; injectable config.
 - No Expo, no JSX, no TSX, no React Native runtime.
 
 ### Mobile View-State Tests
 
-- `apps/mobile/src/__tests__/` — Vitest unit tests for all three view-state modules.
-- All tests run via workspace Vitest (`pnpm --filter @synapse/mobile test`).
+- `apps/mobile/src/features/notes/*.test.ts` — Vitest unit tests for all three view-state modules and note API adapters.
+- `apps/mobile/src/api/synapseClient.test.ts` — fake-fetch composition test for `createMobileSynapseClient()`, note list/detail adapters, and summary history adapter.
+- All mobile tests run via `pnpm --filter mobile test`, which invokes the existing workspace Vitest install with `--globals`.
+- Vitest globals are an intentional no-new-dependency compromise. Direct `vitest` imports are deferred until mobile owns, or is explicitly approved for, a Vitest dependency.
 
 ### API Demo Script
 
@@ -154,21 +157,24 @@ pnpm --filter @synapse/api-client test
 pnpm --filter @synapse/shared test     # or: pnpm contracts:check
 
 # 6. Mobile lint
-pnpm --filter @synapse/mobile lint
+pnpm --filter mobile lint
 
 # 7. Mobile direct tsc (dependency-free TypeScript typecheck)
-cd apps/mobile && npx tsc --noEmit
+pnpm --filter mobile exec tsc --noEmit -p tsconfig.json
 
-# 8. Root lint / typecheck / test / build
+# 8. Mobile tests
+pnpm --filter mobile test
+
+# 9. Root lint / typecheck / test / build
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
 
-# 9. Secret scan
+# 10. Secret scan
 gitleaks detect --source=. --redact
 
-# 10. Demo script syntax check
+# 11. Demo script syntax check
 bash -n scripts/demo-api.sh
 ```
 
@@ -194,26 +200,7 @@ bash -n scripts/demo-api.sh
 
 ## 6. Next Candidate Slices
 
-### Option A — `Slice 8Q-B: Review Mobile API Client Construction Boundary`
-
-**Value:** `apps/mobile/src/api/synapseClient.ts` is currently unreviewed. It wraps
-`createApiClient` and narrows to `Pick<SynapseApiClient, "ai">`. A structured
-review would confirm whether: the boundary is correctly scoped (notes CRUD access
-is absent — intentional?), config defaults are safe, injectable `fetch`/`getAuthToken`
-are correctly threaded, and edge cases (missing config, baseUrl override) are
-handled. Produces a short review memo.
-
-**Risk:** Low — docs-only or minor code fix if an issue is found. No package
-changes needed.
-
-**Recommended agent:** Codex/C (code read + light analysis).
-
-**Worth doing now?** Yes — unreviewed boundary is a residual risk. High value for
-low cost.
-
----
-
-### Option B — `Slice 8Q-C: Refactor Duplicated Mobile toErrorRecord Helper`
+### Option A — `Slice 8Q-C: Refactor Duplicated Mobile toErrorRecord Helper`
 
 **Value:** `toErrorRecord` is defined identically in three mobile modules
 (`noteListViewState.ts`, `noteDetailViewState.ts`, `summaryHistoryViewState.ts`).
@@ -231,7 +218,7 @@ and re-run of mobile tests to confirm green.
 
 ---
 
-### Option C — `Slice 8Q-D: Portfolio/Demo Summary Doc`
+### Option B — `Slice 8Q-D: Portfolio/Demo Summary Doc`
 
 **Value:** Creates `docs/portfolio-summary.md` framing the project for a job
 application: tech decisions made, what was built vs. deferred, honest capability
@@ -251,11 +238,10 @@ technical value but high career/demo value.
 
 | If… | Recommended next slice |
 |---|---|
-| Codex quota available | **Option A (8Q-B)** — client boundary review; highest residual-risk payoff |
-| Codex quota available, prefer refactor | **Option B (8Q-C)** — `toErrorRecord` consolidation |
-| Codex quota unavailable | **Option C (8Q-D)** — portfolio summary doc via AG |
+| Codex quota available | **Option A (8Q-C)** — `toErrorRecord` consolidation |
+| Codex quota unavailable | **Option B (8Q-D)** — portfolio summary doc via AG |
 
-**Prefer Option A or B for Codex. Prefer Option C for AG.**
+**Prefer Option A for Codex. Prefer Option B for AG.**
 
 ---
 
@@ -263,13 +249,11 @@ technical value but high career/demo value.
 
 **If coding quota is available:**
 
-> **`Slice 8Q-B — Review mobile API client construction boundary`**
+> **`Slice 8Q-C — Refactor duplicated mobile toErrorRecord helper`**
 >
-> Read `apps/mobile/src/api/synapseClient.ts` and the surrounding mobile source.
-> Produce a short review memo (or inline doc update) confirming the boundary is
-> correctly scoped, safe, and consistent with the API client contract. If a gap
-> is found, produce a minimal targeted fix. Do not change package manifests,
-> lockfiles, or introduce new dependencies.
+> Extract the duplicated `toErrorRecord` helper from the three mobile
+> view-state modules into a small shared mobile utility. Keep behavior unchanged,
+> preserve UI-safe error messages, and re-run mobile tests.
 
 **If coding quota is unavailable:**
 
@@ -304,7 +288,7 @@ In all cases: **STOP, report the blocker, and await explicit approval.**
 | Risk | Severity | Owner |
 |---|---|---|
 | `toErrorRecord` duplicated 3× in mobile view-state modules | Low | Codex (Slice 8Q-C) |
-| `apps/mobile/src/api/synapseClient.ts` boundary unreviewed | Low-Medium | Codex (Slice 8Q-B) |
+| Direct `vitest` imports in mobile tests are deferred until mobile owns/receives an approved Vitest dependency | Low | Future package approval slice |
 | Node.js 20 deprecation annotation in GitHub Actions | Low — CI green, cosmetic only | Future Node upgrade slice |
 | Summary history is memory-only (resets on restart) | Known/accepted — demo-only scope | Future persistence slice |
 | Expo / rendered mobile UI blocked | Accepted — 10/12 gates missing | Blocked pending approval |
