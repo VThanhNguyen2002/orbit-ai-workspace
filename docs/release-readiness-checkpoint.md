@@ -1,8 +1,8 @@
-# Release / Readiness Checkpoint — Slices 8A–9C-R
+# Release / Readiness Checkpoint — Slices 8A–10A-R
 
 **Document type:** Release/readiness checkpoint (docs-only)
 **Created:** 2026-06-08
-**Author:** Slice 8U
+**Author:** Slice 8U; updated by Slice 10A-R
 
 ---
 
@@ -10,8 +10,8 @@
 
 | Field | Value |
 |---|---|
-| **Latest commit** | `b017105` — `docs: record mobile mutation view-state readiness` |
-| **Latest green CI** | Run `27127541881` — CI ✅ success (push to `main`, ~46 s) |
+| **Latest confirmed base commit** | `1e7d869` — `docs: polish portfolio release review` |
+| **Latest green CI** | Run `27129221678` — CI ✅ success (push to `main`) |
 | **Current demo status** | 13-step `scripts/demo-api.sh` locally validated; backend server + script only, no external deps |
 | **Working tree** | Clean — no uncommitted changes |
 | **Readiness verdict** | **READY\_FOR\_PORTFOLIO\_REVIEW** · **READY\_FOR\_NEXT\_PRODUCT\_SLICE** |
@@ -124,7 +124,8 @@
 
 ## 4. Quality Gates
 
-All of the following are verified passing as of commit `b017105`:
+All of the following were verified passing at the latest full quality-gate
+checkpoint, confirmed before Slice 10A-R at commit `1e7d869`:
 
 | Gate | Tool / Command | Status |
 |---|---|---|
@@ -194,19 +195,36 @@ All gates run automatically on CI (GitHub Actions) on every push to `main`.
 
 Both verdicts apply simultaneously. See Section 8 for options.
 
+### Slice 10A-R Decision Addendum
+
+Notes search/filter was reviewed as a possible dependency-free product slice and
+deferred. `GET /v1/notes` already supports pagination, sorting, archive
+filtering, and deleted-note inclusion. Adding text query support now would
+require coordinated backend, shared-contract, API-client, and test updates for
+only modest demo value.
+
+The repository should remain in portfolio/release review mode unless a new
+product goal is explicitly chosen. See
+`docs/notes-search-filter-defer-record.md`.
+
 ---
 
 ## 8. Recommended Next Options
 
 ### Option A — Pause feature work; use for portfolio / CV review
 
-Use the repository at commit `b017105` as a portfolio artefact. Share the GitHub URL and `docs/portfolio-summary.md`. No further code changes needed. Demo instructions are in `README.md` and `docs/api-demo-walkthrough.md`.
+Use the repository as a portfolio artefact. Share the GitHub URL and
+`docs/portfolio-summary.md`. No further code changes needed. Demo instructions
+are in `README.md` and `docs/api-demo-walkthrough.md`.
 
 **Appropriate when:** the immediate goal is a job application, code review, or interview demonstration.
 
-### Option B — Start next dependency-free product slice
+### Option B — Resume only after a new product goal is explicitly chosen
 
-Pick a new capability that does not require OpenAI SDK, Supabase, Docker, Expo, or any currently denied dependency. Example: note tagging, search, or a new view-state module. Follow the same slice structure and gates.
+Pick a new capability only after it has a clear product goal and demo value.
+Notes search/filter is currently deferred because its demo value does not justify
+the cross-layer contract and test churn. Any future slice must still avoid
+OpenAI SDK, Supabase, Docker, Expo, and currently denied dependencies.
 
 **Appropriate when:** the goal is to continue portfolio depth before portfolio review.
 
@@ -240,4 +258,6 @@ The following must **not** be claimed based on this repository's current state:
 
 ---
 
-*This document is accurate as of commit `b017105`. Update when the repository state changes materially.*
+*This document records the latest full readiness checkpoint confirmed at
+`1e7d869`, plus the Slice 10A-R docs-only defer decision. Update when the
+repository state changes materially.*

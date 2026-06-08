@@ -2,28 +2,29 @@
 
 ## Objective
 
-Slice 9D is complete: The portfolio / release review gate is passed, confirming that the repository is clean, honest, and ready for recruiter/interviewer review.
+Slice 10A-R is complete: Notes search/filter was reviewed as a possible
+dependency-free product slice and deliberately deferred.
 
 The repository is **READY\_FOR\_PORTFOLIO\_REVIEW** (Option A) and **READY\_FOR\_NEXT\_PRODUCT\_SLICE**, with all security and dependency boundaries fully preserved.
 
 Do not proceed to the next slice automatically.
 
-## Slice 9D Result
+## Slice 10A-R Result
 
-*   **Readiness Verdict**: READY_FOR_REVIEW.
-*   **Audit scope**: Reviewed README, portfolio summary, walkthroughs, readiness reviews, privacy/data doc, and demo runbook scripts.
-*   **Result**: Confirmed absolute honesty (no overclaims), clear demo run instructions, robust contract alignment, complete safety/leak redaction, and clean separation of concerns.
-*   **Documentation**: Polished portfolio summary, api walkthrough, and release readiness checkpoint.
+*   **Decision**: Defer Notes search/filter implementation.
+*   **Reason**: Small demo gain; broad contract, backend, client, and test churn.
+*   **Record**: `docs/notes-search-filter-defer-record.md`.
+*   **Result**: Repo remains in portfolio/release review mode.
 
 ## Recommended Next Options
 
 Primary next task:
 
-*   **Portfolio / CV Review (Option A/C)**: Freeze further feature work. Share the repository and `docs/portfolio-summary.md` for portfolio review.
+*   **Pause feature work — use current repo for portfolio/review.**
 
 Still valid:
 
-*   **Next dependency-free product slice**: If additional product domains are requested.
+*   **Slice 10B — Resume only after a new product goal is explicitly chosen.**
 *   **Supabase/RLS or rendered mobile UI planning**: Remain blocked and deferred until explicit approval gates are satisfied.
 
 ## Standing Gates (unchanged)
