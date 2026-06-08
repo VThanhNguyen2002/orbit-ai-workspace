@@ -1245,6 +1245,31 @@ is approved or added. Summary history remains memory-only demo state, the fake
 provider remains the default, and the OpenAI SDK dependency remains
 **NOT APPROVED / DENIED**.
 
+### Slice 9B Update — 2026-06-08
+
+Slice 9B adds dependency-free mobile note mutation foundations. The new
+`noteMutationApi` adapter wraps the existing API client `notes.create`,
+`notes.update`, and `notes.delete` methods through an injected client boundary
+and validates returned notes with the shared `NoteSchema`. The new
+`noteMutationViewState` module models create, update, and delete states for
+future screens: idle, submitting, success, conflict, not-found,
+invalid-response, and unavailable. Version conflicts map to a UI-safe conflict
+reason/message and never expose raw backend diagnostics or server envelopes.
+
+Mobile tests now cover mutation adapter calls, create/update/delete success
+states, version-conflict handling, delete/unavailable handling, invalid
+response and not-found mapping, and redaction of synthetic raw diagnostics from
+UI state. `createMobileSynapseClient()` composition coverage now includes the
+mutation adapter in addition to list/detail/summary history adapters.
+
+No backend API behavior, shared contracts, API client implementation, package
+manifests, lockfiles, dependencies, credentials, `.env`, SQL, migrations,
+Supabase, Docker, Expo/RN, JSX/TSX, rendered UI, OpenAI SDK, live provider
+call, WIF runtime, production persistence, or `.gitleaksignore` broadening is
+approved or added. Summary history remains memory-only demo state, the fake
+provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
 ---
 
 

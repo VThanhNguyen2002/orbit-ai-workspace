@@ -5,6 +5,8 @@ export * from "./features/notes/noteDetailViewState";
 export * from "./features/notes/noteListApi";
 export * from "./features/notes/noteListPlaceholder";
 export * from "./features/notes/noteListViewState";
+export * from "./features/notes/noteMutationApi";
+export * from "./features/notes/noteMutationViewState";
 export * from "./features/notes/noteSummaryHistoryPlaceholder";
 export * from "./features/notes/summaryHistoryApi";
 export * from "./features/notes/summaryHistoryViewState";

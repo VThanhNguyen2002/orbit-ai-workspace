@@ -2,40 +2,54 @@
 
 ## Objective
 
-Slice 8U is complete: `docs/release-readiness-checkpoint.md` has been created,
-summarizing the repository state after Slices 8A–8T with a formal readiness
-verdict, quality-gate table, security posture, remaining limitations, and
-recommended next options.
+Slice 9B is complete: dependency-free mobile note mutation API adapters and
+view-state foundations have been added for create, update, and delete flows.
 
-Readiness verdict: **READY\_FOR\_PORTFOLIO\_REVIEW** and
-**READY\_FOR\_NEXT\_PRODUCT\_SLICE**.
+The repository remains **READY\_FOR\_PORTFOLIO\_REVIEW** and
+**READY\_FOR\_NEXT\_PRODUCT\_SLICE**, with the same blocked gates preserved.
 
 Do not proceed to the next slice automatically.
 
-## Slice 8U Result
+## Slice 9B Result
 
-Slice 8U added docs only:
+Slice 9B added mobile TypeScript-only mutation foundations:
 
-- `docs/release-readiness-checkpoint.md` — formal readiness checkpoint:
-  checkpoint summary, implemented capabilities, verified demo flow (13 steps),
-  quality gates, security posture, remaining risks/limitations, readiness
-  verdict, recommended next options (A–D), and do-not-claim list.
-- `README.md` — documentation index updated to include checkpoint link.
-- `docs/next-action.md` — this file updated.
-- `docs/ai-summarization-implementation-plan.md` — Slice 8U entry added.
+- `apps/mobile/src/features/notes/noteMutationApi.ts` — injected
+  `notes.create`, `notes.update`, and `notes.delete` adapter, validating
+  returned notes through shared contracts.
+- `apps/mobile/src/features/notes/noteMutationViewState.ts` —
+  create/update/delete idle, submitting, success, conflict, not-found,
+  invalid-response, and unavailable states with UI-safe messages.
+- `apps/mobile/src/features/notes/noteMutationViewState.test.ts` — mutation
+  state coverage for success, errors, version conflicts, and diagnostic
+  redaction.
+- `apps/mobile/src/features/notes/noteApiAdapters.test.ts` and
+  `apps/mobile/src/api/synapseClient.test.ts` — adapter/client composition
+  coverage for note mutations.
+- `apps/mobile/src/index.ts` — exports the new mutation adapter and view-state
+  modules.
 
-No runtime code, tests, package manifests, lockfiles, dependencies, credentials,
-`.env`, SQL, migrations, Supabase, Docker, Expo/RN, JSX/TSX, or
-`.gitleaksignore` changes were made.
+No backend API behavior, shared contracts, API client implementation, package
+manifests, lockfiles, dependencies, credentials, `.env`, SQL, migrations,
+Supabase, Docker, Expo/RN, JSX/TSX, rendered UI, OpenAI SDK, live provider
+wiring, WIF runtime, production persistence, or `.gitleaksignore` changes were
+made.
 
 ## Recommended Next Options
 
-See `docs/release-readiness-checkpoint.md` §8 for the full option set:
+Primary next task:
 
-- **Option A** — pause feature work; use current repo for portfolio/CV review.
-- **Option B** — start next dependency-free product slice.
-- **Option C** — plan Supabase/RLS persistence (approval-gated).
-- **Option D** — plan rendered mobile UI (approval-gated, Expo/RN gates).
+- **Slice 9C — Mobile mutation view-state readiness review**: inspect Slice 9B
+  for contract alignment, UI-safe error posture, and whether any docs/readiness
+  checkpoint update is warranted.
+
+Still valid:
+
+- **Pause** — use the repo for portfolio/CV review as-is.
+- **Next dependency-free product slice** — only if a concrete product gap is
+  identified after Slice 9C.
+- **Supabase/RLS or rendered mobile UI planning** — approval-gated and still
+  deferred.
 
 ## Standing Gates (unchanged)
 

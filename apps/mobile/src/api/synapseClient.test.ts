@@ -2,6 +2,7 @@ import type { FetchLike, FetchRequestInit } from "@synapse/api-client";
 
 import { createNoteDetailApi } from "../features/notes/noteDetailApi";
 import { createNoteListApi } from "../features/notes/noteListApi";
+import { createNoteMutationApi } from "../features/notes/noteMutationApi";
 import { createSummaryHistoryApi } from "../features/notes/summaryHistoryApi";
 import {
   createNote,
@@ -30,8 +31,21 @@ function createSuccessResponse(data: unknown, requestId: string) {
 }
 
 describe("createMobileSynapseClient", () => {
-  it("composes with note list, note detail, and summary history adapters", async () => {
+  it("composes with note read, mutation, and summary history adapters", async () => {
     const note = createNote();
+    const createdNote = createNote({
+      content: "",
+      content_type: "plain",
+    });
+    const updatedNote = createNote({
+      title: "Updated planning note",
+      version: 2,
+    });
+    const deletedNote = createNote({
+      is_deleted: true,
+      deleted_at: "2026-05-19T12:30:00.000Z",
+      version: 3,
+    });
     const summary = createSummary();
     const requests: RecordedRequest[] = [];
     const fetch: FetchLike = async (
@@ -58,7 +72,19 @@ describe("createMobileSynapseClient", () => {
         );
       }
 
+      if (input.endsWith("/notes") && init?.method === "POST") {
+        return createSuccessResponse(createdNote, "req_mobile_client_create");
+      }
+
       if (input.endsWith(`/notes/${noteId}`)) {
+        if (init?.method === "PATCH") {
+          return createSuccessResponse(updatedNote, "req_mobile_client_update");
+        }
+
+        if (init?.method === "DELETE") {
+          return createSuccessResponse(deletedNote, "req_mobile_client_delete");
+        }
+
         return createSuccessResponse(note, "req_mobile_client_detail");
       }
 
@@ -80,10 +106,21 @@ describe("createMobileSynapseClient", () => {
     const client = createMobileSynapseClient({ fetch });
     const noteListApi = createNoteListApi(client);
     const noteDetailApi = createNoteDetailApi(client);
+    const noteMutationApi = createNoteMutationApi(client);
     const summaryHistoryApi = createSummaryHistoryApi(client);
 
     const noteList = await noteListApi.listNotes({ page: 1, per_page: 20 });
     const noteDetail = await noteDetailApi.getNote(noteId);
+    const created = await noteMutationApi.createNote({
+      title: "Planning note",
+      content: "",
+      content_type: "plain",
+    });
+    const updated = await noteMutationApi.updateNote(noteId, {
+      title: "Updated planning note",
+      version: 1,
+    });
+    const deleted = await noteMutationApi.deleteNote(noteId, { version: 2 });
     const summaryHistory = await summaryHistoryApi.listForNote(noteId);
     const generatedSummary = await summaryHistoryApi.summarizeForNote(noteId);
 
@@ -97,6 +134,9 @@ describe("createMobileSynapseClient", () => {
       },
     });
     expect(noteDetail).toEqual(note);
+    expect(created).toEqual(createdNote);
+    expect(updated).toEqual(updatedNote);
+    expect(deleted).toEqual(deletedNote);
     expect(summaryHistory).toEqual({
       items: [summary],
     });
@@ -110,6 +150,18 @@ describe("createMobileSynapseClient", () => {
       {
         input: `http://localhost:8000/v1/notes/${noteId}`,
         method: "GET",
+      },
+      {
+        input: "http://localhost:8000/v1/notes",
+        method: "POST",
+      },
+      {
+        input: `http://localhost:8000/v1/notes/${noteId}`,
+        method: "PATCH",
+      },
+      {
+        input: `http://localhost:8000/v1/notes/${noteId}`,
+        method: "DELETE",
       },
       {
         input: `http://localhost:8000/v1/ai/notes/${noteId}/summaries`,
