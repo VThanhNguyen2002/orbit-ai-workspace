@@ -1191,6 +1191,60 @@ or `.gitleaksignore` broadening is approved or added. Summary history remains
 memory-only demo state, the fake provider remains the default, and the OpenAI
 SDK dependency remains **NOT APPROVED / DENIED**.
 
+### Slice 8S Update — 2026-06-08
+
+Slice 8S extends `scripts/demo-api.sh` with the update, stale-conflict, delete,
+and post-delete isolation steps, completing the 13-step API demo flow. New steps:
+update the created note with the current version (step 10), attempt a stale
+update to verify 409 Conflict (step 11), delete the note with the correct version
+(step 12), and confirm the deleted note returns 404 (step 13). The walkthrough
+doc and Slice 8S result were recorded in `docs/next-action.md`.
+
+No runtime code, tests, package manifests, lockfiles, dependencies, credentials,
+`.env`, SQL, migrations, Supabase, Docker, Expo/RN, JSX/TSX, rendered UI,
+OpenAI SDK, live provider call, WIF runtime, or `.gitleaksignore` broadening
+is approved or added. Summary history remains memory-only demo state, the fake
+provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
+### Slice 8T Update — 2026-06-08
+
+Slice 8T adds `docs/portfolio-summary.md`: a portfolio/CV-safe project overview
+with a one-liner, capability table, 13-step demo flow summary, architecture
+value bullets, security posture table, verifiable CV-safe demo bullet list,
+remaining limitations, and recommended next slices. `README.md` documentation
+index was updated to link the portfolio summary.
+
+No runtime code, tests, package manifests, lockfiles, dependencies, credentials,
+`.env`, SQL, migrations, Supabase, Docker, Expo/RN, JSX/TSX, rendered UI,
+OpenAI SDK, live provider call, WIF runtime, or `.gitleaksignore` broadening
+is approved or added. Summary history remains memory-only demo state, the fake
+provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
+### Slice 8U Update — 2026-06-08
+
+Slice 8U adds `docs/release-readiness-checkpoint.md`: a formal release/readiness
+checkpoint for Slices 8A–8T. The document covers the checkpoint summary (latest
+commit, CI run, demo status, working tree), implemented capabilities (Notes CRUD,
+versioned conflict detection, soft-delete isolation, fake-provider AI
+summarization, summary history newest-first, API client integration, shared
+contracts/schema registry, mobile dependency-free view-state, mobile unit tests,
+API demo script, README/portfolio docs), the verified 13-step demo flow, quality
+gates table, security posture table, remaining risks/limitations, readiness
+verdict (**READY\_FOR\_PORTFOLIO\_REVIEW** and **READY\_FOR\_NEXT\_PRODUCT\_SLICE**),
+recommended next options (A–D), and the do-not-claim list.
+
+`README.md` documentation index was updated to link the checkpoint.
+`docs/next-action.md` and this plan were updated with Slice 8U results.
+
+No runtime code, tests, package manifests, lockfiles, dependencies, credentials,
+`.env`, SQL, migrations, Supabase, Docker, Expo/RN, JSX/TSX, rendered UI,
+OpenAI SDK, live provider call, WIF runtime, or `.gitleaksignore` broadening
+is approved or added. Summary history remains memory-only demo state, the fake
+provider remains the default, and the OpenAI SDK dependency remains
+**NOT APPROVED / DENIED**.
+
 ---
 
 

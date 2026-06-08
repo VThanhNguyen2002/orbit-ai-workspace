@@ -188,6 +188,7 @@ See [docs/security/privacy-and-data-handling.md](docs/security/privacy-and-data-
 
 | Document | Purpose |
 |---|---|
+| [Release/Readiness Checkpoint](docs/release-readiness-checkpoint.md) | Slices 8A–8T summary, readiness verdict, do-not-claim list |
 | [Portfolio Summary](docs/portfolio-summary.md) | Project overview, demo flow, CV-safe bullets, limitations |
 | [API Demo Walkthrough](docs/api-demo-walkthrough.md) | Step-by-step Note CRUD + fake AI demo (13 steps) |
 | [Mobile View-State Readiness Review](docs/mobile-viewstate-readiness-review.md) | Slice 8L review — READY verdict |
