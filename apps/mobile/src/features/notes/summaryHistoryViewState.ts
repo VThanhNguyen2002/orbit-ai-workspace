@@ -3,6 +3,7 @@ import type {
   SummaryHistoryData,
   SummaryHistoryItem,
 } from "./summaryHistoryApi";
+import { toErrorRecord } from "./viewStateError";
 
 export const SUMMARY_HISTORY_EMPTY_MESSAGE = "No summaries generated yet.";
 export const SUMMARY_HISTORY_LOADING_MESSAGE = "Loading summary history.";
@@ -296,10 +297,4 @@ function toTimestamp(value: string): number {
 
 function summaryCountMessage(count: number): string {
   return count === 1 ? "1 summary available." : `${count} summaries available.`;
-}
-
-function toErrorRecord(error: unknown): Record<string, unknown> {
-  return typeof error === "object" && error !== null
-    ? (error as Record<string, unknown>)
-    : {};
 }

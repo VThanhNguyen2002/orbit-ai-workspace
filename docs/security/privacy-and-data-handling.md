@@ -475,6 +475,12 @@ state, Docker/RLS/live-provider work, Expo/React Native runtime, JSX/TSX,
 rendered UI, SQL, migrations, dependency additions, lockfile changes, or
 `.gitleaksignore` changes.
 
+Slice 8Q-C deduplicates the mobile view-state `toErrorRecord` helper into a
+shared dependency-free module. Error mapping behavior is unchanged: note list,
+note detail, and summary history states still expose only coarse UI-safe
+messages and never surface raw backend diagnostics, credentials, auth headers,
+prompt text, provider payloads, or token-like values.
+
 Slice 8O adds `scripts/demo-api.sh` for local API walkthroughs. The script is
 restricted to localhost-style base URLs, sends no auth header, uses no provider
 credential, creates no `.env` file, starts no Docker/Supabase/Expo process, and

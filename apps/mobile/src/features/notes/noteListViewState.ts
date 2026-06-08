@@ -5,6 +5,7 @@ import type {
   NoteListPaginationData,
   NoteListQuery,
 } from "./noteListApi";
+import { toErrorRecord } from "./viewStateError";
 
 export const NOTE_LIST_EMPTY_MESSAGE = "No notes yet.";
 export const NOTE_LIST_LOADING_MESSAGE = "Loading notes.";
@@ -191,10 +192,4 @@ function toContentPreview(content: string): string {
 
 function noteCountMessage(total: number): string {
   return total === 1 ? "1 note available." : `${total} notes available.`;
-}
-
-function toErrorRecord(error: unknown): Record<string, unknown> {
-  return typeof error === "object" && error !== null
-    ? (error as Record<string, unknown>)
-    : {};
 }

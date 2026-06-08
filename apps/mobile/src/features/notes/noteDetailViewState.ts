@@ -1,4 +1,5 @@
 import type { NoteDetailApi, NoteDetailData } from "./noteDetailApi";
+import { toErrorRecord } from "./viewStateError";
 
 export const NOTE_DETAIL_LOADING_MESSAGE = "Loading note.";
 export const NOTE_DETAIL_SUCCESS_MESSAGE = "Note loaded.";
@@ -154,10 +155,4 @@ function toNoteDetail(note: NoteDetailData): NoteDetail {
     deletedAt: note.deleted_at,
     version: note.version,
   };
-}
-
-function toErrorRecord(error: unknown): Record<string, unknown> {
-  return typeof error === "object" && error !== null
-    ? (error as Record<string, unknown>)
-    : {};
 }

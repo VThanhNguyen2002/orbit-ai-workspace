@@ -367,7 +367,7 @@ opt-in environment variable and never run in default CI.
 | **8Q-A** | Codex handoff notes *(Complete — handoff notes documented)* |
 | **8Q-B-SPEC** | Mobile API client boundary implementation packet *(Complete — implementation packet documented)* |
 | **8Q-B** | Mobile API client boundary + mobile test infra *(Complete — `ai` + `notes` boundary; mobile tests run through workspace Vitest globals)* |
-| **8Q-C** | Refactor duplicated mobile toErrorRecord helper |
+| **8Q-C** | Refactor duplicated mobile toErrorRecord helper *(Complete — shared dependency-free helper, behavior preserved)* |
 | **8Q-D** | Portfolio/demo summary doc |
 
 
@@ -1001,9 +1001,9 @@ return value. `SummaryHistoryListItem` intentionally omits `provider` and
 `model` fields, keeping provider identity hidden from mobile consumers. No
 overclaiming of Expo or React Native is possible: placeholder `NON_GOALS` arrays
 and the `tsconfig.json` `"include": ["src/**/*.ts"]` restriction physically gate
-rendered-UI drift. Only minor gap found: `toErrorRecord` (4-line helper)
-duplicated across the three view-state modules — deferred to when a fourth module
-forces consolidation.
+rendered-UI drift. The only minor gap found at the time was duplicated
+`toErrorRecord` helper code across the three view-state modules; that cleanup
+was completed later in Slice 8Q-C.
 
 Review record: [`docs/mobile-viewstate-readiness-review.md`](mobile-viewstate-readiness-review.md).
 
@@ -1138,9 +1138,8 @@ live API call, SSE streaming, SQL, migration, Supabase state, Docker work,
 fake provider remains default, and the OpenAI SDK dependency remains
 **NOT APPROVED / DENIED**.
 
-Next candidate slices are:
-- Slice 8Q-C: Refactor duplicated mobile toErrorRecord helper (Codex)
-- Slice 8Q-D: Portfolio/demo summary doc (AG)
+Next candidate slice after the mobile cleanup path is Slice 8R: choose the next
+product/value slice.
 
 ### Slice 8Q-B-SPEC Update — 2026-06-07
 
@@ -1171,6 +1170,21 @@ one `createMobileSynapseClient()` composes with note list, note detail, and
 summary history adapters. No real network call, credential, provider SDK,
 `.env` file, SQL, migration, Supabase state, Docker work, Expo/React Native
 runtime, JSX/TSX, rendered UI, package dependency addition, lockfile change,
+or `.gitleaksignore` broadening is approved or added. Summary history remains
+memory-only demo state, the fake provider remains the default, and the OpenAI
+SDK dependency remains **NOT APPROVED / DENIED**.
+
+### Slice 8Q-C Update — 2026-06-08
+
+Slice 8Q-C extracts the duplicated mobile `toErrorRecord(error: unknown)`
+helper into `apps/mobile/src/features/notes/viewStateError.ts`. The note list,
+note detail, and summary history view-state modules now import the shared
+dependency-free helper while preserving the same error reason mapping, UI-safe
+messages, state shapes, and adapter behavior.
+
+No tests, package manifests, lockfiles, dependencies, mobile test infra,
+Expo/React Native runtime, JSX/TSX, rendered UI, OpenAI SDK, credential, `.env`
+file, SQL, migration, Supabase state, Docker work, RLS/live-provider wiring,
 or `.gitleaksignore` broadening is approved or added. Summary history remains
 memory-only demo state, the fake provider remains the default, and the OpenAI
 SDK dependency remains **NOT APPROVED / DENIED**.

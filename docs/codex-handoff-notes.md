@@ -1,4 +1,4 @@
-# Codex Handoff Notes — Slice 8Q-B
+# Codex Handoff Notes — Slice 8Q-C
 
 _Generated: 2026-06-08. Do NOT proceed to coding automatically._
 
@@ -8,12 +8,12 @@ _Generated: 2026-06-08. Do NOT proceed to coding automatically._
 
 | Field | Value |
 |---|---|
-| Base commit before Slice 8Q-B | `d7d8dcd` — previous green `origin/main` |
-| Latest green CI run before Slice 8Q-B | `27088547279` — completed success |
+| Base commit before Slice 8Q-C | `cbbe07d` — previous green `origin/main` |
+| Latest green CI run before Slice 8Q-C | `27111243926` — completed success |
 | Pre-slice worktree state | Clean (verified: `git status --short` empty before local edits) |
 | Gitleaks result | No leaks found |
 
-### Completed Slices (8A-R through 8Q-A)
+### Completed Slices (8A-R through 8Q-C)
 
 | Slice | Summary |
 |---|---|
@@ -39,6 +39,7 @@ _Generated: 2026-06-08. Do NOT proceed to coding automatically._
 | 8Q-A | Codex handoff notes — handoff notes documented |
 | 8Q-B-SPEC | Mobile API client boundary implementation packet for Codex (docs-only) |
 | 8Q-B | Mobile test script + API client boundary hardening |
+| 8Q-C | Deduplicated mobile view-state error helper |
 
 ### Current Product/Demo Capabilities
 
@@ -92,6 +93,7 @@ _Generated: 2026-06-08. Do NOT proceed to coding automatically._
 - `apps/mobile/src/features/notes/noteListViewState.ts` — idle/loading/success/error/empty states.
 - `apps/mobile/src/features/notes/noteDetailViewState.ts` — single note states.
 - `apps/mobile/src/features/notes/summaryHistoryViewState.ts` — summary history adapter + orchestrator.
+- `apps/mobile/src/features/notes/viewStateError.ts` — shared dependency-free error record helper used by all three view-state modules.
 - `apps/mobile/src/api/synapseClient.ts` — `createMobileSynapseClient()` wraps `createApiClient`; `Pick<SynapseApiClient, "ai" | "notes">` boundary; injectable config.
 - No Expo, no JSX, no TSX, no React Native runtime.
 
@@ -198,50 +200,15 @@ bash -n scripts/demo-api.sh
 
 ---
 
-## 6. Next Candidate Slices
+## 6. Next Candidate Slice
 
-### Option A — `Slice 8Q-C: Refactor Duplicated Mobile toErrorRecord Helper`
+### `Slice 8R: Choose Next Product/Value Slice`
 
-**Value:** `toErrorRecord` is defined identically in three mobile modules
-(`noteListViewState.ts`, `noteDetailViewState.ts`, `summaryHistoryViewState.ts`).
-Extracting it to `apps/mobile/src/utils/errorRecord.ts` (or similar) eliminates
-the duplication, reduces future divergence risk, and is a clean refactor with
-clear test coverage path.
+**Value:** Pick the next high-signal project increment now that the mobile
+view-state test and refactor cleanup path is complete.
 
-**Risk:** Low-medium — touches three source files and needs tests updated/added.
-No package changes. Straightforward refactor but requires careful import updates
-and re-run of mobile tests to confirm green.
-
-**Recommended agent:** Codex/C.
-
-**Worth doing now?** Yes — concrete tech-debt cleanup with clear scope.
-
----
-
-### Option B — `Slice 8Q-D: Portfolio/Demo Summary Doc`
-
-**Value:** Creates `docs/portfolio-summary.md` framing the project for a job
-application: tech decisions made, what was built vs. deferred, honest capability
-claims, architecture rationale, and anticipated interviewer questions. Useful
-for CV/portfolio presentation.
-
-**Risk:** None — docs-only, no code touched.
-
-**Recommended agent:** AG.
-
-**Worth doing now?** Yes, especially if Codex quota is unavailable. Lower
-technical value but high career/demo value.
-
----
-
-### Recommendation Summary
-
-| If… | Recommended next slice |
-|---|---|
-| Codex quota available | **Option A (8Q-C)** — `toErrorRecord` consolidation |
-| Codex quota unavailable | **Option B (8Q-D)** — portfolio summary doc via AG |
-
-**Prefer Option A for Codex. Prefer Option B for AG.**
+**Risk:** Depends on selected scope. Keep the same dependency, credential,
+provider, Supabase, Docker, and rendered-mobile gates unless explicitly changed.
 
 ---
 
@@ -249,18 +216,14 @@ technical value but high career/demo value.
 
 **If coding quota is available:**
 
-> **`Slice 8Q-C — Refactor duplicated mobile toErrorRecord helper`**
+> **`Slice 8R — Choose next product/value slice`**
 >
-> Extract the duplicated `toErrorRecord` helper from the three mobile
-> view-state modules into a small shared mobile utility. Keep behavior unchanged,
-> preserve UI-safe error messages, and re-run mobile tests.
+> Choose the next dependency-free backend, shared-contracts, API client, docs,
+> or portfolio-value improvement. Do not assume approval for dependencies,
+> lockfile changes, live providers, Supabase, Docker, Expo, or rendered UI.
 
-**If coding quota is unavailable:**
-
-> **`Slice 8Q-D — Portfolio/demo summary doc`**
->
-> AG writes `docs/portfolio-summary.md` framing the project for a technical
-> job application audience. Docs-only. No code, no packages.
+If coding quota is unavailable, keep Slice 8R as a planning/product-choice
+slice and choose a docs-only or review-only option there.
 
 ---
 
@@ -287,7 +250,6 @@ In all cases: **STOP, report the blocker, and await explicit approval.**
 
 | Risk | Severity | Owner |
 |---|---|---|
-| `toErrorRecord` duplicated 3× in mobile view-state modules | Low | Codex (Slice 8Q-C) |
 | Direct `vitest` imports in mobile tests are deferred until mobile owns/receives an approved Vitest dependency | Low | Future package approval slice |
 | Node.js 20 deprecation annotation in GitHub Actions | Low — CI green, cosmetic only | Future Node upgrade slice |
 | Summary history is memory-only (resets on restart) | Known/accepted — demo-only scope | Future persistence slice |
