@@ -1,6 +1,6 @@
 # Synapse — Portfolio / Demo Summary
 
-_Slice 8T · 2026-06-08 · Docs-only_
+_Slice 9D · 2026-06-08 · Docs-only_
 
 ---
 
@@ -28,8 +28,8 @@ production AI, rendered mobile UI, or live database persistence.
 | **Memory-only summary history** | ✅ Complete | Newest-first; resets on server restart; no persistence |
 | **API client** | ✅ Complete | Typed, Zod-validated, injection-ready; notes CRUD + AI methods |
 | **Shared Zod contracts** | ✅ Complete | Schema registry; snake_case wire contracts; strict envelope validation |
-| **Mobile view-state foundation** | ✅ Complete | Dependency-free TypeScript — note list, detail, summary history |
-| **Mobile view-state unit tests** | ✅ Complete | Vitest coverage for all three view-state modules and API adapters |
+| **Mobile view-state foundation** | ✅ Complete | Dependency-free TypeScript — note list, detail, summary history, note mutation (create/update/delete) |
+| **Mobile view-state unit tests** | ✅ Complete | Vitest coverage for all four view-state modules and API adapters |
 | **Local API demo script** | ✅ Complete | `scripts/demo-api.sh` — bash/curl/python3 only; 13-step verified flow |
 | **CI pipeline** | ✅ Complete | GitHub Actions: lint, typecheck, test, Zod contract check, gitleaks |
 | **Security posture** | ✅ Complete | Gitleaks, redaction tests, error sanitization, no credential fixtures |
@@ -152,8 +152,8 @@ as-is in a CV without review — they are reference anchors for later wording.
 - Implemented a **demo-safe fake-provider AI summarization flow** with
   configurable provider boundary, fail-closed defaults, and no SDK dependency.
 - Authored a **dependency-free TypeScript mobile view-state foundation** with
-  injected API adapters, typed state machines, and Vitest unit tests — no Expo
-  or rendered UI required.
+  injected API adapters, typed state machines, and Vitest unit tests — covering note
+  list, detail, summary history, and note mutations (create/update/delete).
 - Maintained **strict CI/security quality gates**: GitHub Actions, gitleaks
   secret scanning, Ruff lint, pytest, Vitest, and Zod contract validation on
   every push.
@@ -189,11 +189,10 @@ as-is in a CV without review — they are reference anchors for later wording.
 
 | Option | Description | Effort | Agent |
 |---|---|---|---|
-| **Slice 8U** — Release/readiness checkpoint | Formal readiness review doc; good stopping point before portfolio review | Very low | AG |
-| **Slice 9A** — Next product domain | Choose next product feature (e.g., note search/tag/pagination, mobile create view-state) | Low–Medium | Codex |
+| **Slice 9D** — Portfolio/release review gate | Audit documentation clarity and project positioning | Very low | AG |
+| **Slice 10A** — Next product domain | Choose next product feature (e.g., note search/tag/pagination) | Low–Medium | Codex |
 | **Pause** — Portfolio review as-is | Current state is demo-complete and CV-honest; pause feature work and use for portfolio review now | Zero | — |
 
 > **Recommendation:** If the primary goal is portfolio readiness, the project is
-> in a good state for review as-is. Slice 8U (readiness checkpoint doc) is a
-> minimal value-add before sharing. Slice 9A should only start if a concrete
-> product gap needs filling.
+> in a good state for review as-is. Slice 9D (portfolio/release review gate) is the
+> final validation step. Slice 10A should only start if a concrete product gap needs filling.

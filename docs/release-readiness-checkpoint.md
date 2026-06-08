@@ -1,4 +1,4 @@
-# Release / Readiness Checkpoint — Slices 8A–8T
+# Release / Readiness Checkpoint — Slices 8A–9C-R
 
 **Document type:** Release/readiness checkpoint (docs-only)
 **Created:** 2026-06-08
@@ -10,8 +10,8 @@
 
 | Field | Value |
 |---|---|
-| **Latest commit** | `6f65bd7` — `docs: add portfolio demo summary` |
-| **Latest green CI** | Run `27113056404` — CI ✅ success (push to `main`, ~45 s, ≤ 15 min ago at time of authorship) |
+| **Latest commit** | `b017105` — `docs: record mobile mutation view-state readiness` |
+| **Latest green CI** | Run `27127541881` — CI ✅ success (push to `main`, ~46 s) |
 | **Current demo status** | 13-step `scripts/demo-api.sh` locally validated; backend server + script only, no external deps |
 | **Working tree** | Clean — no uncommitted changes |
 | **Readiness verdict** | **READY\_FOR\_PORTFOLIO\_REVIEW** · **READY\_FOR\_NEXT\_PRODUCT\_SLICE** |
@@ -74,7 +74,7 @@
 ### 2.8 Mobile Dependency-Free View-State (`apps/mobile`)
 
 - TypeScript-only; no Expo, no React Native, no JSX/TSX, no rendered UI.
-- Three feature modules: `noteListViewState`, `noteDetailViewState`, `summaryHistoryViewState`.
+- Four feature modules: `noteListViewState`, `noteDetailViewState`, `noteMutationViewState`, `summaryHistoryViewState`.
 - Each module receives a `Pick<>`-narrowed API adapter — cannot call out-of-scope client methods.
 - States: idle / loading / empty / success / error (+ `not_found`, `invalid_response`, `summarizing`, dedup logic).
 - Error mappers return typed constant strings only — no backend diagnostics, no raw envelopes, no provider identity.
@@ -82,7 +82,7 @@
 ### 2.9 Mobile Unit Tests
 
 - `pnpm --filter mobile test` runs real Vitest tests against view-state modules.
-- Covers: list states, detail not-found, summary history dedup and sort, error sanitization.
+- Covers: list states, detail not-found, summary history dedup and sort, mutation success/error/conflict, error sanitization.
 - No Expo, no test runner requiring native bridge.
 
 ### 2.10 API Demo Script (`scripts/demo-api.sh`)
@@ -115,8 +115,8 @@
 | 7 | `GET /v1/ai/notes/{id}/summaries` (history 1) | 200, one summary in list |
 | 8 | `POST /v1/ai/notes/{id}/summarize` (summarize 2) | 200, second summary returned |
 | 9 | `GET /v1/ai/notes/{id}/summaries` (history 2, newest-first) | 200, two summaries, newest first |
-| 10 | `PUT /v1/notes/{id}` (update, correct version) | 200, updated note, `version=2` |
-| 11 | `PUT /v1/notes/{id}` (stale conflict) | 409 Conflict |
+| 10 | `PATCH /v1/notes/{id}` (update, correct version) | 200, updated note, `version=2` |
+| 11 | `PATCH /v1/notes/{id}` (stale conflict) | 409 Conflict |
 | 12 | `DELETE /v1/notes/{id}` (delete, correct version) | 200 or 204 |
 | 13 | `GET /v1/notes/{id}` (post-delete) | 404 Not Found |
 
@@ -124,7 +124,7 @@
 
 ## 4. Quality Gates
 
-All of the following are verified passing as of commit `6f65bd7`:
+All of the following are verified passing as of commit `b017105`:
 
 | Gate | Tool / Command | Status |
 |---|---|---|
@@ -200,7 +200,7 @@ Both verdicts apply simultaneously. See Section 8 for options.
 
 ### Option A — Pause feature work; use for portfolio / CV review
 
-Use the repository at commit `6f65bd7` as a portfolio artefact. Share the GitHub URL and `docs/portfolio-summary.md`. No further code changes needed. Demo instructions are in `README.md` and `docs/api-demo-walkthrough.md`.
+Use the repository at commit `b017105` as a portfolio artefact. Share the GitHub URL and `docs/portfolio-summary.md`. No further code changes needed. Demo instructions are in `README.md` and `docs/api-demo-walkthrough.md`.
 
 **Appropriate when:** the immediate goal is a job application, code review, or interview demonstration.
 
@@ -240,4 +240,4 @@ The following must **not** be claimed based on this repository's current state:
 
 ---
 
-*This document is accurate as of commit `6f65bd7`. Update when the repository state changes materially.*
+*This document is accurate as of commit `b017105`. Update when the repository state changes materially.*

@@ -2,28 +2,28 @@
 
 ## Objective
 
-Slice 9C-R is complete: The mobile mutation view-state readiness review has been officially recorded in `docs/mobile-mutation-viewstate-readiness-review.md`.
+Slice 9D is complete: The portfolio / release review gate is passed, confirming that the repository is clean, honest, and ready for recruiter/interviewer review.
 
-The repository remains **READY\_FOR\_PORTFOLIO\_REVIEW** and **READY\_FOR\_NEXT\_PRODUCT\_SLICE**, with all security and dependency boundaries fully preserved.
+The repository is **READY\_FOR\_PORTFOLIO\_REVIEW** (Option A) and **READY\_FOR\_NEXT\_PRODUCT\_SLICE**, with all security and dependency boundaries fully preserved.
 
 Do not proceed to the next slice automatically.
 
-## Slice 9C-R Result
+## Slice 9D Result
 
-*   **Readiness Verdict**: READY.
-*   **Audit scope**: Fully reviewed `noteMutationApi.ts`, `noteMutationViewState.ts`, `noteMutationViewState.test.ts`, and core mobile composition/error modules.
-*   **Result**: Validated full contract alignment, error mapping (409 Conflict, 404 Not Found), test coverage (6 files / 29 tests passing), and complete diagnostic/credential redaction in UI state.
-*   **Documentation**: Created `docs/mobile-mutation-viewstate-readiness-review.md`.
+*   **Readiness Verdict**: READY_FOR_REVIEW.
+*   **Audit scope**: Reviewed README, portfolio summary, walkthroughs, readiness reviews, privacy/data doc, and demo runbook scripts.
+*   **Result**: Confirmed absolute honesty (no overclaims), clear demo run instructions, robust contract alignment, complete safety/leak redaction, and clean separation of concerns.
+*   **Documentation**: Polished portfolio summary, api walkthrough, and release readiness checkpoint.
 
 ## Recommended Next Options
 
 Primary next task:
 
-*   **Release/Portfolio Review (Option C)**: Freeze further mobile view-state work. Use the local runbook and verified demo script (`scripts/demo-api.sh`) for CV/portfolio review.
+*   **Portfolio / CV Review (Option A/C)**: Freeze further feature work. Share the repository and `docs/portfolio-summary.md` for portfolio review.
 
 Still valid:
 
-*   **Next dependency-free product slice**: If new product domains (e.g. note tags or search view-states) are required.
+*   **Next dependency-free product slice**: If additional product domains are requested.
 *   **Supabase/RLS or rendered mobile UI planning**: Remain blocked and deferred until explicit approval gates are satisfied.
 
 ## Standing Gates (unchanged)

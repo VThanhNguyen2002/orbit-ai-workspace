@@ -1,6 +1,6 @@
 # API Demo Walkthrough
 
-Slice: **8H / 8O / 8S**
+Slice: **8H / 8O / 8S / 9C-R**
 Date: 2026-06-06; updated 2026-06-08
 Status: **Complete — docs plus dependency-free local demo script**
 
@@ -462,19 +462,12 @@ preserves snake_case field names and URL-encodes note ids in path segments.
 
 The dependency-free mobile export surface now includes:
 
-- `createNoteListApi(client)`
-- `loadNoteListViewState(api, query)`
-- `mapNoteListDataToViewState(data)`
-- `mapNoteListErrorToViewState(error)`
-- `createNoteListPlaceholder(state)`
-- `createNoteDetailApi(client)`
-- `loadNoteDetailViewState(api, noteId)`
-- `mapNoteDetailDataToViewState(note)`
-- `mapNoteDetailErrorToViewState(noteId, error)`
-- `createNoteDetailPlaceholder(noteId, state)`
+- **Note List**: `createNoteListApi(client)`, `loadNoteListViewState(api, query)`, `mapNoteListDataToViewState(data)`, `mapNoteListErrorToViewState(error)`, `createNoteListPlaceholder(state)`
+- **Note Detail**: `createNoteDetailApi(client)`, `loadNoteDetailViewState(api, noteId)`, `mapNoteDetailDataToViewState(note)`, `mapNoteDetailErrorToViewState(noteId, error)`, `createNoteDetailPlaceholder(noteId, state)`
+- **Note Mutation**: `createNoteMutationApi(client)`, `createNoteAndMapMutationViewState(api, payload)`, `updateNoteAndMapMutationViewState(api, noteId, payload)`, `deleteNoteAndMapMutationViewState(api, noteId, payload)`
+- **Summary History**: `createSummaryHistoryApi(client)`, `loadSummaryHistoryViewState(api, noteId)`, `mapSummaryHistoryDataToViewState(noteId, data)`, `mapSummaryHistoryErrorToViewState(noteId, error)`, `createNoteSummaryHistoryPlaceholder(noteId, state)`
 
-These modules are plain `.ts` and are intended as future screen-ready state
-plumbing, not rendered mobile UI.
+These modules are plain `.ts` and are intended as future screen-ready state plumbing, not rendered mobile UI.
 
 ## 12. Verification
 
