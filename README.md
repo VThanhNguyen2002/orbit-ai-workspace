@@ -17,7 +17,7 @@ A monorepo demonstrating backend REST API design, shared TypeScript contracts, t
 | **Summary history** | ✅ Complete | Memory-only, newest-first, cleared on restart |
 | **Shared Zod contracts** | ✅ Complete | Schema registry, snake_case wire contracts, strict envelope validation |
 | **API client** | ✅ Complete | Typed, injection-ready, schema-validated, no fetch in mobile features |
-| **Mobile view-state** | ✅ Complete | Dependency-free TypeScript — note list, detail, summary history |
+| **Mobile view-state** | ✅ Complete | Dependency-free TypeScript — note list, detail, summary history, mutations (create/update/delete) |
 | **Backend tests** | ✅ Complete | pytest: CRUD, isolation, fake summarize, newest-first history, leak checks |
 | **TypeScript tests** | ✅ Complete | Vitest: API client notes + AI methods, shared contract schemas |
 | **CI** | ✅ Complete | GitHub Actions: lint, typecheck, test, contract check, gitleaks |
@@ -62,6 +62,8 @@ synapse/
 │               ├── summaryHistoryApi.ts    # DI adapter → client.ai.*
 │               ├── noteListViewState.ts    # idle/loading/empty/success/error states
 │               ├── noteDetailViewState.ts  # idle/loading/success/error states
+│               ├── noteMutationApi.ts      # DI adapter → client.notes.{create,update,delete}
+│               ├── noteMutationViewState.ts # idle/submitting/success/error states
 │               └── summaryHistoryViewState.ts  # + summarizing state, dedup, sort
 ├── packages/
 │   ├── shared/            # Zod schemas, types, contract registry
@@ -99,6 +101,7 @@ synapse/
 │         apps/mobile/src (TypeScript view-state, no Expo)        │
 │  noteListApi → noteListViewState (idle/loading/empty/success/error)
 │  noteDetailApi → noteDetailViewState (+ not_found / invalid_response)
+│  noteMutationApi → noteMutationViewState (idle/submitting/success/error)
 │  summaryHistoryApi → summaryHistoryViewState (+ summarizing, dedup)
 │  All adapters: no raw fetch, no URL construction, no credentials │
 └─────────────────────────────────────────────────────────────────┘
@@ -192,6 +195,7 @@ See [docs/security/privacy-and-data-handling.md](docs/security/privacy-and-data-
 | [Portfolio Summary](docs/portfolio-summary.md) | Project overview, demo flow, CV-safe bullets, limitations |
 | [API Demo Walkthrough](docs/api-demo-walkthrough.md) | Step-by-step Note CRUD + fake AI demo (13 steps) |
 | [Mobile View-State Readiness Review](docs/mobile-viewstate-readiness-review.md) | Slice 8L review — READY verdict |
+| [Mobile Mutation View-State Readiness Review](docs/mobile-mutation-viewstate-readiness-review.md) | Slice 9C-R review — READY verdict |
 | [Rendered Mobile Demo Decision](docs/rendered-mobile-demo-unblock-decision-packet.md) | Expo/RN gate status — DEFERRED |
 | [AI Summarization Plan](docs/ai-summarization-implementation-plan.md) | Master implementation record |
 | [Backend Demo Polish Record](docs/backend-product-demo-polish-record.md) | Slice 8E–8F demo polish record |
