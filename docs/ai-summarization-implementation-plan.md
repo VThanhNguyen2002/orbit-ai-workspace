@@ -369,6 +369,8 @@ opt-in environment variable and never run in default CI.
 | **8Q-B** | Mobile API client boundary + mobile test infra *(Complete — `ai` + `notes` boundary; mobile tests run through workspace Vitest globals)* |
 | **8Q-C** | Refactor duplicated mobile toErrorRecord helper *(Complete — shared dependency-free helper, behavior preserved)* |
 | **8Q-D** | Portfolio/demo summary doc |
+| **8S** | Demo script update/delete/conflict extension *(Complete — update, stale 409, delete, post-delete 404 added to `scripts/demo-api.sh`; walkthrough steps 10–13 added)* |
+| **8T** | Portfolio/demo summary doc *(Complete — `docs/portfolio-summary.md` created; README and next-action updated)* |
 
 
 ### Slice 7E Update — 2026-06-01

@@ -188,7 +188,8 @@ See [docs/security/privacy-and-data-handling.md](docs/security/privacy-and-data-
 
 | Document | Purpose |
 |---|---|
-| [API Demo Walkthrough](docs/api-demo-walkthrough.md) | Step-by-step Note CRUD + fake AI demo |
+| [Portfolio Summary](docs/portfolio-summary.md) | Project overview, demo flow, CV-safe bullets, limitations |
+| [API Demo Walkthrough](docs/api-demo-walkthrough.md) | Step-by-step Note CRUD + fake AI demo (13 steps) |
 | [Mobile View-State Readiness Review](docs/mobile-viewstate-readiness-review.md) | Slice 8L review — READY verdict |
 | [Rendered Mobile Demo Decision](docs/rendered-mobile-demo-unblock-decision-packet.md) | Expo/RN gate status — DEFERRED |
 | [AI Summarization Plan](docs/ai-summarization-implementation-plan.md) | Master implementation record |
